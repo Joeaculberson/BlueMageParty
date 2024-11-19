@@ -1,0 +1,10 @@
+{
+"SpaProxyServer": {
+"ServerUrl": "https://localhost:25607",
+"RedirectUrl": "",
+"LaunchCommand": "npm run dev",
+"WorkingDirectory": "C:\\Users\\Joseph\\Documents\\Side Projects\\BlueMageParty\\BlueMageParty.Server\\..\\bluemageparty.client",
+"MaxTimeoutInSeconds": "120",
+"KeepRunning": "false"
+}
+}

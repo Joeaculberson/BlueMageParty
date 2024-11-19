@@ -1,0 +1,24 @@
+{
+  "Version": 1,
+  "Hash": "NJhy22tEW49UrTrHXNUub8C9SCfQaHtajPTyZ2sMO10=",
+  "Source": "BlueMageParty.Server",
+  "BasePath": "_content/BlueMageParty.Server",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [
+    {
+      "Identity": "C:\\Users\\Joseph\\Documents\\Side Projects\\BlueMageParty\\bluemageparty.client\\bluemageparty.client.esproj",
+      "Version": 2,
+      "Source": "bluemageparty.client",
+      "GetPublishAssetsTargets": "GetCurrentProjectPublishStaticWebAssetItems",
+      "AdditionalPublishProperties": "Configuration=Debug;Platform=AnyCPU",
+      "AdditionalPublishPropertiesToRemove": "WebPublishProfileFile;TargetFramework",
+      "GetBuildAssetsTargets": "GetCurrentProjectBuildStaticWebAssetItems",
+      "AdditionalBuildProperties": "Configuration=Debug;Platform=AnyCPU",
+      "AdditionalBuildPropertiesToRemove": "WebPublishProfileFile;TargetFramework"
+    }
+  ],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
