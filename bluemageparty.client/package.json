@@ -12,7 +12,11 @@
     "lint": "eslint . --fix"
   },
   "dependencies": {
-    "vue": "^3.5.12"
+    "pinia": "^2.2.6",
+    "vee-validate": "^4.14.7",
+    "vue": "^3.5.12",
+    "vue-router": "^4.4.5",
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.0",
