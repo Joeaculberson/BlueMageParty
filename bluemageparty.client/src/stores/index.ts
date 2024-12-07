@@ -1,2 +1,4 @@
-export * from './auth.store';
-export * from './users.store';
+// Utilities
+import { createPinia } from 'pinia'
+
+export default createPinia()

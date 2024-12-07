@@ -1,27 +1,20 @@
-import { createApp } from 'vue';
-import { createPinia } from 'pinia';
+/**
+ * main.ts
+ *
+ * Bootstraps Vuetify and other plugins then mounts the App`
+ */
 
-// Vuetify
-import 'vuetify/styles'
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
+// Plugins
+import { registerPlugins } from '@/plugins'
 
-import App from './App.vue';
-import { router } from './helpers';
+// Components
+import App from './App.vue'
 
-const vuetify = createVuetify({
-    components,
-    directives,
-})
+// Composables
+import { createApp } from 'vue'
 
-// setup fake backend
-import { fakeBackend } from './helpers';
-fakeBackend();
+const app = createApp(App)
 
-const app: ReturnType<typeof createApp> = createApp(App);
+registerPlugins(app)
 
-app.use(createPinia());
-app.use(router);
-app.use(vuetify).mount('#app');
-
+app.mount('#app')
