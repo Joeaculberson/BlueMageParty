@@ -1,8 +1,8 @@
 export { fakeBackend };
 
 function fakeBackend(): void {
-  let users: { id: number; username: string; password: string; firstName: string; lastName: string; }[] = [{ id: 1, username: 'test', password: 'test', firstName: 'Test', lastName: 'User' }];
-  let realFetch: typeof window.fetch = window.fetch;
+  const users: { id: number; username: string; password: string; firstName: string; lastName: string; }[] = [{ id: 1, username: 'test', password: 'test', firstName: 'Test', lastName: 'User' }];
+  const realFetch: typeof window.fetch = window.fetch;
   window.fetch = function (url: string, opts: RequestInit): Promise<Response> {
     return new Promise((resolve, reject) => {
       setTimeout(handleRoute, 500);

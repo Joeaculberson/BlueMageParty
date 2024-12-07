@@ -15,8 +15,14 @@
     <PackageJsonDependenciesVeeValidate Condition="$(PackageJsonDependenciesVeeValidate) == ''">^4.14.7</PackageJsonDependenciesVeeValidate>
     <PackageJsonDependenciesVue Condition="$(PackageJsonDependenciesVue) == ''">^3.5.12</PackageJsonDependenciesVue>
     <PackageJsonDependenciesVueRouter Condition="$(PackageJsonDependenciesVueRouter) == ''">^4.4.5</PackageJsonDependenciesVueRouter>
-    <PackageJsonDependenciesVuetify Condition="$(PackageJsonDependenciesVuetify) == ''">^3.7.4</PackageJsonDependenciesVuetify>
+    <PackageJsonDependenciesVuetify Condition="$(PackageJsonDependenciesVuetify) == ''">^3.7.5</PackageJsonDependenciesVuetify>
     <PackageJsonDependenciesYup Condition="$(PackageJsonDependenciesYup) == ''">^1.4.0</PackageJsonDependenciesYup>
+    <PackageJsonDevdependenciesFortawesomeFontawesomeFree Condition="$(PackageJsonDevdependenciesFortawesomeFontawesomeFree) == ''">^6.7.1</PackageJsonDevdependenciesFortawesomeFontawesomeFree>
+    <PackageJsonDevdependenciesFortawesomeFontawesomeSvgCore Condition="$(PackageJsonDevdependenciesFortawesomeFontawesomeSvgCore) == ''">^6.7.1</PackageJsonDevdependenciesFortawesomeFontawesomeSvgCore>
+    <PackageJsonDevdependenciesFortawesomeFreeRegularSvgIcons Condition="$(PackageJsonDevdependenciesFortawesomeFreeRegularSvgIcons) == ''">^6.7.1</PackageJsonDevdependenciesFortawesomeFreeRegularSvgIcons>
+    <PackageJsonDevdependenciesFortawesomeFreeSolidSvgIcons Condition="$(PackageJsonDevdependenciesFortawesomeFreeSolidSvgIcons) == ''">^6.7.1</PackageJsonDevdependenciesFortawesomeFreeSolidSvgIcons>
+    <PackageJsonDevdependenciesFortawesomeVueFontawesome Condition="$(PackageJsonDevdependenciesFortawesomeVueFontawesome) == ''">^3.0.8</PackageJsonDevdependenciesFortawesomeVueFontawesome>
+    <PackageJsonDevdependenciesMdiFont Condition="$(PackageJsonDevdependenciesMdiFont) == ''">^7.4.47</PackageJsonDevdependenciesMdiFont>
     <PackageJsonDevdependenciesTsconfigNode22 Condition="$(PackageJsonDevdependenciesTsconfigNode22) == ''">^22.0.0</PackageJsonDevdependenciesTsconfigNode22>
     <PackageJsonDevdependenciesTypesNode Condition="$(PackageJsonDevdependenciesTypesNode) == ''">^22.9.0</PackageJsonDevdependenciesTypesNode>
     <PackageJsonDevdependenciesVitejsPluginVue Condition="$(PackageJsonDevdependenciesVitejsPluginVue) == ''">^5.1.4</PackageJsonDevdependenciesVitejsPluginVue>
@@ -28,6 +34,7 @@
     <PackageJsonDevdependenciesTypescript Condition="$(PackageJsonDevdependenciesTypescript) == ''">~5.6.3</PackageJsonDevdependenciesTypescript>
     <PackageJsonDevdependenciesVite Condition="$(PackageJsonDevdependenciesVite) == ''">^5.4.10</PackageJsonDevdependenciesVite>
     <PackageJsonDevdependenciesVitePluginVueDevtools Condition="$(PackageJsonDevdependenciesVitePluginVueDevtools) == ''">^7.5.4</PackageJsonDevdependenciesVitePluginVueDevtools>
+    <PackageJsonDevdependenciesVueCliPluginVuetify Condition="$(PackageJsonDevdependenciesVueCliPluginVuetify) == ''">~2.5.8</PackageJsonDevdependenciesVueCliPluginVuetify>
     <PackageJsonDevdependenciesVueTsc Condition="$(PackageJsonDevdependenciesVueTsc) == ''">^2.1.10</PackageJsonDevdependenciesVueTsc>
   </PropertyGroup>
 </Project>
