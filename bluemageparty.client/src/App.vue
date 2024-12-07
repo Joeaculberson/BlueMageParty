@@ -1,4 +1,4 @@
-<script setup>
+<script lang="ts" setup>
   import { RouterLink, RouterView } from 'vue-router';
 
   import { useAuthStore } from '@/stores';
@@ -7,14 +7,14 @@
 </script>
 
 <template>
-  <div class="app-container bg-light">
-    <nav v-show="authStore.user" class="navbar navbar-expand navbar-dark bg-dark">
-      <div class="navbar-nav">
+  <div>
+    <nav v-show="authStore.user">
+      <div>
         <RouterLink to="/" class="nav-item nav-link">Home</RouterLink>
         <a @click="authStore.logout()" class="nav-item nav-link">Logout</a>
       </div>
     </nav>
-    <div class="container pt-4 pb-4">
+    <div>
       <RouterView />
     </div>
   </div>

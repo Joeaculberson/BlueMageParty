@@ -1,4 +1,4 @@
-<script setup>
+<script lang="ts" setup>
 import { Form, Field } from 'vee-validate';
 import * as Yup from 'yup';
 
@@ -17,8 +17,17 @@ function onSubmit(values, { setErrors }) {
         .catch(error => setErrors({ apiError: error }));
 }
 </script>
+<script lang="ts">
+  export default {
+    data: () => ({
+      reveal: false,
+    }),
+  }
+</script>
 
 <template>
+  <v-icon icon="mdi-home" />
+
   <div>
     <div class="alert alert-info">
       Username: test<br />
