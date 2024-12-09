@@ -36,6 +36,7 @@
     <PackageJsonDevdependenciesUnpluginVueComponents Condition="$(PackageJsonDevdependenciesUnpluginVueComponents) == ''">^0.27.2</PackageJsonDevdependenciesUnpluginVueComponents>
     <PackageJsonDevdependenciesUnpluginVueRouter Condition="$(PackageJsonDevdependenciesUnpluginVueRouter) == ''">^0.10.0</PackageJsonDevdependenciesUnpluginVueRouter>
     <PackageJsonDevdependenciesVite Condition="$(PackageJsonDevdependenciesVite) == ''">^5.4.10</PackageJsonDevdependenciesVite>
+    <PackageJsonDevdependenciesVitePluginMkcert Condition="$(PackageJsonDevdependenciesVitePluginMkcert) == ''">^1.17.6</PackageJsonDevdependenciesVitePluginMkcert>
     <PackageJsonDevdependenciesVitePluginVueLayouts Condition="$(PackageJsonDevdependenciesVitePluginVueLayouts) == ''">^0.11.0</PackageJsonDevdependenciesVitePluginVueLayouts>
     <PackageJsonDevdependenciesVitePluginVuetify Condition="$(PackageJsonDevdependenciesVitePluginVuetify) == ''">^2.0.3</PackageJsonDevdependenciesVitePluginVuetify>
     <PackageJsonDevdependenciesVueRouter Condition="$(PackageJsonDevdependenciesVueRouter) == ''">^4.4.0</PackageJsonDevdependenciesVueRouter>

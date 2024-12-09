@@ -1,39 +1,96 @@
-﻿using BlueMageParty.Server.Models;
-using BlueMageParty.Server.Services;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using BlueMageParty.Server.Data;
+using BlueMageParty.Server.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlueMageParty.Server.Controllers
 {
-    [Route("[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
-        private IUserService _userService;
+        private readonly BlueMagePartyContext _context;
 
-        public UsersController(IUserService userService)
+        public UsersController(BlueMagePartyContext context)
         {
-            _userService = userService;
+            _context = context;
         }
 
-        [HttpPost("authenticate")]
-        public IActionResult Authenticate(AuthenticateRequest model)
-        {
-            var response = _userService.Authenticate(model);
-
-            if (response == null)
-                return BadRequest(new { message = "Username or password is incorrect" });
-
-            return Ok(response);
-        }
-
-        [Authorize]
+        /// <summary>
+        /// Returns a list of all Users.
+        /// </summary>
+        /// <returns>A list of all Users.</returns>
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            var users = _userService.GetAll();
-            return Ok(users);
+            return await _context.Users.ToListAsync();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<User>> GetUser(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return user;
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<User>> CreateUser(User user)
+        {
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser(Guid id, User user)
+        {
+            if (id != user.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(user).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.Users.Any(e => e.Id == id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }

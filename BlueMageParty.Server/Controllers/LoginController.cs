@@ -1,5 +1,6 @@
 ﻿namespace BlueMageParty.Server.Controllers
 {
+    using BlueMageParty.Server.Data;
     using BlueMageParty.Server.Models;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.IdentityModel.Tokens;
@@ -11,12 +12,12 @@
     [Route("api/[controller]")]
     public class LoginController : ControllerBase
     {
-        [HttpPost("login")]
+        [HttpPost("Login")]
         public IActionResult Login([FromBody] LoginRequest request)
-        {
-            if (request.Username == "user" && request.Password == "password") // Replace with proper user validation
+        {   
+            if (request.Email == "user" && request.Password == "password")
             {
-                var token = GenerateJwtToken(request.Username);
+                var token = GenerateJwtToken(request.Email);
                 return Ok(new { Token = token });
             }
 
@@ -27,9 +28,9 @@
         {
             var claims = new[]
             {
-            new Claim(JwtRegisteredClaimNames.Sub, username),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
+                new Claim(JwtRegisteredClaimNames.Sub, username),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
 
             var key = new SymmetricSecurityKey(Convert.FromBase64String(Credentials.SymmetricSecurityKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -45,5 +46,5 @@
         }
     }
 
-    public record LoginRequest(string Username, string Password);
+    public record LoginRequest(string Email, string Password);
 }

@@ -9,8 +9,8 @@
     <h1>Login</h1>
     <form @submit.prevent="login">
       <div>
-        <label for="username">Username:</label>
-        <input id="username" v-model="username" type="text" required />
+        <label for="email">Email:</label>
+        <input id="email" v-model="email" type="text" required />
       </div>
       <div>
         <label for="password">Password:</label>
@@ -29,25 +29,37 @@ import axios from "axios";
 export default defineComponent({
   name: "App",
   setup() {
-    const username = ref("");
+    const email = ref("");
     const password = ref("");
     const message = ref("");
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
     const login = async () => {
       try {
-        const response = await axios.post("http://localhost:5000/api/login/login", {
-          username: username.value,
+        // Send POST request with email and password
+        const response = await axios.post(apiBaseUrl + '/Login/Login', {
+          email: email.value,
           password: password.value,
         });
-        const token = response.data.token;
-        localStorage.setItem("jwt", token);
-        message.value = "Login successful!";
+
+        // Log successful response
+        console.log('Login successful:', response.data);
       } catch (error) {
-        message.value = "Invalid username or password.";
+        // Log error details for debugging
+        if (axios.isAxiosError(error)) {
+          console.error('Axios error:', error.response?.data || error.message);
+        } else {
+          console.error('Unexpected error:', error);
+        }
       }
     };
 
-    return { username, password, login, message };
+    return {
+      email,
+      password,
+      login,
+      message
+    };
   },
 });
 </script>
