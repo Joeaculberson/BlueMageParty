@@ -25,26 +25,32 @@ namespace BlueMageParty.Server.Controllers
         [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
-            if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
+            try
             {
-                return BadRequest("Email and password are required");
+                if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
+                {
+                    return BadRequest("Email and password are required");
+                }
+
+                var hashedPassword = PasswordHasher.HashPassword(request.Password);
+
+                var user = new User
+                {
+                    Email = request.Email.Trim(),
+                    Password = hashedPassword,
+                    CreatedOn = DateTime.Now,
+                    UpdatedOn = DateTime.Now
+                };
+
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "User registered successfully" });
             }
-
-            var hashedPassword = PasswordHasher.HashPassword(request.Password);
-
-            var user = new User
+            catch (Exception ex)
             {
-                Id = Guid.NewGuid(),
-                Email = request.Email,
-                Password = hashedPassword,
-                CreatedOn = DateTime.UtcNow,
-                UpdatedOn = DateTime.UtcNow
-            };
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            return Ok(new { message = "User registered successfully" });
+                throw ex;
+            }
         }
 
         public record class RegisterRequest(string Email, string Password);
