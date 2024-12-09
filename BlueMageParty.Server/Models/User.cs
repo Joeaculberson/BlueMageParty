@@ -4,10 +4,10 @@ namespace BlueMageParty.Server.Models
 {
     public class User
     {
-        public int Id { get; set;  }
-        public string Username { get; set; } = null!;
-        [JsonIgnore]
-        public string Password { get; set; } = null!;
+        public Guid Id { get; set; }
         public string Email { get; set; } = null!;
+        public string Password { get; set; } = null!;
+        public DateTime CreatedOn { get; set; }
+        public DateTime UpdatedOn { get; set; }
     }
 }

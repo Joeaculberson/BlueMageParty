@@ -4,9 +4,9 @@
     public class Credentials
     {
         /// <summary>
-        /// If you want to run this project on your own, you'll need to generate your own 256-bit/512-bit key.
-        /// To generate your own key, go to https://randomkeygen.com/ and copy/paste the 256-bit/512-bit WEP Keys option to the const below.
+        /// If you want to run this project on your own, you'll need to generate your own base64 key.
+        /// To generate your own key, go to https://generate.plus/en/base64 and copy/paste the base64 key below.
         /// </summary>
-        public const string SymmetricSecurityKey = null;
+        public const string SymmetricSecurityKey = "";
     }
 }
