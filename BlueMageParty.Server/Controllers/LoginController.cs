@@ -1,6 +1,7 @@
 ﻿namespace BlueMageParty.Server.Controllers
 {
     using BlueMageParty.Server.Data;
+    using BlueMageParty.Server.Helpers;
     using BlueMageParty.Server.Models;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
@@ -26,7 +27,19 @@
         {   
             try
             {
-                if (request.Email == "user" && request.Password == "password")
+                if(string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
+                {
+                    return BadRequest("Email and password are required");
+                }
+
+                var user = await this._context.Users.FirstOrDefaultAsync(x => x.Email.ToLower().Equals(request.Email.ToLower()));
+                if (user == null)
+                {
+                    return Unauthorized("Invalid credentials");
+                }
+
+                if (request.Email.ToLower().Equals(user.Email.ToLower()) 
+                    && PasswordHasher.VerifyPassword(request.Password, user.Password))
                 {
                     var token = GenerateJwtToken(request.Email);
                     return Ok(new { Token = token });
@@ -55,14 +68,14 @@
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-            var key = new SymmetricSecurityKey(Convert.FromBase64String(Credentials.SymmetricSecurityKey));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Credentials.JWTSecurityKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
                 issuer: "AuthApp",
                 audience: "AuthAppUsers",
                 claims: claims,
-                expires: DateTime.Now.AddHours(1),
+                expires: DateTime.Now.AddHours(3),
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);

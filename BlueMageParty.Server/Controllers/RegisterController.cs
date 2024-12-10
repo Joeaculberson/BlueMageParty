@@ -32,8 +32,13 @@ namespace BlueMageParty.Server.Controllers
                     return BadRequest("Email and password are required");
                 }
 
-                var hashedPassword = PasswordHasher.HashPassword(request.Password);
+                var duplicateUser = await this._context.Users.FirstOrDefaultAsync(x => x.Email.ToLower().Equals(request.Email.ToLower()));
+                if (duplicateUser != null)
+                {
+                    return Conflict(new { message = "A user with this email already exists" });
+                }
 
+                var hashedPassword = PasswordHasher.HashPassword(request.Password);
                 var user = new User
                 {
                     Email = request.Email.Trim(),

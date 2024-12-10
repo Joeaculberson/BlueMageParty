@@ -41,7 +41,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidIssuer = "AuthApp",
             ValidAudience = "AuthAppUsers",
-            IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Credentials.SymmetricSecurityKey))
+            IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Credentials.JWTSecurityKey))
         };
     });
 
