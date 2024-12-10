@@ -6,15 +6,21 @@ namespace BlueMageParty.Server.Models
 {
     public class User
     {
+        [Key]
         public Guid Id { get; set; }
 
         [Required]
         [EmailAddress]
-        public string Email { get; set; } = null!;
+        [MaxLength(255)]
+        public string Email { get; set; }
 
         [Required]
-        public string Password { get; set; } = null!;
-        public DateTime CreatedOn { get; set; }
-        public DateTime UpdatedOn { get; set; }
+        public string Password { get; set; }
+        public DateTime CreatedOn { get; set; } = DateTime.Now;
+        public DateTime UpdatedOn { get; set; } = DateTime.Now;
+
+        // Navigation Property for ErrorLogs
+        public ICollection<ErrorLog> ErrorLogs { get; set; }
+        public ICollection<Character> Characters { get; set; }
     }
 }

@@ -37,9 +37,7 @@ namespace BlueMageParty.Server.Controllers
                 var user = new User
                 {
                     Email = request.Email.Trim(),
-                    Password = hashedPassword,
-                    CreatedOn = DateTime.Now,
-                    UpdatedOn = DateTime.Now
+                    Password = hashedPassword
                 };
 
                 _context.Users.Add(user);
@@ -49,6 +47,14 @@ namespace BlueMageParty.Server.Controllers
             }
             catch (Exception ex)
             {
+                var error = new ErrorLog()
+                {
+                    Message = ex.Message,
+                    StackTrace = ex.StackTrace
+                };
+
+                this._context.ErrorLogs.Add(error);
+                await _context.SaveChangesAsync();
                 throw ex;
             }
         }

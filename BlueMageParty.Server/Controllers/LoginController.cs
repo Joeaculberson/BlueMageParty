@@ -3,25 +3,48 @@
     using BlueMageParty.Server.Data;
     using BlueMageParty.Server.Models;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.IdentityModel.Tokens;
     using System.IdentityModel.Tokens.Jwt;
     using System.Security.Claims;
     using System.Text;
+    using System.Threading.Tasks;
 
     [ApiController]
     [Route("api/[controller]")]
     public class LoginController : ControllerBase
     {
-        [HttpPost("Login")]
-        public IActionResult Login([FromBody] LoginRequest request)
-        {   
-            if (request.Email == "user" && request.Password == "password")
-            {
-                var token = GenerateJwtToken(request.Email);
-                return Ok(new { Token = token });
-            }
+        private readonly BlueMagePartyContext _context;
 
-            return Unauthorized("Invalid credentials");
+        public LoginController(BlueMagePartyContext context)
+        {
+            _context = context;
+        }
+
+        [HttpPost("Login")]
+        public async Task<IActionResult> LoginAsync([FromBody] LoginRequest request)
+        {   
+            try
+            {
+                if (request.Email == "user" && request.Password == "password")
+                {
+                    var token = GenerateJwtToken(request.Email);
+                    return Ok(new { Token = token });
+                }
+
+                return Unauthorized("Invalid credentials");
+            } catch (Exception ex) 
+            {
+                var error = new ErrorLog()
+                {
+                    Message = ex.Message,
+                    StackTrace = ex.StackTrace
+                };
+
+                this._context.ErrorLogs.Add(error);
+                await _context.SaveChangesAsync();
+                throw ex;
+            } 
         }
 
         private string GenerateJwtToken(string username)
