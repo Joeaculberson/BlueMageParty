@@ -27,7 +27,7 @@
     <PackageJsonDevdependenciesEslint Condition="$(PackageJsonDevdependenciesEslint) == ''">^9.14.0</PackageJsonDevdependenciesEslint>
     <PackageJsonDevdependenciesEslintPluginVue Condition="$(PackageJsonDevdependenciesEslintPluginVue) == ''">^9.30.0</PackageJsonDevdependenciesEslintPluginVue>
     <PackageJsonDevdependenciesNpmRunAll2 Condition="$(PackageJsonDevdependenciesNpmRunAll2) == ''">^7.0.1</PackageJsonDevdependenciesNpmRunAll2>
-    <PackageJsonDevdependenciesPinia Condition="$(PackageJsonDevdependenciesPinia) == ''">^2.1.7</PackageJsonDevdependenciesPinia>
+    <PackageJsonDevdependenciesPinia Condition="$(PackageJsonDevdependenciesPinia) == ''">^2.3.0</PackageJsonDevdependenciesPinia>
     <PackageJsonDevdependenciesSass Condition="$(PackageJsonDevdependenciesSass) == ''">^1.82.0</PackageJsonDevdependenciesSass>
     <PackageJsonDevdependenciesSassEmbedded Condition="$(PackageJsonDevdependenciesSassEmbedded) == ''">^1.77.8</PackageJsonDevdependenciesSassEmbedded>
     <PackageJsonDevdependenciesSassLoader Condition="$(PackageJsonDevdependenciesSassLoader) == ''">^16.0.4</PackageJsonDevdependenciesSassLoader>
