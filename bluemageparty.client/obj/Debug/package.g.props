@@ -11,12 +11,12 @@
     <PackageJsonScriptsBuildOnly Condition="$(PackageJsonScriptsBuildOnly) == ''">vite build</PackageJsonScriptsBuildOnly>
     <PackageJsonScriptsTypeCheck Condition="$(PackageJsonScriptsTypeCheck) == ''">vue-tsc --build --force</PackageJsonScriptsTypeCheck>
     <PackageJsonScriptsLint Condition="$(PackageJsonScriptsLint) == ''">eslint . --fix</PackageJsonScriptsLint>
-    <PackageJsonDependenciesMdiFont Condition="$(PackageJsonDependenciesMdiFont) == ''">7.4.47</PackageJsonDependenciesMdiFont>
+    <PackageJsonDependenciesMdiFont Condition="$(PackageJsonDependenciesMdiFont) == ''">^7.4.47</PackageJsonDependenciesMdiFont>
     <PackageJsonDependenciesAxios Condition="$(PackageJsonDependenciesAxios) == ''">^1.7.9</PackageJsonDependenciesAxios>
     <PackageJsonDependenciesCoreJs Condition="$(PackageJsonDependenciesCoreJs) == ''">^3.37.1</PackageJsonDependenciesCoreJs>
+    <PackageJsonDependenciesMaterialDesignIconsIconfont Condition="$(PackageJsonDependenciesMaterialDesignIconsIconfont) == ''">^6.7.0</PackageJsonDependenciesMaterialDesignIconsIconfont>
     <PackageJsonDependenciesRobotoFontface Condition="$(PackageJsonDependenciesRobotoFontface) == ''">*</PackageJsonDependenciesRobotoFontface>
     <PackageJsonDependenciesVue Condition="$(PackageJsonDependenciesVue) == ''">^3.4.31</PackageJsonDependenciesVue>
-    <PackageJsonDependenciesVuetify Condition="$(PackageJsonDependenciesVuetify) == ''">^3.6.14</PackageJsonDependenciesVuetify>
     <PackageJsonDevdependenciesEslintJs Condition="$(PackageJsonDevdependenciesEslintJs) == ''">^9.14.0</PackageJsonDevdependenciesEslintJs>
     <PackageJsonDevdependenciesTsconfigNode22 Condition="$(PackageJsonDevdependenciesTsconfigNode22) == ''">^22.0.0</PackageJsonDevdependenciesTsconfigNode22>
     <PackageJsonDevdependenciesTypesAxios Condition="$(PackageJsonDevdependenciesTypesAxios) == ''">^0.9.36</PackageJsonDevdependenciesTypesAxios>
@@ -28,8 +28,9 @@
     <PackageJsonDevdependenciesEslintPluginVue Condition="$(PackageJsonDevdependenciesEslintPluginVue) == ''">^9.30.0</PackageJsonDevdependenciesEslintPluginVue>
     <PackageJsonDevdependenciesNpmRunAll2 Condition="$(PackageJsonDevdependenciesNpmRunAll2) == ''">^7.0.1</PackageJsonDevdependenciesNpmRunAll2>
     <PackageJsonDevdependenciesPinia Condition="$(PackageJsonDevdependenciesPinia) == ''">^2.1.7</PackageJsonDevdependenciesPinia>
-    <PackageJsonDevdependenciesSass Condition="$(PackageJsonDevdependenciesSass) == ''">1.77.8</PackageJsonDevdependenciesSass>
+    <PackageJsonDevdependenciesSass Condition="$(PackageJsonDevdependenciesSass) == ''">^1.82.0</PackageJsonDevdependenciesSass>
     <PackageJsonDevdependenciesSassEmbedded Condition="$(PackageJsonDevdependenciesSassEmbedded) == ''">^1.77.8</PackageJsonDevdependenciesSassEmbedded>
+    <PackageJsonDevdependenciesSassLoader Condition="$(PackageJsonDevdependenciesSassLoader) == ''">^16.0.4</PackageJsonDevdependenciesSassLoader>
     <PackageJsonDevdependenciesTypescript Condition="$(PackageJsonDevdependenciesTypescript) == ''">~5.6.3</PackageJsonDevdependenciesTypescript>
     <PackageJsonDevdependenciesUnpluginAutoImport Condition="$(PackageJsonDevdependenciesUnpluginAutoImport) == ''">^0.17.6</PackageJsonDevdependenciesUnpluginAutoImport>
     <PackageJsonDevdependenciesUnpluginFonts Condition="$(PackageJsonDevdependenciesUnpluginFonts) == ''">^1.1.1</PackageJsonDevdependenciesUnpluginFonts>
@@ -39,7 +40,8 @@
     <PackageJsonDevdependenciesVitePluginMkcert Condition="$(PackageJsonDevdependenciesVitePluginMkcert) == ''">^1.17.6</PackageJsonDevdependenciesVitePluginMkcert>
     <PackageJsonDevdependenciesVitePluginVueLayouts Condition="$(PackageJsonDevdependenciesVitePluginVueLayouts) == ''">^0.11.0</PackageJsonDevdependenciesVitePluginVueLayouts>
     <PackageJsonDevdependenciesVitePluginVuetify Condition="$(PackageJsonDevdependenciesVitePluginVuetify) == ''">^2.0.3</PackageJsonDevdependenciesVitePluginVuetify>
-    <PackageJsonDevdependenciesVueRouter Condition="$(PackageJsonDevdependenciesVueRouter) == ''">^4.4.0</PackageJsonDevdependenciesVueRouter>
+    <PackageJsonDevdependenciesVueRouter Condition="$(PackageJsonDevdependenciesVueRouter) == ''">^4.5.0</PackageJsonDevdependenciesVueRouter>
     <PackageJsonDevdependenciesVueTsc Condition="$(PackageJsonDevdependenciesVueTsc) == ''">^2.1.10</PackageJsonDevdependenciesVueTsc>
+    <PackageJsonDevdependenciesVuetify Condition="$(PackageJsonDevdependenciesVuetify) == ''">^3.7.0-beta.1</PackageJsonDevdependenciesVuetify>
   </PropertyGroup>
 </Project>

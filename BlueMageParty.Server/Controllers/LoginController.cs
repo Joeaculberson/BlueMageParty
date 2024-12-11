@@ -42,7 +42,7 @@
                     && PasswordHasher.VerifyPassword(request.Password, user.Password))
                 {
                     var token = GenerateJwtToken(request.Email);
-                    return Ok(new { Token = token });
+                    return Ok(new { auth_token = token });
                 }
 
                 return Unauthorized("Invalid credentials");
