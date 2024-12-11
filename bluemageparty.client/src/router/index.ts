@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { useAuthStore } from '@/stores/authStore';
 import Home from '../views/Home.vue';
 import Login from '../views/Login.vue';
 import Dashboard from '../views/Dashboard.vue';
@@ -14,18 +15,30 @@ const routes = [
     component: Login,
   },
   {
-    path: '/dashboard',
-    component: Dashboard,
-  },
-  {
     path: '/register',
     component: Register,
+  },
+  {
+    path: '/dashboard',
+    component: Dashboard,
   },
 ];
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
+});
+
+// Global navigation guard
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = useAuthStore().isAuthenticated;
+
+  // If the user is logged in and tries to access login or register, redirect to dashboard
+  if (isAuthenticated && (to.path === '/login' || to.path === '/register')) {
+    next('/dashboard'); // Redirect to dashboard if logged in
+  } else {
+    next(); // Proceed to the requested route if not logged in or accessing other routes
+  }
 });
 
 export default router;

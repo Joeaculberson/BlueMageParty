@@ -4,13 +4,17 @@
             <v-row justify="center">
                 <v-col>
                     <v-card title="Login">
-                        <v-card-text>
+                        <v-form>
+                            <v-card-text>
                             <v-text-field label="Email" v-model="email" type="email" required />
-                            <v-text-field label="Password" v-model="password" type="password" required />
-                        </v-card-text>
-                        <v-card-actions>
-                            <v-btn @click="login" color="primary">Login</v-btn>
-                        </v-card-actions>
+                            <v-text-field label="Password" v-model="password" type="password" required
+                                @keydown.enter="login"
+                                />
+                            </v-card-text>
+                            <v-card-actions>
+                                <v-btn @click="login" color="primary">Login</v-btn>
+                            </v-card-actions>
+                        </v-form>
                     </v-card>
                 </v-col>
             </v-row>

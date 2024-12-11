@@ -6,7 +6,7 @@
         <v-spacer></v-spacer>
 
         <!-- Right Section: Conditional Buttons -->
-        <v-btn v-if="!isAuthenticated && !isOnLoginPage && !isOnRegisterPage" @click="goToLogin" text>
+        <v-btn v-if="!isAuthenticated && !isOnLoginPage" @click="goToLogin" text>
             Login
         </v-btn>
 

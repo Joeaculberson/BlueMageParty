@@ -3,7 +3,6 @@
         <v-row>
             <v-col cols="12">
                 <h1>Welcome to Blue Mage Party</h1>
-                <p>Navigate to different pages using the Vue Router!</p>
             </v-col>
         </v-row>
     </v-container>
