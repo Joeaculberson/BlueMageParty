@@ -17,9 +17,11 @@ namespace BlueMageParty.Server.Models
         [Required]
         public string Password { get; set; }
         public string? VerificationToken { get; set; }
+        public string? VerificationCode { get; set; }  // For code-based verification
+        public DateTime? VerificationExpires { get; set; }
         public bool IsVerified { get; set; } = false;
-        public DateTime CreatedOn { get; set; } = DateTime.Now;
-        public DateTime UpdatedOn { get; set; } = DateTime.Now;
+        public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedOn { get; set; } = DateTime.UtcNow;
 
         // Navigation Property for ErrorLogs
         public ICollection<ErrorLog> ErrorLogs { get; set; }
