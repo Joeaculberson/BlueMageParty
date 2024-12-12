@@ -43,6 +43,7 @@ export default {
         const goToRegisterPage = () => router.push('/register');
 
         const logout = () => {
+            authStore.clearEmail();
             authStore.logout();  // Call logout from the store
             router.push('/login');  // Redirect to login page
         };

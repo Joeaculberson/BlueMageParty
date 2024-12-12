@@ -47,7 +47,7 @@
   import { defineComponent, ref } from "vue";
   import { useRouter } from "vue-router";
   import axios from "axios";
-  import { LOGIN_URL, REGISTER_URL } from "@/constants/api";
+  import { REGISTER_URL } from "@/constants/api";
   import { useAuthStore } from '@/stores/authStore';
   
   export default defineComponent({
@@ -59,6 +59,8 @@
       const message = ref("");
       const successMessage = ref('');
       const isValid = ref(false);
+      const router = useRouter();
+      const authStore = useAuthStore();
   
       // Validation rules
       const emailRule = (value: string) => !!value || "Email is required";
@@ -81,10 +83,13 @@
             email: email.value,
             password: password.value,
           });
+
+          // Store email in Pinia
+          authStore.setEmail(email.value);
   
           // Handle success
           console.log("Registration successful:", response.data);
-          successMessage.value = "Registration successful! Check your email to verify your account.";
+          router.push('/verify');
         } catch (error) {
           // Handle error
           if (axios.isAxiosError(error)) {

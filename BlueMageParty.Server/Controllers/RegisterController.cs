@@ -46,11 +46,14 @@ namespace BlueMageParty.Server.Controllers
                 }
 
                 var hashedPassword = PasswordHasher.HashPassword(request.Password);
+                var verificationCode = GenerateVerificationCode();
                 var user = new User
                 {
                     Email = request.Email.Trim(),
                     Password = hashedPassword,
-                    VerificationToken = GenerateVerificationToken()
+                    VerificationToken = GenerateVerificationToken(),
+                    VerificationCode = PasswordHasher.HashPassword(verificationCode),
+                    VerificationExpires = DateTime.UtcNow.AddMinutes(10)
                 };
 
                 _context.Users.Add(user);
@@ -64,9 +67,9 @@ namespace BlueMageParty.Server.Controllers
                 }
 
                 // Send verification email
-                var verificationUrl = $"{backendUrl}/api/register/verify?token={user.VerificationToken}";
-                await SendEmail(user.Email, "Verify your account",
-                    $"Click <a href='{verificationUrl}'>here</a> to verify your account.");
+                var verificationUrl = $"{backendUrl}/api/register/verifytoken?token={user.VerificationToken}";
+                await SendEmail(user.Email, verificationCode + " is your Blue Mage Party activation code",
+                    $"<p>Alternatively, click <a href='{verificationUrl}'>here</a> to verify your account.</p>");
 
                 return Ok(new { message = "Registration successful! Check your email to verify your account." });
 
@@ -85,7 +88,7 @@ namespace BlueMageParty.Server.Controllers
             }
         }
 
-        [HttpGet("Verify")]
+        [HttpGet("VerifyToken")]
         public async Task<IActionResult> VerifyToken(string token)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.VerificationToken == token);
@@ -95,8 +98,16 @@ namespace BlueMageParty.Server.Controllers
                 return BadRequest("Invalid or expired verification token.");
             }
 
+            if (user.VerificationExpires < DateTime.UtcNow)
+            {
+                return BadRequest("Verification link has expired.");
+            }
+
             user.IsVerified = true;
             user.VerificationToken = null; // Clear the token after verification
+            user.VerificationCode = null;
+            user.VerificationExpires = null;
+            user.UpdatedOn = DateTime.Now;
             await _context.SaveChangesAsync();
 
             // Get the frontend URL from configuration
@@ -110,14 +121,48 @@ namespace BlueMageParty.Server.Controllers
             return Redirect($"{frontendUrl}/login?verified=true");
         }
 
+        [HttpPost("VerifyCode")]
+        public async Task<IActionResult> VerifyCode(VerifyCodeRequest request)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+
+            if (user == null || !PasswordHasher.VerifyPassword(request.Code, user.VerificationCode))
+            {
+                return BadRequest("Invalid verification code.");
+            }
+
+            if (user.VerificationExpires < DateTime.UtcNow)
+            {
+                return BadRequest("Verification code has expired.");
+            }
+
+            // Mark user as verified
+            user.IsVerified = true;
+            user.VerificationToken = null;
+            user.VerificationCode = null;
+            user.VerificationExpires = null;
+            user.UpdatedOn = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return Ok("Account successfully verified.");
+        }
+
+
         private async Task SendEmail(string ToEmail, string Subject, string Body)
         {
             var Client = new SendGridClient(this._configuration["EmailSettings:SendGridApiKey"]);
             var From = new EmailAddress(this._configuration["EmailSettings:SmtpEmail"], this._configuration["EmailSettings:EmailName"]);
             var To = new EmailAddress(ToEmail);
             var HtmlContent = Body;
-            var Msg = MailHelper.CreateSingleEmail(From, To, Subject, "", HtmlContent);
+            var Msg = MailHelper.CreateSingleEmail(From, To, Subject, string.Empty, HtmlContent);
             var Response = await Client.SendEmailAsync(Msg).ConfigureAwait(false);
+        }
+
+        private string GenerateVerificationCode()
+        {
+            Random random = new Random();
+            return random.Next(100000, 999999).ToString(); // Generate 6-digit code
         }
 
         private string GenerateVerificationToken()
@@ -133,6 +178,7 @@ namespace BlueMageParty.Server.Controllers
         }
 
         public record class RegisterRequest(string Email, string Password);
+        public record class VerifyCodeRequest(string Email, string Code);
     }
 }
 
