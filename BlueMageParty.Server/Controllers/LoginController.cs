@@ -32,17 +32,23 @@
                     return BadRequest("Email and password are required");
                 }
 
-                var user = await this._context.Users.FirstOrDefaultAsync(x => x.Email.ToLower().Equals(request.Email.ToLower()));
+                var user = await this._context.Users.FirstOrDefaultAsync(x => x.Email.ToLower() == request.Email.ToLower());
                 if (user == null)
                 {
                     return Unauthorized("Invalid credentials");
                 }
 
-                if (request.Email.ToLower().Equals(user.Email.ToLower()) 
+                if (request.Email.ToLower() == user.Email.ToLower()
                     && PasswordHasher.VerifyPassword(request.Password, user.Password))
                 {
-                    var token = GenerateJwtToken(request.Email);
-                    return Ok(new { auth_token = token });
+                    if(user.IsVerified)
+                    {
+                        var token = GenerateJwtToken(request.Email);
+                        return Ok(new { auth_token = token });
+                    } else
+                    {
+                        return Unauthorized("Your account needs to be verified before you can login.");
+                    }
                 }
 
                 return Unauthorized("Invalid credentials");

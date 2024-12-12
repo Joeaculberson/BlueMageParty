@@ -54,8 +54,6 @@
       const confirmPassword = ref("");
       const message = ref("");
       const isValid = ref(false);
-      const router = useRouter();
-      const authStore = useAuthStore();
   
       // Validation rules
       const emailRule = (value: string) => !!value || "Email is required";
@@ -81,17 +79,7 @@
   
           // Handle success
           console.log("Registration successful:", response.data);
-          message.value = ""; // Clear any previous error messages
-  
-          // Log user in after registering and redirect to dashboard
-          const loginResponse = await axios.post(LOGIN_URL, { email: email.value, password: password.value });
-          if (loginResponse.data.auth_token) {
-            console.log("login response: success");
-            authStore.login(loginResponse.data.token); // Use the loginResponse token
-            router.push('/dashboard'); // Redirect to the dashboard after registering
-          } else {
-            console.log('No login response');
-          }
+          message.value = "Registration successful! Check your email to verify your account.";
         } catch (error) {
           // Handle error
           if (axios.isAxiosError(error)) {

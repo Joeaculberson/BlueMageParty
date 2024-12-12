@@ -16,6 +16,8 @@ namespace BlueMageParty.Server.Models
 
         [Required]
         public string Password { get; set; }
+        public string VerificationToken { get; set; }
+        public bool IsVerified { get; set; }
         public DateTime CreatedOn { get; set; } = DateTime.Now;
         public DateTime UpdatedOn { get; set; } = DateTime.Now;
 
