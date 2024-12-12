@@ -31,6 +31,10 @@
                 <v-alert v-if="message" type="error" dismissible>
                   {{ message }}
                 </v-alert>
+                <!-- Success Message Alert -->
+                <v-alert v-if="successMessage" type="success" dismissible>
+                    {{ successMessage }}
+                </v-alert>
               </v-form>
             </v-card>
           </v-col>
@@ -53,6 +57,7 @@
       const password = ref("");
       const confirmPassword = ref("");
       const message = ref("");
+      const successMessage = ref('');
       const isValid = ref(false);
   
       // Validation rules
@@ -79,7 +84,7 @@
   
           // Handle success
           console.log("Registration successful:", response.data);
-          message.value = "Registration successful! Check your email to verify your account.";
+          successMessage.value = "Registration successful! Check your email to verify your account.";
         } catch (error) {
           // Handle error
           if (axios.isAxiosError(error)) {
@@ -102,6 +107,7 @@
         password,
         confirmPassword,
         message,
+        successMessage,
         isValid,
         register,
         handleEnter,
