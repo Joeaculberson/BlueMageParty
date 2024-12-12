@@ -16,10 +16,12 @@
     public class LoginController : ControllerBase
     {
         private readonly BlueMagePartyContext _context;
+        private readonly IConfiguration _configuration;
 
-        public LoginController(BlueMagePartyContext context)
+        public LoginController(BlueMagePartyContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         [HttpPost("Login")]
@@ -74,7 +76,7 @@
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Credentials.JWTSecurityKey));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this._configuration["LoginSettings:JWTSecurityKey"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(

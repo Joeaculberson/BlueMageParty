@@ -11,7 +11,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigins", policy =>
                       {
-                          policy.WithOrigins("http://localhost:3000")
+                          policy.WithOrigins(builder.Configuration["CORS:AllowedOrigins"])
                           .AllowAnyHeader()
                           .AllowAnyMethod()
                           .AllowCredentials();
@@ -41,7 +41,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidIssuer = "AuthApp",
             ValidAudience = "AuthAppUsers",
-            IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(Credentials.JWTSecurityKey))
+            IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(builder.Configuration["LoginSettings:JWTSecurityKey"]))
         };
     });
 

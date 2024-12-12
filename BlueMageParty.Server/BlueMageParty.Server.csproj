@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -7,6 +7,7 @@
     <SpaRoot>..\bluemageparty.client</SpaRoot>
     <SpaProxyLaunchCommand>npm run dev</SpaProxyLaunchCommand>
     <SpaProxyServerUrl>https://localhost:25607</SpaProxyServerUrl>
+    <UserSecretsId>020a45a3-4028-4c45-ac4e-5e71a0977567</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

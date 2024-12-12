@@ -20,10 +20,12 @@ namespace BlueMageParty.Server.Controllers
     public class RegisterController : ControllerBase
     {
         public BlueMagePartyContext _context;
+        private readonly IConfiguration _configuration;
 
-        public RegisterController(BlueMagePartyContext context)
+        public RegisterController(BlueMagePartyContext context, IConfiguration configuration)
         {
             this._context = context;
+            _configuration = configuration;
         }
 
         [HttpPost("Register")]
@@ -55,7 +57,7 @@ namespace BlueMageParty.Server.Controllers
                 await _context.SaveChangesAsync();
 
                 // Send verification email
-                var verificationUrl = $"{Request.Scheme}://{Request.Host}/verify?token={user.VerificationToken}";
+                var verificationUrl = $"{Request.Scheme}://{Request.Host}/api/register/verify?token={user.VerificationToken}";
                 await SendEmail(user.Email, "Verify your account",
                     $"Click <a href='{verificationUrl}'>here</a> to verify your account.");
 
@@ -94,13 +96,13 @@ namespace BlueMageParty.Server.Controllers
             return Redirect($"{Request.Scheme}://{Request.Host}/login?verified=true");
         }
 
-        private async Task SendEmail(string To, string Subject, string Body)
+        private async Task SendEmail(string ToEmail, string Subject, string Body)
         {
-            var Client = new SendGridClient(Credentials.SendGridApiKey);
-            var From = new EmailAddress(Credentials.SMTPEmail, "noreply");
-            var to1 = new EmailAddress(To);
-            var HtmlContent = "";
-            var Msg = MailHelper.CreateSingleEmail(From, to1, Subject, Body, HtmlContent);
+            var Client = new SendGridClient(this._configuration["EmailSettings:SendGridApiKey"]);
+            var From = new EmailAddress(this._configuration["EmailSettings:SmtpEmail"], this._configuration["EmailSettings:EmailName"]);
+            var To = new EmailAddress(ToEmail);
+            var HtmlContent = Body;
+            var Msg = MailHelper.CreateSingleEmail(From, To, Subject, "", HtmlContent);
             var Response = await Client.SendEmailAsync(Msg).ConfigureAwait(false);
         }
 
