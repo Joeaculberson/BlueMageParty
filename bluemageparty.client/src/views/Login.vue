@@ -6,11 +6,6 @@
                     <v-card title="Login">
                         <v-form>
                             <v-card-text>
-                                <!-- Success Message Alert -->
-                                <v-alert v-if="successMessage" type="success" dismissible>
-                                    {{ successMessage }}
-                                </v-alert>
-
                                 <!-- Email and Password Fields -->
                                 <v-text-field label="Email" v-model="email" type="email" required />
                                 <v-text-field 
@@ -25,6 +20,11 @@
                             <v-card-actions>
                                 <v-btn @click="login" color="primary">Login</v-btn>
                             </v-card-actions>
+
+                                                            <!-- Success Message Alert -->
+                            <v-alert v-if="successMessage" type="success" dismissible>
+                                {{ successMessage }}
+                            </v-alert>
                         </v-form>
                     </v-card>
                 </v-col>

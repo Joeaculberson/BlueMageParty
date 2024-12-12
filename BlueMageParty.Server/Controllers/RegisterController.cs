@@ -12,6 +12,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net.Mail;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace BlueMageParty.Server.Controllers
 {
@@ -49,15 +50,21 @@ namespace BlueMageParty.Server.Controllers
                 {
                     Email = request.Email.Trim(),
                     Password = hashedPassword,
-                    VerificationToken = GenerateVerificationToken(),
-                    IsVerified = false
+                    VerificationToken = GenerateVerificationToken()
                 };
 
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
 
+                // Get the frontend URL from configuration
+                var backendUrl = _configuration["BackendUrl"];
+                if (string.IsNullOrEmpty(backendUrl))
+                {
+                    return StatusCode(500, "BackendUrl not configured.");
+                }
+
                 // Send verification email
-                var verificationUrl = $"{Request.Scheme}://{Request.Host}/api/register/verify?token={user.VerificationToken}";
+                var verificationUrl = $"{backendUrl}/api/register/verify?token={user.VerificationToken}";
                 await SendEmail(user.Email, "Verify your account",
                     $"Click <a href='{verificationUrl}'>here</a> to verify your account.");
 
@@ -79,7 +86,7 @@ namespace BlueMageParty.Server.Controllers
         }
 
         [HttpGet("Verify")]
-        public async Task<IActionResult> Verify(string token)
+        public async Task<IActionResult> VerifyToken(string token)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.VerificationToken == token);
 
@@ -92,8 +99,15 @@ namespace BlueMageParty.Server.Controllers
             user.VerificationToken = null; // Clear the token after verification
             await _context.SaveChangesAsync();
 
-            // Redirect to login with a query parameter indicating success
-            return Redirect($"{Request.Scheme}://{Request.Host}/login?verified=true");
+            // Get the frontend URL from configuration
+            var frontendUrl = _configuration["FrontendUrl"];
+            if (string.IsNullOrEmpty(frontendUrl))
+            {
+                return StatusCode(500, "FrontendUrl not configured.");
+            }
+
+            // Redirect to the login page on the frontend
+            return Redirect($"{frontendUrl}/login?verified=true");
         }
 
         private async Task SendEmail(string ToEmail, string Subject, string Body)
@@ -109,15 +123,13 @@ namespace BlueMageParty.Server.Controllers
         private string GenerateVerificationToken()
         {
             var tokenBytes = new byte[32];
-            string refreshToken = "";
 
             using (var rng = RandomNumberGenerator.Create())
             {
                 rng.GetBytes(tokenBytes);
-                refreshToken = Convert.ToBase64String(tokenBytes);
             }
 
-            return refreshToken;
+            return WebEncoders.Base64UrlEncode(tokenBytes);
         }
 
         public record class RegisterRequest(string Email, string Password);
