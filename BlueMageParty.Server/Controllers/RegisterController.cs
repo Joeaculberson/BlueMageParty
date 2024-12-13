@@ -13,6 +13,7 @@ using System.Net.Mail;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.WebUtilities;
+using Azure.Core;
 
 namespace BlueMageParty.Server.Controllers
 {
@@ -42,7 +43,7 @@ namespace BlueMageParty.Server.Controllers
                 var duplicateUser = await this._context.Users.FirstOrDefaultAsync(x => x.Email.ToLower() == request.Email.ToLower());
                 if (duplicateUser != null)
                 {
-                    return Conflict(new { message = "A user with this email already exists" });
+                    return Conflict(new { message = "A user with this email already exists." });
                 }
 
                 var hashedPassword = PasswordHasher.HashPassword(request.Password);
@@ -53,7 +54,7 @@ namespace BlueMageParty.Server.Controllers
                     Password = hashedPassword,
                     VerificationToken = GenerateVerificationToken(),
                     VerificationCode = PasswordHasher.HashPassword(verificationCode),
-                    VerificationExpires = DateTime.UtcNow.AddMinutes(10)
+                    VerificationExpires = DateTime.UtcNow.AddMinutes(int.Parse(_configuration["VerificationEmailTimeoutMinutes"]))
                 };
 
                 _context.Users.Add(user);
@@ -66,10 +67,7 @@ namespace BlueMageParty.Server.Controllers
                     return StatusCode(500, "BackendUrl not configured.");
                 }
 
-                // Send verification email
-                var verificationUrl = $"{backendUrl}/api/register/verifytoken?token={user.VerificationToken}";
-                await SendEmail(user.Email, verificationCode + " is your Blue Mage Party activation code",
-                    $"<p>Alternatively, click <a href='{verificationUrl}'>here</a> to verify your account.</p>");
+                this.ProcessEmail(verificationCode, user, backendUrl);
 
                 return Ok(new { message = "Registration successful! Check your email to verify your account." });
 
@@ -86,6 +84,47 @@ namespace BlueMageParty.Server.Controllers
                 await _context.SaveChangesAsync();
                 throw ex;
             }
+        }
+
+        [HttpPost("ResendActivationEmail")]
+        public async Task<IActionResult> ResendActivationCode([FromBody] ResendActivationCodeRequest request)
+        {
+            if (string.IsNullOrEmpty(request.Email))
+            {
+                return BadRequest("Email is required.");
+            }
+
+            var existingUser = await this._context.Users.FirstOrDefaultAsync(x => x.Email == request.Email);
+            if(existingUser == null)
+            {
+                return BadRequest("User does not exist.");
+            }
+            
+            if(existingUser.IsVerified)
+            {
+                return BadRequest("User already activated.");
+            }
+
+            var verificationCode = GenerateVerificationCode();
+
+            existingUser.Email = request.Email.Trim();
+            existingUser.VerificationToken = GenerateVerificationToken();
+            existingUser.VerificationCode = PasswordHasher.HashPassword(verificationCode);
+            existingUser.VerificationExpires = DateTime.UtcNow.AddMinutes(int.Parse(_configuration["VerificationEmailTimeoutMinutes"]));
+
+            _context.Users.Update(existingUser);
+            await _context.SaveChangesAsync();
+
+            // Get the frontend URL from configuration
+            var backendUrl = _configuration["BackendUrl"];
+            if (string.IsNullOrEmpty(backendUrl))
+            {
+                return StatusCode(500, "BackendUrl not configured.");
+            }
+
+            this.ProcessEmail(verificationCode, existingUser, backendUrl);
+
+            return Ok(new { message = "Activation email resent. Code/link expires in " + int.Parse(_configuration["VerificationEmailTimeoutMinutes"]) + " minutes." });
         }
 
         [HttpGet("VerifyToken")]
@@ -148,6 +187,13 @@ namespace BlueMageParty.Server.Controllers
             return Ok("Account successfully verified.");
         }
 
+        private async void ProcessEmail(string verificationCode, User user, string backendUrl)
+        {
+            // Send verification email
+            var verificationUrl = $"{backendUrl}/api/register/verifytoken?token={user.VerificationToken}";
+            await SendEmail(user.Email, verificationCode + " is your Blue Mage Party activation code",
+                $"<p>Alternatively, click <a href='{verificationUrl}'>here</a> to verify your account. The code/link expires in " + int.Parse(_configuration["VerificationEmailTimeoutMinutes"]) + " Sminutes.</p>");
+        }
 
         private async Task SendEmail(string ToEmail, string Subject, string Body)
         {
@@ -179,6 +225,7 @@ namespace BlueMageParty.Server.Controllers
 
         public record class RegisterRequest(string Email, string Password);
         public record class VerifyCodeRequest(string Email, string Code);
+        public record class ResendActivationCodeRequest(string Email);
     }
 }
 

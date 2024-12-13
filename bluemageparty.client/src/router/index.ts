@@ -5,6 +5,7 @@ import Login from '../views/Login.vue';
 import Dashboard from '../views/Dashboard.vue';
 import Register from '../views/Register.vue';
 import Verify from '../views/Verify.vue';
+import ResendActivationEmail from '../views/ResendActivationEmail.vue';
 
 const routes = [
   {
@@ -27,6 +28,10 @@ const routes = [
     path: '/verify',
     component: Verify,
   },
+  {
+    path: '/ResendActivationEmail',
+    component: ResendActivationEmail,
+  }
 ];
 
 const router = createRouter({
