@@ -63,7 +63,7 @@ export default {
 
             if (route.query.emailsent) {
                 alertType.value = 'success';
-                message.value = 'Verification email sent. Code/link will expire in 10 minutes.';
+                message.value = 'Verification email sent.';
             }
         });
 
