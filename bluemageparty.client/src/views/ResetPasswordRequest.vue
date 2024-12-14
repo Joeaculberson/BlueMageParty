@@ -3,7 +3,7 @@
         <v-container>
             <v-row justify="center">
                 <v-col>
-                    <v-card title="Resend Activation Email">
+                    <v-card title="Reset Password">
                         <v-form v-model="isValid">
                             <v-card-text>
                                 <!-- Email Input Field -->
@@ -11,8 +11,8 @@
                                     required />
                                 <!-- Resend Activation Code Button -->
                                 <v-card-actions>
-                                    <v-btn @click="resendActivationEmail" color="primary" :disabled="!isValid">
-                                        Resend Activation Email
+                                    <v-btn @click="resetPasswordRequest" color="primary" :disabled="!isValid">
+                                        Reset Password
                                     </v-btn>
                                 </v-card-actions>
 
@@ -31,44 +31,36 @@
 
 <script lang="ts">
 import { ref } from 'vue';
-import { useAuthStore } from '@/stores/authStore';
 import axios from 'axios';
-import { RESEND_ACTIVATION_EMAIL_URL } from '@/constants/api';
-import { useRouter } from 'vue-router';
+import { RESET_PASSWORD_REQUEST_URL } from '@/constants/api';
 
 export default {
-    name: 'ResendActivationEmail',
+    name: 'resetPassword',
     setup() {
         const email = ref('');
         const message = ref('');
         const alertType = ref<'success' | 'error' | 'info' | 'warning'>('info');
-        const authStore = useAuthStore();
-        const router = useRouter();
         const isValid = ref(false);
         const isVerifying = ref(false);
 
         const emailRule = (value: string) => !!value || "Email is required";
 
-        const resendActivationEmail = async () => {
+        const resetPasswordRequest = async () => {
             if (!isValid.value) return;
 
             if (isVerifying.value) return; // Prevent double clicks
             isVerifying.value = true;
 
             try {
-                const response = await axios.post(RESEND_ACTIVATION_EMAIL_URL, { email: email.value });
-
-                // Store email in Pinia (authStore)
-                authStore.setEmail(email.value);
+                const response = await axios.post(RESET_PASSWORD_REQUEST_URL, { email: email.value });
 
                 alertType.value = 'success';
-                message.value = response.data.message;
-                console.log("Resend activation response: success");
-                router.push('/verify?emailsent=true'); // Redirect to verification page
+                message.value = 'Password reset email has been sent.';
+                console.log("Reset Password response: " + response.data.message);
             } catch (error) {
                 alertType.value = 'error';
-                message.value = error.response?.data || 'There was a problem resending the activation email.';
-                console.error('Resend activation failed:', error);
+                message.value = error.response?.data || 'There was a problem sending the password reset email.';
+                console.error('Password reset failed:', error);
             } finally {
                 isVerifying.value = false;
             }
@@ -79,8 +71,8 @@ export default {
             message,
             alertType,
             isValid,
-            emailRule,
-            resendActivationEmail,
+            resetPasswordRequest,
+            emailRule
         };
     },
 };

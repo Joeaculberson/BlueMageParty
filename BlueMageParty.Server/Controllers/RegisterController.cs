@@ -47,14 +47,14 @@ namespace BlueMageParty.Server.Controllers
                 }
 
                 var hashedPassword = PasswordHasher.HashPassword(request.Password);
-                var verificationCode = GenerateVerificationCode();
+                var verificationCode = TokenManager.GenerateVerificationCode();
                 var user = new User
                 {
                     Email = request.Email.Trim(),
                     Password = hashedPassword,
-                    VerificationToken = GenerateVerificationToken(),
+                    VerificationToken = TokenManager.GenerateToken(),
                     VerificationCode = PasswordHasher.HashPassword(verificationCode),
-                    VerificationExpires = DateTime.UtcNow.AddMinutes(int.Parse(_configuration["VerificationEmailTimeoutMinutes"]))
+                    VerificationExpires = DateTime.UtcNow.AddMinutes(int.Parse(_configuration["EmailTimeoutMinutes"]))
                 };
 
                 _context.Users.Add(user);
@@ -105,12 +105,18 @@ namespace BlueMageParty.Server.Controllers
                 return BadRequest("User already activated.");
             }
 
-            var verificationCode = GenerateVerificationCode();
+            var timeInitialRequestWasSubmitted = existingUser.VerificationExpires.GetValueOrDefault().AddMinutes(-int.Parse(_configuration["EmailTimeoutMinutes"]));
+            if (DateTime.UtcNow < timeInitialRequestWasSubmitted.AddMinutes(int.Parse(_configuration["EmailWaitMinutes"])))
+            {
+                return BadRequest("Please wait " + int.Parse(_configuration["EmailWaitMinutes"]) + " minute(s) before requesting a new code.");
+            }
+
+            var verificationCode = TokenManager.GenerateVerificationCode();
 
             existingUser.Email = request.Email.Trim();
-            existingUser.VerificationToken = GenerateVerificationToken();
+            existingUser.VerificationToken = TokenManager.GenerateToken();
             existingUser.VerificationCode = PasswordHasher.HashPassword(verificationCode);
-            existingUser.VerificationExpires = DateTime.UtcNow.AddMinutes(int.Parse(_configuration["VerificationEmailTimeoutMinutes"]));
+            existingUser.VerificationExpires = DateTime.UtcNow.AddMinutes(int.Parse(_configuration["EmailTimeoutMinutes"]));
 
             _context.Users.Update(existingUser);
             await _context.SaveChangesAsync();
@@ -124,107 +130,18 @@ namespace BlueMageParty.Server.Controllers
 
             this.ProcessEmail(verificationCode, existingUser, backendUrl);
 
-            return Ok(new { message = "Activation email resent. Code/link expires in " + int.Parse(_configuration["VerificationEmailTimeoutMinutes"]) + " minutes." });
-        }
-
-        [HttpGet("VerifyToken")]
-        public async Task<IActionResult> VerifyToken(string token)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.VerificationToken == token);
-
-            if (user == null)
-            {
-                return BadRequest("Invalid or expired verification token.");
-            }
-
-            if (user.VerificationExpires < DateTime.UtcNow)
-            {
-                return BadRequest("Verification link has expired.");
-            }
-
-            user.IsVerified = true;
-            user.VerificationToken = null; // Clear the token after verification
-            user.VerificationCode = null;
-            user.VerificationExpires = null;
-            user.UpdatedOn = DateTime.Now;
-            await _context.SaveChangesAsync();
-
-            // Get the frontend URL from configuration
-            var frontendUrl = _configuration["FrontendUrl"];
-            if (string.IsNullOrEmpty(frontendUrl))
-            {
-                return StatusCode(500, "FrontendUrl not configured.");
-            }
-
-            // Redirect to the login page on the frontend
-            return Redirect($"{frontendUrl}/login?verified=true");
-        }
-
-        [HttpPost("VerifyCode")]
-        public async Task<IActionResult> VerifyCode(VerifyCodeRequest request)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-
-            if (user == null || !PasswordHasher.VerifyPassword(request.Code, user.VerificationCode))
-            {
-                return BadRequest("Invalid verification code.");
-            }
-
-            if (user.VerificationExpires < DateTime.UtcNow)
-            {
-                return BadRequest("Verification code has expired.");
-            }
-
-            // Mark user as verified
-            user.IsVerified = true;
-            user.VerificationToken = null;
-            user.VerificationCode = null;
-            user.VerificationExpires = null;
-            user.UpdatedOn = DateTime.UtcNow;
-
-            await _context.SaveChangesAsync();
-
-            return Ok("Account successfully verified.");
+            return Ok(new { message = "Activation email resent. Code/link expires in " + int.Parse(_configuration["EmailTimeoutMinutes"]) + " minutes." });
         }
 
         private async void ProcessEmail(string verificationCode, User user, string backendUrl)
         {
             // Send verification email
             var verificationUrl = $"{backendUrl}/api/register/verifytoken?token={user.VerificationToken}";
-            await SendEmail(user.Email, verificationCode + " is your Blue Mage Party activation code",
-                $"<p>Alternatively, click <a href='{verificationUrl}'>here</a> to verify your account. The code/link expires in " + int.Parse(_configuration["VerificationEmailTimeoutMinutes"]) + " Sminutes.</p>");
-        }
-
-        private async Task SendEmail(string ToEmail, string Subject, string Body)
-        {
-            var Client = new SendGridClient(this._configuration["EmailSettings:SendGridApiKey"]);
-            var From = new EmailAddress(this._configuration["EmailSettings:SmtpEmail"], this._configuration["EmailSettings:EmailName"]);
-            var To = new EmailAddress(ToEmail);
-            var HtmlContent = Body;
-            var Msg = MailHelper.CreateSingleEmail(From, To, Subject, string.Empty, HtmlContent);
-            var Response = await Client.SendEmailAsync(Msg).ConfigureAwait(false);
-        }
-
-        private string GenerateVerificationCode()
-        {
-            Random random = new Random();
-            return random.Next(100000, 999999).ToString(); // Generate 6-digit code
-        }
-
-        private string GenerateVerificationToken()
-        {
-            var tokenBytes = new byte[32];
-
-            using (var rng = RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(tokenBytes);
-            }
-
-            return WebEncoders.Base64UrlEncode(tokenBytes);
+            await EmailManager.SendEmail(user.Email, verificationCode + " is your Blue Mage Party activation code",
+                $"<p>Alternatively, click <a href='{verificationUrl}'>here</a> to verify your account. The code/link expires in " + int.Parse(_configuration["EmailTimeoutMinutes"]) + " Sminutes.</p>", _configuration);
         }
 
         public record class RegisterRequest(string Email, string Password);
-        public record class VerifyCodeRequest(string Email, string Code);
         public record class ResendActivationCodeRequest(string Email);
     }
 }

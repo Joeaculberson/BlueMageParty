@@ -20,6 +20,8 @@ namespace BlueMageParty.Server.Models
         public string? VerificationCode { get; set; }  // For code-based verification
         public DateTime? VerificationExpires { get; set; }
         public bool IsVerified { get; set; } = false;
+        public string? PasswordResetToken { get; set; }
+        public DateTime? PasswordResetTokenExpiry { get; set; }
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedOn { get; set; } = DateTime.UtcNow;
 
