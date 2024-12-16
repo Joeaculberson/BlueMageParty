@@ -7,6 +7,7 @@ import Register from '../views/Register.vue';
 import Verify from '../views/Verify.vue';
 import ResendActivationEmail from '../views/ResendActivationEmail.vue';
 import ResetPasswordRequest from '@/views/ResetPasswordRequest.vue';
+import ResetPassword from '@/views/ResetPassword.vue';
 
 const routes = [
   {
@@ -36,6 +37,10 @@ const routes = [
   {
     path: '/ResetPasswordRequest',
     component: ResetPasswordRequest
+  },
+  {
+    path: '/ResetPassword',
+    component: ResetPassword
   }
 ];
 

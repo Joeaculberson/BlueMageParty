@@ -130,15 +130,15 @@ namespace BlueMageParty.Server.Controllers
 
             this.ProcessEmail(verificationCode, existingUser, backendUrl);
 
-            return Ok(new { message = "Activation email resent. Code/link expires in " + int.Parse(_configuration["EmailTimeoutMinutes"]) + " minutes." });
+            return Ok(new { message = "Activation email resent. Code/link expires in " + int.Parse(_configuration["EmailTimeoutMinutes"]) + " minute(s)." });
         }
 
         private async void ProcessEmail(string verificationCode, User user, string backendUrl)
         {
             // Send verification email
-            var verificationUrl = $"{backendUrl}/api/register/verifytoken?token={user.VerificationToken}";
+            var verificationUrl = $"{backendUrl}/api/verify/verifytoken?token={user.VerificationToken}";
             await EmailManager.SendEmail(user.Email, verificationCode + " is your Blue Mage Party activation code",
-                $"<p>Alternatively, click <a href='{verificationUrl}'>here</a> to verify your account. The code/link expires in " + int.Parse(_configuration["EmailTimeoutMinutes"]) + " Sminutes.</p>", _configuration);
+                $"<p>Alternatively, click <a href='{verificationUrl}'>here</a> to verify your account. The code/link expires in " + int.Parse(_configuration["EmailTimeoutMinutes"]) + " minute(s).</p>", _configuration);
         }
 
         public record class RegisterRequest(string Email, string Password);

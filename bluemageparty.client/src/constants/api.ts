@@ -7,3 +7,4 @@ export const VERIFY_URL = `${API_BASE_URL}/Verify/VerifyToken`;
 export const VERIFY_CODE_URL = `${API_BASE_URL}/Verify/VerifyCode`;
 export const RESEND_ACTIVATION_EMAIL_URL = `${API_BASE_URL}/Register/ResendActivationEmail`
 export const RESET_PASSWORD_REQUEST_URL = `${API_BASE_URL}/ResetPassword/ResetPasswordRequest`
+export const RESET_PASSWORD_URL = `${API_BASE_URL}/ResetPassword/ResetPassword`

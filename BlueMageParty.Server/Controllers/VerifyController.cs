@@ -25,7 +25,7 @@ namespace BlueMageParty.Server.Controllers
 
             if (user == null)
             {
-                return BadRequest("Invalid or expired verification token.");
+                return BadRequest("Invalid verification token.");
             }
 
             if (user.VerificationExpires < DateTime.UtcNow)
@@ -37,7 +37,7 @@ namespace BlueMageParty.Server.Controllers
             user.VerificationToken = null; // Clear the token after verification
             user.VerificationCode = null;
             user.VerificationExpires = null;
-            user.UpdatedOn = DateTime.Now;
+            user.UpdatedOn = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
             // Get the frontend URL from configuration
