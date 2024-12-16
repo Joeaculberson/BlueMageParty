@@ -15,7 +15,7 @@
 
                 <!-- Confirm Password Input -->
                 <v-text-field v-model="confirmPassword" label="Confirm Password" type="password"
-                  :rules="[confirmPasswordRule]" required @keydown.enter="register" />
+                  :rules="[confirmPasswordValidation]" required @keydown.enter="register" />
               </v-card-text>
 
               <v-card-actions class="justify-space-between">
@@ -41,6 +41,7 @@ import { useRouter } from "vue-router";
 import axios from "axios";
 import { REGISTER_URL } from "@/constants/api";
 import { useAuthStore } from '@/stores/authStore';
+import { emailRule, passwordRule, confirmPasswordRule } from '@/utils/validationRules';
 
 export default defineComponent({
   name: "Register",
@@ -54,14 +55,8 @@ export default defineComponent({
     const router = useRouter();
     const authStore = useAuthStore();
 
-    // Validation rules
-    const emailRule = (value: string) => !!value || "Email is required";
-    const passwordRule = (value: string) => !!value || "Password is required";
-    const confirmPasswordRule = (value: string) => {
-      if (!value) return "Please confirm your password";
-      if (value !== password.value) return "Passwords do not match";
-      return true;
-    };
+    // Confirm password rule depends on the current password value
+    const confirmPasswordValidation = confirmPasswordRule(() => password.value);
 
     // Register method
     const register = async () => {
@@ -107,6 +102,7 @@ export default defineComponent({
       emailRule,
       passwordRule,
       confirmPasswordRule,
+      confirmPasswordValidation
     };
   },
 });

@@ -2,6 +2,7 @@
 using BlueMageParty.Server.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using static BlueMageParty.Server.Controllers.RegisterController;
 
 namespace BlueMageParty.Server.Controllers
@@ -33,9 +34,14 @@ namespace BlueMageParty.Server.Controllers
                 return BadRequest("User does not exist.");
             }
 
-            if(user.PasswordResetTokenExpiry != null)
+            if(!user.IsVerified)
             {
-                var timeInitialRequestWasSubmitted = user.PasswordResetTokenExpiry.GetValueOrDefault().AddMinutes(-int.Parse(_configuration["EmailTimeoutMinutes"]));
+                return BadRequest("User is not verified.");
+            }
+
+            if(user.PasswordResetTokenExpires != null)
+            {
+                var timeInitialRequestWasSubmitted = user.PasswordResetTokenExpires.GetValueOrDefault().AddMinutes(-int.Parse(_configuration["EmailTimeoutMinutes"]));
                 if (DateTime.UtcNow < timeInitialRequestWasSubmitted.AddMinutes(int.Parse(_configuration["EmailWaitMinutes"])))
                 {
                     return BadRequest("Please wait " + int.Parse(_configuration["EmailWaitMinutes"]) + " minute(s) before requesting another password reset.");
@@ -43,24 +49,70 @@ namespace BlueMageParty.Server.Controllers
             }
 
             user.PasswordResetToken = TokenManager.GenerateToken();
-            user.PasswordResetTokenExpiry = DateTime.UtcNow.AddMinutes(int.Parse(_configuration["EmailTimeoutMinutes"]));
+            user.PasswordResetTokenExpires = DateTime.UtcNow.AddMinutes(int.Parse(_configuration["EmailTimeoutMinutes"]));
             this._context.Update(user);
             await this._context.SaveChangesAsync();
 
-            var verificationUrl = $"{_configuration["BackendUrl"]}/api/ResetPassword/ResetPassword?token={user.PasswordResetToken}";
+            var verificationUrl = $"{_configuration["BackendUrl"]}/api/ResetPassword/ResetPasswordRedirect?token={user.PasswordResetToken}";
             await EmailManager.SendEmail(request.Email, "Complete your password reset request", "Click <a href='" + verificationUrl + "'>here</a> to reset your password.", this._configuration);
 
             return Ok(new { message = "Password reset email sent." });
         }
 
+        [HttpGet("ResetPasswordRedirect")]
+        public async Task<IActionResult> ResetPasswordRedirect(string token)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.PasswordResetToken == token);
+
+            if (user == null)
+            {
+                return BadRequest("Invalid password reset link.");
+            }
+
+            if (user.PasswordResetTokenExpires < DateTime.UtcNow)
+            {
+                return BadRequest("Password reset link has expired.");
+            }
+
+            // Redirect to the login page on the frontend
+            return Redirect($"{_configuration["FrontendUrl"]}/resetpassword?token=" + token);
+        }
+
         [HttpPost("ResetPassword")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordBodyRequest request)
         {
-            //TODO
-            return Ok(new { message = "Password reset successfully." });
+            if (string.IsNullOrEmpty(request.Password))
+            {
+                return BadRequest("Password is required.");
+            }
+
+            if (string.IsNullOrEmpty(request.Token))
+            {
+                return BadRequest("Token is required.");
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.PasswordResetToken == request.Token);
+
+            if (user == null)
+            {
+                return BadRequest("Invalid password reset token.");
+            }
+
+            if (user.PasswordResetTokenExpires < DateTime.UtcNow)
+            {
+                return BadRequest("Password reset token has expired.");
+            }
+
+            user.PasswordResetToken = null;
+            user.PasswordResetTokenExpires = null;
+            user.Password = PasswordHasher.HashPassword(request.Password);
+            user.UpdatedOn = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            return Ok("Password reset successfully.");
         }
 
         public record class ResetPasswordRequestRequest(string Email);
-        public record class ResetPasswordBodyRequest(string Password);
+        public record class ResetPasswordBodyRequest(string Password, string Token);
     }
 }

@@ -33,6 +33,8 @@
 import { ref } from 'vue';
 import axios from 'axios';
 import { RESET_PASSWORD_REQUEST_URL } from '@/constants/api';
+import { useAuthStore } from '@/stores/authStore';
+import { emailRule } from '@/utils/validationRules';
 
 export default {
     name: 'resetPassword',
@@ -42,8 +44,7 @@ export default {
         const alertType = ref<'success' | 'error' | 'info' | 'warning'>('info');
         const isValid = ref(false);
         const isVerifying = ref(false);
-
-        const emailRule = (value: string) => !!value || "Email is required";
+        const authStore = useAuthStore();
 
         const resetPasswordRequest = async () => {
             if (!isValid.value) return;
@@ -53,6 +54,9 @@ export default {
 
             try {
                 const response = await axios.post(RESET_PASSWORD_REQUEST_URL, { email: email.value });
+
+                // Store email in Pinia
+                authStore.setEmail(email.value);
 
                 alertType.value = 'success';
                 message.value = 'Password reset email has been sent.';

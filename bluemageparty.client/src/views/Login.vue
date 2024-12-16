@@ -36,6 +36,7 @@ import axios from 'axios';
 import { LOGIN_URL } from '@/constants/api';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/authStore';
+import { emailRule, passwordRule } from '@/utils/validationRules';
 
 export default {
     name: 'Login',
@@ -50,15 +51,16 @@ export default {
         const route = useRoute();
         const authStore = useAuthStore();
 
-        // Validation rules
-        const emailRule = (value: string) => !!value || "Email is required";
-        const passwordRule = (value: string) => !!value || "Password is required";
-
         // Check for verification success message on mount
         onMounted(() => {
             if (route.query.verified) {
                 alertType.value = 'success';
                 message.value = 'Your account has been successfully verified. You can now log in.';
+            }
+
+            if(route.query.passwordreset) {
+                alertType.value = 'success';
+                message.value = 'Your password has been successfully reset.';
             }
         });
 
@@ -81,6 +83,8 @@ export default {
                     console.log('No login response');
                 }
             } catch (error) {
+                alertType.value = 'error';
+                message.value = error.response.data;
                 console.error('Login failed:', error);
             } finally {
                 isVerifying.value = false;

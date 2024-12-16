@@ -47,7 +47,11 @@ export default {
         const isValid = ref(false);
         const isVerifying = ref(false);
 
-        const emailRule = (value: string) => !!value || "Email is required";
+        const emailRule = (value: string) => {
+            if (!value) return "Email is required";
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(value) || "Please enter a valid email address";
+        };
 
         const resendActivationEmail = async () => {
             if (!isValid.value) return;
