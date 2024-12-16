@@ -1,6 +1,6 @@
 <template>
     <v-app-bar app color="primary" dark>
-        <v-app-bar-nav-icon></v-app-bar-nav-icon>
+        <v-app-bar-nav-icon @click="drawer = !drawer" />
         <v-toolbar-title>Blue Mage Party</v-toolbar-title>
 
         <v-spacer></v-spacer>
@@ -31,6 +31,7 @@ export default {
         const router = useRouter();
         const route = useRoute();
         const authStore = useAuthStore();  // Access the store
+        const drawer = false;
 
         // Reactive variable to check if user is authenticated
         const isAuthenticated = computed(() => authStore.isAuthenticated);
@@ -53,6 +54,7 @@ export default {
             goToLogin,
             goToRegisterPage,
             logout,
+            drawer,
             isOnLoginPage,
             isOnRegisterPage,
         };

@@ -26,10 +26,10 @@
 
         [HttpPost("Login")]
         public async Task<IActionResult> LoginAsync([FromBody] LoginRequest request)
-        {   
+        {
             try
             {
-                if(string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
+                if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
                 {
                     return BadRequest("Email and password are required");
                 }
@@ -40,21 +40,47 @@
                     return Unauthorized("Invalid credentials");
                 }
 
-                if (request.Email.ToLower() == user.Email.ToLower()
-                    && PasswordHasher.VerifyPassword(request.Password, user.Password))
+                // Check if the user is locked out
+                if (user.LockoutEnd.HasValue && user.LockoutEnd.Value > DateTime.UtcNow)
                 {
-                    if(user.IsVerified)
+                    return Unauthorized($"Your account is locked until {user.LockoutEnd.Value.ToLocalTime()}.");
+                }
+
+                // Verify the password
+                if (PasswordHasher.VerifyPassword(request.Password, user.Password))
+                {
+                    if (user.IsVerified)
                     {
+                        // Reset failed login attempts on successful login
+                        user.FailedLoginAttempts = 0;
+                        user.LockoutEnd = null;
+                        await _context.SaveChangesAsync();
+
                         var token = GenerateJwtToken(request.Email);
                         return Ok(new { auth_token = token });
-                    } else
+                    }
+                    else
                     {
                         return Unauthorized("Your account needs to be verified before you can login.");
                     }
                 }
+                else
+                {
+                    // Increment failed login attempts
+                    user.FailedLoginAttempts += 1;
 
-                return Unauthorized("Invalid credentials");
-            } catch (Exception ex) 
+                    // Check if failed attempts exceed the limit
+                    if (user.FailedLoginAttempts >= 5) // Adjust limit as needed
+                    {
+                        user.LockoutEnd = DateTime.UtcNow.AddMinutes(15); // Lockout duration
+                        user.FailedLoginAttempts = 0; // Reset attempts after lockout
+                    }
+
+                    await _context.SaveChangesAsync();
+                    return Unauthorized("Invalid credentials");
+                }
+            }
+            catch (Exception ex)
             {
                 var error = new ErrorLog()
                 {
@@ -65,8 +91,9 @@
                 this._context.ErrorLogs.Add(error);
                 await _context.SaveChangesAsync();
                 throw ex;
-            } 
+            }
         }
+
 
         private string GenerateJwtToken(string username)
         {
