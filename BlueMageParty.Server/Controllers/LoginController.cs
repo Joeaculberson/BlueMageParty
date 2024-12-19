@@ -43,7 +43,7 @@
                 // Check if the user is locked out
                 if (user.LockoutEnd.HasValue && user.LockoutEnd.Value > DateTime.UtcNow)
                 {
-                    return Unauthorized($"Your account is locked until {user.LockoutEnd.Value.ToLocalTime()}.");
+                    return Unauthorized($"Your account is locked. Please try again later.");
                 }
 
                 // Verify the password
