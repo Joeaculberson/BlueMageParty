@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlueMageParty.Server.Migrations
 {
     [DbContext(typeof(BlueMagePartyContext))]
-    [Migration("20241219192700_Spell")]
+    [Migration("20250102222833_Spell")]
     partial class Spell
     {
         /// <inheritdoc />
@@ -91,6 +91,63 @@ namespace BlueMageParty.Server.Migrations
                     b.ToTable("ErrorLogs");
                 });
 
+            modelBuilder.Entity("BlueMageParty.Server.Models.Spell", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Enemy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IconUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Number")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Patch")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Spells");
+                });
+
+            modelBuilder.Entity("BlueMageParty.Server.Models.SpellsOwned", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("SpellId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SpellId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SpellsOwned");
+                });
+
             modelBuilder.Entity("BlueMageParty.Server.Models.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -159,6 +216,25 @@ namespace BlueMageParty.Server.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BlueMageParty.Server.Models.SpellsOwned", b =>
+                {
+                    b.HasOne("BlueMageParty.Server.Models.Spell", "Spell")
+                        .WithMany()
+                        .HasForeignKey("SpellId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BlueMageParty.Server.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Spell");
 
                     b.Navigation("User");
                 });

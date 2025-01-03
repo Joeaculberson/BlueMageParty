@@ -11,11 +11,18 @@ export const useAuthStore = defineStore('auth', {
       this.isAuthenticated = true;  // Update the state
     },
     logout() {
-      localStorage.removeItem('auth_token');  // Remove token from localStorage
+      localStorage.removeItem('auth_token'); // Remove token from localStorage
+      this.email = '';
       this.isAuthenticated = false;  // Update the state
+    },
+    getAuthToken() {
+      return localStorage.getItem('auth_token')
     },
     setEmail(newEmail: string) {
       this.email = newEmail;
+    },
+    getEmail() {
+      return this.email;
     },
     clearEmail() {
       this.email = '';

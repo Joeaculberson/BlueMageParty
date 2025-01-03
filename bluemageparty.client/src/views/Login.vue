@@ -7,10 +7,8 @@
                         <v-form v-model="isValid">
                             <v-card-text>
                                 <!-- Email and Password Fields -->
-                                <v-text-field label="Email" v-model="email" type="email" :rules="[emailRule]"
-                                    required />
-                                <v-text-field label="Password" v-model="password" type="password"
-                                    :rules="[passwordRule]" required @keydown.enter="login" />
+                                <v-text-field label="Email" v-model="email" type="email" :rules="[emailRule]" required />
+                                <v-text-field label="Password" v-model="password" type="password" :rules="[passwordRule]" required @keydown.enter="login" />
                             </v-card-text>
 
                             <v-card-actions class="justify-space-between">
@@ -51,14 +49,14 @@ export default {
         const route = useRoute();
         const authStore = useAuthStore();
 
-        // Check for verification success message on mount
         onMounted(() => {
+            // Check for query parameters
             if (route.query.verified) {
                 alertType.value = 'success';
                 message.value = 'Your account has been successfully verified. You can now log in.';
             }
 
-            if(route.query.passwordreset) {
+            if (route.query.passwordreset) {
                 alertType.value = 'success';
                 message.value = 'Your password has been successfully reset.';
             }
@@ -76,6 +74,7 @@ export default {
                     alertType.value = 'success';
                     console.log("login response: success");
                     authStore.login(response.data.auth_token);
+                    authStore.setEmail(email.value);
                     router.push('/dashboard'); // Redirect to the dashboard after login
                 } else {
                     alertType.value = 'error';
@@ -84,7 +83,7 @@ export default {
                 }
             } catch (error) {
                 alertType.value = 'error';
-                message.value = error.response.data;
+                message.value = error.response?.data || 'An error occurred during login.';
                 console.error('Login failed:', error);
             } finally {
                 isVerifying.value = false;

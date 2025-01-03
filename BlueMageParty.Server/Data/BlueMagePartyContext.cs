@@ -6,6 +6,8 @@ namespace BlueMageParty.Server.Data
     public class BlueMagePartyContext : DbContext
     {
         public DbSet<User> Users { get; set; }
+        public DbSet<Spell> Spells { get; set; }
+        public DbSet<SpellsOwned> SpellsOwned { get; set; }
         public DbSet<Character> Characters { get; set; }
         public DbSet<ErrorLog> ErrorLogs { get; set; }
 
