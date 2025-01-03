@@ -2,6 +2,7 @@
 using BlueMageParty.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace BlueMageParty.Server.Controllers
 {
@@ -24,28 +25,6 @@ namespace BlueMageParty.Server.Controllers
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
             return await _context.Users.ToListAsync();
-        }
-
-        [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
-        {
-            var user = await _context.Users.FindAsync(id);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return user;
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<User>> CreateUser(User user)
-        {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
         }
 
         [HttpPut("{id}")]
@@ -92,5 +71,50 @@ namespace BlueMageParty.Server.Controllers
 
             return NoContent();
         }
+
+        [HttpGet("JWT/{jwt}")]
+        public async Task<ActionResult<User>> GetUser(string jwt)
+        {
+            string email = TokenDecoder.DecodeEmailFromJwtToken(jwt);
+
+            if (email == null)
+            {
+                return Unauthorized("Invalid token or email not found.");
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            // Even though it's encoded, I don't want to take any chances
+            user.Password = string.Empty;
+            user.PasswordResetToken = string.Empty;
+
+            return user;
+        }
+
+        [HttpGet("IsAdmin/{jwt}")]
+        public async Task<ActionResult<bool>> IsAdmin(string jwt)
+        {
+            string email = TokenDecoder.DecodeEmailFromJwtToken(jwt);
+
+            if (email == null)
+            {
+                return Unauthorized("Invalid token or email not found.");
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            return user.IsAdmin;
+        }
     }
+
 }

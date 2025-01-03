@@ -24,6 +24,7 @@ namespace BlueMageParty.Server.Models
         public DateTime? PasswordResetTokenExpires { get; set; }
         public int FailedLoginAttempts { get; set; } = 0;
         public DateTime? LockoutEnd { get; set; }
+        public bool IsAdmin { get; set; } = false;
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedOn { get; set; } = DateTime.UtcNow;
 
