@@ -10,3 +10,4 @@ export const RESET_PASSWORD_REQUEST_URL = `${API_BASE_URL}/ResetPassword/ResetPa
 export const RESET_PASSWORD_URL = `${API_BASE_URL}/ResetPassword/ResetPassword`
 export const SAVE_SPELLS_BULK_URL = `${API_BASE_URL}/Spells/SaveBulk`
 export const GET_USER_ADMIN_URL = `${API_BASE_URL}/Users/IsAdmin/`
+export const GET_SPELLS_URL = `${API_BASE_URL}/Spells`

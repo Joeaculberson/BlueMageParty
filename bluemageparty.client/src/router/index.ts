@@ -2,12 +2,13 @@ import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '@/stores/authStore';
 import Home from '../views/Home.vue';
 import Login from '../views/Login.vue';
-import Dashboard from '../views/Dashboard.vue';
+import SpellManager from '../views/SpellManager.vue';
 import Register from '../views/Register.vue';
 import Verify from '../views/Verify.vue';
 import ResendActivationEmail from '../views/ResendActivationEmail.vue';
 import ResetPasswordRequest from '@/views/ResetPasswordRequest.vue';
 import ResetPassword from '@/views/ResetPassword.vue';
+import Parties from '@/views/Parties.vue';
 
 const routes = [
   {
@@ -23,8 +24,8 @@ const routes = [
     component: Register,
   },
   {
-    path: '/dashboard',
-    component: Dashboard,
+    path: '/spellmanager',
+    component: SpellManager,
   },
   {
     path: '/verify',
@@ -41,6 +42,10 @@ const routes = [
   {
     path: '/ResetPassword',
     component: ResetPassword
+  },
+  {
+    path: '/Parties',
+    component: Parties
   }
 ];
 
@@ -55,7 +60,7 @@ router.beforeEach((to, from, next) => {
 
   // If the user is logged in and tries to access login or register, redirect to dashboard
   if (isAuthenticated && (to.path === '/login' || to.path === '/register')) {
-    next('/dashboard'); // Redirect to dashboard if logged in
+    next('/spellmanager'); // Redirect if logged in
   } else {
     next(); // Proceed to the requested route if not logged in or accessing other routes
   }

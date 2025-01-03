@@ -75,7 +75,7 @@ export default {
                     console.log("login response: success");
                     authStore.login(response.data.auth_token);
                     authStore.setEmail(email.value);
-                    router.push('/dashboard'); // Redirect to the dashboard after login
+                    router.push('/spellmanager'); // Redirect to the dashboard after login
                 } else {
                     alertType.value = 'error';
                     message.value = response.data.message;

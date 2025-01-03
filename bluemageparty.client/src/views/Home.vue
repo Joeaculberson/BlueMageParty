@@ -22,7 +22,7 @@ export default {
         // Redirect to Dashboard if logged in
         onMounted(() => {
             if (authStore.isAuthenticated) {
-                router.push('/dashboard');
+                router.push('/spellmanager');
             }
         });
     },
