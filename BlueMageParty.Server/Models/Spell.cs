@@ -17,5 +17,6 @@ namespace BlueMageParty.Server.Models
         public string Icon { get; set; } = null!;
         public string TypeName { get; set; } = null!;
         public string AspectName { get; set; } = null!;
+        public ICollection<SpellSource> SpellSources { get; set; }
     }
 }

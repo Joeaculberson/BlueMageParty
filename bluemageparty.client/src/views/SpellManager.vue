@@ -19,6 +19,9 @@
           <th class="text-left">
             Patch
           </th>
+          <th class="text-left">
+            <span style="visibility: hidden;">Space</span>
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -28,6 +31,7 @@
           <td>{{ spell.name }}</td>
           <td>{{ spell.description }}</td>
           <td>{{ spell.patch }}</td>
+          <td></td>
         </tr>
       </tbody>
     </v-table>
