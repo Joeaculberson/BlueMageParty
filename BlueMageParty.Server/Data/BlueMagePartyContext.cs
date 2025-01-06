@@ -10,7 +10,7 @@ namespace BlueMageParty.Server.Data
         public DbSet<SpellsOwned> SpellsOwned { get; set; }
         public DbSet<Character> Characters { get; set; }
         public DbSet<ErrorLog> ErrorLogs { get; set; }
-
+        public DbSet<SpellSource> SpellSources { get; set; }
         public BlueMagePartyContext(DbContextOptions<BlueMagePartyContext> options)
             : base(options)
         {
@@ -28,7 +28,12 @@ namespace BlueMageParty.Server.Data
                 .HasOne(e => e.User)
                 .WithMany(u => u.ErrorLogs)
                 .HasForeignKey(e => e.UserId);
-              
+
+            modelBuilder.Entity<SpellSource>()
+                .HasOne(e => e.Spell)
+                .WithMany(u => u.SpellSources)
+                .HasForeignKey(e => e.SpellId);
+
             base.OnModelCreating(modelBuilder);
         }
     }

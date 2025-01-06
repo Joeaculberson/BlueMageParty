@@ -1,6 +1,7 @@
 ﻿using BlueMageParty.Server.Data;
 using BlueMageParty.Server.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -13,6 +14,38 @@ public class SpellsController : ControllerBase
         _context = context;
     }
 
+    /// <summary>
+    /// A method that returns all spells in the Spells table.
+    /// </summary>
+    /// <param name="spells"></param>
+    /// <returns>All spells in the Spells table.</returns>
+    [HttpGet]
+    public async Task<IActionResult> GetSpells()
+    {
+        try
+        {
+            return Ok(_context.Spells.ToList());
+        }
+        catch (Exception ex)
+        {
+            var error = new ErrorLog()
+            {
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            this._context.ErrorLogs.Add(error);
+            await _context.SaveChangesAsync();
+            throw ex;
+        }
+
+    }
+
+    /// <summary>
+    /// A method that saves spells to the Spells table if they don't already exist in bulk.
+    /// </summary>
+    /// <param name="spells"></param>
+    /// <returns></returns>
     [HttpPost("SaveBulk")]
     public async Task<IActionResult> SaveSpells([FromBody] List<Spell> spells)
     {
