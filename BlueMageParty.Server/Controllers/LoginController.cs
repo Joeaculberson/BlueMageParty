@@ -56,7 +56,7 @@
                         user.LockoutEnd = null;
                         await _context.SaveChangesAsync();
 
-                        var token = GenerateJwtToken(request.Email);
+                        var token = GenerateJwtToken(request.Email, user.Id);
                         return Ok(new { auth_token = token });
                     }
                     else
@@ -95,11 +95,12 @@
         }
 
 
-        private string GenerateJwtToken(string username)
+        private string GenerateJwtToken(string username, Guid userId)
         {
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, username),
+                new Claim("user_id", userId.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 

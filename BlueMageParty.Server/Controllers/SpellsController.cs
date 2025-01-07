@@ -1,4 +1,5 @@
 ﻿using BlueMageParty.Server.Data;
+using BlueMageParty.Server.Migrations;
 using BlueMageParty.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -24,7 +25,8 @@ public class SpellsController : ControllerBase
     {
         try
         {
-            return Ok(_context.Spells.ToList());
+            var spells = await _context.Spells.ToListAsync();
+            return Ok(spells);
         }
         catch (Exception ex)
         {
@@ -41,33 +43,43 @@ public class SpellsController : ControllerBase
 
     }
 
-    /// <summary>
-    /// A method that saves spells to the Spells table if they don't already exist in bulk.
-    /// </summary>
-    /// <param name="spells"></param>
-    /// <returns></returns>
-    [HttpPost("SaveBulk")]
-    public async Task<IActionResult> SaveSpells([FromBody] List<Spell> spells)
+    [HttpPost]
+    public async Task<IActionResult> UpdateSpellOwned([FromBody] SpellOwnedVM spellOwned)
     {
         try
         {
-            if (spells == null || spells.Count == 0)
+            if (spellOwned == null)
             {
-                return BadRequest("Invalid spell data.");
+                return BadRequest("Invalid spellOwned data.");
+            }
+            
+            var userId = TokenDecoder.DecodeEmailFromJwtToken(spellOwned.AuthToken);
+            if (userId == null)
+            {
+                return BadRequest("Invalid auth token.");
             }
 
-            // Filter out spells that already exist in the database. Order == Id
-            var existingIds = _context.Spells.Select(s => s.Number).ToHashSet();
-            var newSpells = spells.Where(s => !existingIds.Contains(s.Number)).ToList();
-
-            if (newSpells.Any())
+            var spellOwnedResult = this._context.SpellsOwned.FirstOrDefault(
+                x => x.SpellId == spellOwned.SpellId && x.UserId == new Guid(userId));
+            if(spellOwnedResult == null)
             {
-                _context.Spells.AddRange(newSpells);
-                await _context.SaveChangesAsync();
+                //Add to table
+                await this._context.SpellsOwned.AddAsync(new SpellOwned()
+                {
+                    SpellId = spellOwned.SpellId,
+                    UserId = new Guid(userId),
+                    Owned = spellOwned.Owned
+                });
+            } else
+            {
+                //Update
+                spellOwnedResult.Owned = spellOwned.Owned;
+                this._context.SpellsOwned.Update(spellOwnedResult);
             }
+            await this._context.SaveChangesAsync();
 
-            return Ok(new { message = $"{newSpells.Count} new spells saved successfully." });
-        } 
+            return Ok(_context.Spells.ToList());
+        }
         catch (Exception ex)
         {
             var error = new ErrorLog()
@@ -80,6 +92,98 @@ public class SpellsController : ControllerBase
             await _context.SaveChangesAsync();
             throw ex;
         }
+    }
 
+    /// <summary>
+    /// Save multiple spells with their associated sources.
+    /// </summary>
+    [HttpPost("SaveBulk")]
+    public async Task<IActionResult> SaveBulkSpells([FromBody] List<SpellVM> spells)
+    {
+        if (spells == null || spells.Count == 0)
+        {
+            return BadRequest("Invalid spell data.");
+        }
+
+        try
+        {
+            // Filter out spells that already exist in the database based on the spell Number
+            var existingSpells = _context.Spells
+                .Where(s => spells.Select(spell => spell.Number).Contains(s.Number))
+                .ToDictionary(s => s.Number, s => s.Id);
+
+            var newSpells = new List<Spell>();
+            var newSpellSources = new List<SpellSource>();
+
+            foreach (var spellVM in spells)
+            {
+                // Add new spell if it doesn't exist
+                if (!existingSpells.ContainsKey(spellVM.Number))
+                {
+                    var newSpell = new Spell
+                    {
+                        Number = spellVM.Number,
+                        Name = spellVM.Name,
+                        Description = spellVM.Description,
+                        Tooltip = spellVM.Tooltip,
+                        Order = spellVM.Order,
+                        Rank = spellVM.Rank,
+                        Patch = spellVM.Patch,
+                        Icon = spellVM.Icon,
+                        TypeName = spellVM.TypeName,
+                        AspectName = spellVM.AspectName
+                    };
+
+                    newSpells.Add(newSpell);
+                }
+            }
+
+            if (newSpells.Any())
+            {
+                // Save the new spells first, so that their Ids are populated
+                await _context.Spells.AddRangeAsync(newSpells);
+                await _context.SaveChangesAsync(); // This will populate the Ids of the spells
+
+                // Now, create and link the SpellSource entities
+                foreach (var spellVM in spells)
+                {
+                    if (!existingSpells.ContainsKey(spellVM.Number))
+                    {
+                        var savedSpell = newSpells.FirstOrDefault(s => s.Number == spellVM.Number);
+
+                        if (savedSpell != null && spellVM.Sources != null && spellVM.Sources.Any())
+                        {
+                            var newSpellSource = new SpellSource
+                            {
+                                SpellId = savedSpell.Id, // Link to the saved spell Id
+                                Enemy = spellVM.Sources.FirstOrDefault()?.Enemy,
+                                Location = spellVM.Sources.FirstOrDefault()?.Location
+                            };
+
+                            newSpellSources.Add(newSpellSource);
+                        }
+                    }
+                }
+
+                // Save the new spell sources
+                await _context.SpellSources.AddRangeAsync(newSpellSources);
+                await _context.SaveChangesAsync();
+            }
+
+            return Ok(new { message = $"{newSpells.Count} new spells and their sources saved successfully." });
+        }
+        catch (Exception ex)
+        {
+            // Log error and return an internal server error
+            var error = new ErrorLog
+            {
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+            _context.ErrorLogs.Add(error);
+            await _context.SaveChangesAsync();
+
+            return StatusCode(500, "An error occurred while saving spells and their sources.");
+        }
     }
 }

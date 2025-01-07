@@ -7,7 +7,7 @@ namespace BlueMageParty.Server.Data
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Spell> Spells { get; set; }
-        public DbSet<SpellsOwned> SpellsOwned { get; set; }
+        public DbSet<SpellOwned> SpellsOwned { get; set; }
         public DbSet<Character> Characters { get; set; }
         public DbSet<ErrorLog> ErrorLogs { get; set; }
         public DbSet<SpellSource> SpellSources { get; set; }
@@ -31,8 +31,9 @@ namespace BlueMageParty.Server.Data
 
             modelBuilder.Entity<SpellSource>()
                 .HasOne(e => e.Spell)
-                .WithMany(u => u.SpellSources)
-                .HasForeignKey(e => e.SpellId);
+                .WithMany(u => u.Sources)
+                .HasForeignKey(e => e.SpellId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(modelBuilder);
         }

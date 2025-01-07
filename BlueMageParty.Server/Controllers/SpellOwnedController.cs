@@ -10,11 +10,11 @@ namespace BlueMageParty.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SpellsOwnedController : ControllerBase
+    public class SpellOwnedController : ControllerBase
     {
         private readonly BlueMagePartyContext _context;
 
-        public SpellsOwnedController(BlueMagePartyContext context)
+        public SpellOwnedController(BlueMagePartyContext context)
         {
             _context = context;
         }
@@ -36,7 +36,7 @@ namespace BlueMageParty.Server.Controllers
 
             if (existingSpellOwned == null)
             {
-                SpellsOwned spellOwned = new SpellsOwned();
+                SpellOwned spellOwned = new SpellOwned();
                 spellOwned.SpellId = spellId;
                 spellOwned.UserId = userId;
                 spellOwned.CreatedOn = DateTime.UtcNow;
