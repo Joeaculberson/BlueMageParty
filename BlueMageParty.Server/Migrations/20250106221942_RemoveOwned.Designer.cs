@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlueMageParty.Server.Migrations
 {
     [DbContext(typeof(BlueMagePartyContext))]
-    [Migration("20250102222833_Spell")]
-    partial class Spell
+    [Migration("20250106221942_RemoveOwned")]
+    partial class RemoveOwned
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -97,11 +97,55 @@ namespace BlueMageParty.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Enemy")
+                    b.Property<string>("AspectName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("IconUrl")
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Icon")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Number")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Patch")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Rank")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Tooltip")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TypeName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Spells");
+                });
+
+            modelBuilder.Entity("BlueMageParty.Server.Models.SpellSource", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Enemy")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -109,16 +153,14 @@ namespace BlueMageParty.Server.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Number")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Patch")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("SpellId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Spells");
+                    b.HasIndex("SpellId");
+
+                    b.ToTable("SpellSources");
                 });
 
             modelBuilder.Entity("BlueMageParty.Server.Models.SpellsOwned", b =>
@@ -164,6 +206,9 @@ namespace BlueMageParty.Server.Migrations
 
                     b.Property<int>("FailedLoginAttempts")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsVerified")
                         .HasColumnType("bit");
@@ -220,6 +265,17 @@ namespace BlueMageParty.Server.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("BlueMageParty.Server.Models.SpellSource", b =>
+                {
+                    b.HasOne("BlueMageParty.Server.Models.Spell", "Spell")
+                        .WithMany("Sources")
+                        .HasForeignKey("SpellId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Spell");
+                });
+
             modelBuilder.Entity("BlueMageParty.Server.Models.SpellsOwned", b =>
                 {
                     b.HasOne("BlueMageParty.Server.Models.Spell", "Spell")
@@ -237,6 +293,11 @@ namespace BlueMageParty.Server.Migrations
                     b.Navigation("Spell");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BlueMageParty.Server.Models.Spell", b =>
+                {
+                    b.Navigation("Sources");
                 });
 
             modelBuilder.Entity("BlueMageParty.Server.Models.User", b =>

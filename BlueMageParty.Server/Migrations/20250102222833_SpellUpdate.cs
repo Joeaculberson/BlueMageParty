@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BlueMageParty.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class Spell : Migration
+    public partial class SpellUpdate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

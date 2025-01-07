@@ -1,46 +1,56 @@
 <template>
-    <v-container>  
-    <v-table>
-      <thead>
-        <tr>
-          <th class="text-left">
-            #  <span style="visibility: hidden;">Space</span>
-          </th>
-          <th class="text-left">
-            <!-- Empty span to keep the column in place -->
-            <span style="visibility: hidden;">Icon Space</span>
-          </th>
-          <th class="text-left">
-            Name
-          </th>
-          <th class="text-left">
-            Description
-          </th>
-          <th class="text-left">
-            Patch
-          </th>
-          <th class="text-left">
-            <span style="visibility: hidden;">Space</span>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="spell in spells" :key="spell.name">
-          <td>No. {{ spell.number }}</td>
-          <td><v-img :src="spell.icon" class="spell-sprite" max-width="42" max-height="42" /></td>
-          <td>{{ spell.name }}</td>
-          <td>{{ spell.description }}</td>
-          <td>{{ spell.patch }}</td>
-          <td></td>
-        </tr>
-      </tbody>
-    </v-table>
-
+    <v-container>
+      <v-table>
+        <thead>
+          <tr>
+            <th class="text-left">
+              #<span style="visibility: hidden;">Number Space</span>
+            </th>
+            <th class="text-left">
+              <!-- Empty span to keep the column in place -->
+              <span style="visibility: hidden;">Icon Space</span>
+            </th>
+            <th class="text-left">
+              Name
+            </th>
+            <th class="text-left">
+              Enemy
+            </th>
+            <th class="text-left">
+              Location
+            </th>
+            <th class="text-left">
+              Patch
+            </th>
+            <th class="text-left">
+              <span style="visibility: hidden;">Space</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="spell in spells" :key="spell.name">
+            <td>No. {{ spell.number }}</td>
+            <td><v-img :src="spell.icon" class="spell-sprite" max-width="42" max-height="42" /></td>
+            <td>{{ spell.name }}</td>
+            <td>{{ spell.enemy }}</td>
+            <td>{{ spell.location }}</td>
+            <td>{{ spell.patch }}</td>
+            <td>
+              <v-checkbox
+                v-model="spell.checked"
+                @change="handleCheckboxChange(spell)"
+                color="primary"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </v-table>
+  
       <!-- Display message if no spells are available -->
       <v-alert v-if="spells.length === 0" type="info" dismissible>
         No spells found.
       </v-alert>
-
+  
       <v-alert v-if="adminMessage" :type="alertType" dismissible>
         {{ adminMessage }}
       </v-alert>
@@ -52,61 +62,149 @@
     </v-container>
   </template>
   
+  
+  
   <script lang="ts">
-  import { ref, onMounted } from 'vue';
-  import axios from 'axios';
-  import { useAuthStore } from '@/stores/authStore';
-  import { GET_USER_ADMIN_URL, GET_SPELLS_URL } from '@/constants/api';
-  
-  export default {
-    name: 'SpellManager',
-    setup() {
-      const authStore = useAuthStore();
-      const alertType = ref<'success' | 'error'>('info');
-      const adminMessage = ref('');
-      const isAdmin = ref(false);
-      const spells = ref<any[]>([]); // Store spells here
-  
-      // Check if the user is an admin
-      const checkAdminStatus = async () => {
-        try {
-          const response = await axios.get(GET_USER_ADMIN_URL + authStore.getAuthToken());
-          isAdmin.value = response.data;
-        } catch (error) {
-          console.error('Error checking admin status:', error);
-          isAdmin.value = false;
-        }
-      };
-  
-      // Fetch and save spells
-      const fetchAndSaveSpells = async () => {
-        try {
-          // First, get the list of all spells
-          const response = await axios.get(GET_SPELLS_URL);
-          spells.value = response.data.reverse(); // Store the spells in the spells array
-  
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
+import { useAuthStore } from '@/stores/authStore';
+import { 
+    GET_USER_ADMIN_URL, 
+    GET_SPELLS_URL, 
+    SAVE_SPELLS_BULK_URL, 
+    UPDATE_SPELL_OWNED_URL,
+    GET_TARO_BOKOKINGWAY_MISSING_SPELLS_URL 
+} from '@/constants/api';
+
+interface Spell {
+  name: string;
+  number: number;
+  description: string;
+  tooltip: string;
+  order: number;
+  rank: number;
+  patch: string;
+  icon: string;
+  type: { id: number; name: string };
+  aspect: { id: number; name: string };
+  sources: { text: string; location: string }[];
+  checked: boolean; // Track checkbox state
+}
+
+export default {
+  name: 'SpellManager',
+  setup() {
+    const authStore = useAuthStore();
+    const alertType = ref<'success' | 'error'>('info');
+    const adminMessage = ref('');
+    const isAdmin = ref(false);
+    const spells = ref<Spell[]>([]); // Store spells here
+
+    // Check if the user is an admin
+    const checkAdminStatus = async () => {
+      try {
+        const response = await axios.get(GET_USER_ADMIN_URL + authStore.getAuthToken());
+        isAdmin.value = response.data;
+      } catch (error) {
+        console.error('Error checking admin status:', error);
+        isAdmin.value = false;
+      }
+    };
+
+    // Fetch the list of spells
+    const getSpells = async () => {
+      try {
+        const response = await axios.get(GET_SPELLS_URL);
+        spells.value = response.data.reverse().map((spell: any) => ({
+          ...spell,
+          checked: false, // Initialize checkbox state as false
+        }));
+        alertType.value = 'success';
+      } catch (error) {
+        alertType.value = 'error';
+        console.error('Error fetching spells:', error);
+      }
+    };
+
+    // Handle checkbox change (trigger POST API call)
+    const handleCheckboxChange = async (spell: Spell) => {
+      try {
+        if (spell.checked) {
+          // Make POST request when checked
+          const response = await axios.post(UPDATE_SPELL_OWNED_URL, { spellId: spell.number });
+          adminMessage.value = `Spell ${spell.name} saved successfully!`;
           alertType.value = 'success';
-        } catch (error) {
-          alertType.value = 'error';
-          console.error('Error fetching spells:', error);
+        } else {
+          // Optionally, you could add logic for when the checkbox is unchecked
+          console.log(`Spell ${spell.name} unchecked`);
         }
-      };
-  
-      onMounted(() => {
-        checkAdminStatus();
-        fetchAndSaveSpells();
-      });
-  
-      return {
-        isAdmin,
-        spells,
-        adminMessage,
-        alertType,
-        fetchAndSaveSpells,
-      };
-    },
-  };
-  </script>
+      } catch (error) {
+        console.error('Error saving spell:', error);
+        adminMessage.value = `Failed to save spell ${spell.name}.`;
+        alertType.value = 'error';
+      }
+    };
+
+     // Fetch and save spells in bulk from external API
+     const fetchAndSaveSpells = async (): Promise<void> => {
+      try {
+        // Fetch the spell data from the external API
+        const response = await axios.get(GET_TARO_BOKOKINGWAY_MISSING_SPELLS_URL);
+
+        const spellsToSave = response.data.map((spell: any) => ({
+          number: spell.order,
+          name: spell.name,
+          description: spell.description,
+          tooltip: spell.tooltip,
+          order: spell.order,
+          rank: spell.rank,
+          patch: spell.patch,
+          icon: spell.icon,
+          typeName: spell.type.name,
+          aspectName: spell.aspect.name,
+          sources: spell.sources.map((source: any) => {
+            const [rawEnemy, rawLocation = ''] = source.text.split('/');
+            const enemy = rawEnemy.trim();
+            const location = rawLocation.trim();
+            return { enemy, location };
+          }),
+        }));
+
+        // Send the spells data in bulk to the server
+        const bulkResponse = await axios.post(SAVE_SPELLS_BULK_URL, spellsToSave, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        alertType.value = 'success';
+        adminMessage.value = bulkResponse.data.message;
+        getSpells();
+      } catch (error) {
+        alertType.value = 'error';
+        adminMessage.value = 'Failed to fetch or save spells.';
+        console.error('Error response:', error.response?.data || error.message);
+      }
+    };
+
+    onMounted(() => {
+      checkAdminStatus();
+      getSpells();
+    });
+
+    return {
+      isAdmin,
+      spells,
+      adminMessage,
+      alertType,
+      getSpells,
+      handleCheckboxChange,
+      fetchAndSaveSpells
+    };
+  },
+};
+</script>
+
   
   <style scoped>
   tbody tr:nth-of-type(odd) {

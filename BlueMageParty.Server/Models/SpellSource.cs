@@ -14,4 +14,12 @@ namespace BlueMageParty.Server.Models
         public string Enemy { get; set; } = null!;
         public string Location { get; set; } = null!;
     }
+
+    public class SpellSourceVM
+    {
+        [Required]
+        public Guid SpellId { get; set; }
+        public string Enemy { get; set; } = null!;
+        public string Location { get; set; } = null!;
+    }
 }
