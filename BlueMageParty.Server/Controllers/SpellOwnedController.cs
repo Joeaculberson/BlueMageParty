@@ -29,39 +29,32 @@ namespace BlueMageParty.Server.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddSpellsOwned(Guid userId, Guid spellId)
+        public async Task<IActionResult> UpdateSpellOwned([FromBody] UpdateSpellOwnedRequest request)
         {
+            Guid userId = TokenDecoder.DecodeUserIdFromJwtToken(request.authToken);
             var existingSpellOwned = await _context.SpellsOwned
-                .FirstOrDefaultAsync(s => s.UserId == userId && s.SpellId == spellId);
+                .FirstOrDefaultAsync(s => s.UserId == userId && s.SpellId == request.spellId);
 
-            if (existingSpellOwned == null)
+            if (existingSpellOwned == null && request.isChecked)
             {
                 SpellOwned spellOwned = new SpellOwned();
-                spellOwned.SpellId = spellId;
+                spellOwned.SpellId = request.spellId;
                 spellOwned.UserId = userId;
+                spellOwned.Owned = request.isChecked;
                 spellOwned.CreatedOn = DateTime.UtcNow;
                 _context.SpellsOwned.Add(spellOwned);
-                await _context.SaveChangesAsync();
-            }
-
-            return NoContent();
-        }
-
-        [HttpDelete]
-        public async Task<IActionResult> DeleteSpellsOwned(Guid userId, Guid spellId)
-        {
-            var existingSpellOwned = await _context.SpellsOwned
-                .FirstOrDefaultAsync(s => s.UserId == userId && s.SpellId == spellId);
-
-            if (existingSpellOwned == null)
+            } else if(existingSpellOwned != null)
             {
-                return NotFound();
+                existingSpellOwned.Owned = request.isChecked;
+                existingSpellOwned.UpdatedOn = DateTime.UtcNow;
+                _context.SpellsOwned.Update(existingSpellOwned);
             }
 
-            _context.SpellsOwned.Remove(existingSpellOwned);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
+
+        public record UpdateSpellOwnedRequest(Guid spellId, string authToken, bool isChecked);
     }
 }

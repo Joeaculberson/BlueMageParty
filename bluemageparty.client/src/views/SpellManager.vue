@@ -23,7 +23,7 @@
               Patch
             </th>
             <th class="text-left">
-              <span style="visibility: hidden;">Space</span>
+              Owned
             </th>
           </tr>
         </thead>
@@ -32,12 +32,21 @@
             <td>No. {{ spell.number }}</td>
             <td><v-img :src="spell.icon" class="spell-sprite" max-width="42" max-height="42" /></td>
             <td>{{ spell.name }}</td>
-            <td>{{ spell.enemy }}</td>
-            <td>{{ spell.location }}</td>
+            <td>
+                <div v-for="source in spell.sources">
+                    {{ source.enemy }}
+                </div>
+            </td>
+            <td>
+                {{ spell.source }}
+                <div v-for="source in spell.sources">
+                    {{ source.location }}
+                </div>
+            </td>
             <td>{{ spell.patch }}</td>
             <td>
               <v-checkbox
-                v-model="spell.checked"
+                v-model="spell.owned"
                 @change="handleCheckboxChange(spell)"
                 color="primary"
               />
@@ -77,6 +86,7 @@ import {
 } from '@/constants/api';
 
 interface Spell {
+    id: string,
   name: string;
   number: number;
   description: string;
@@ -87,8 +97,8 @@ interface Spell {
   icon: string;
   type: { id: number; name: string };
   aspect: { id: number; name: string };
-  sources: { text: string; location: string }[];
-  checked: boolean; // Track checkbox state
+  sources: { enemy: string; location: string }[];
+  owned: boolean; // Track checkbox state
 }
 
 export default {
@@ -114,7 +124,7 @@ export default {
     // Fetch the list of spells
     const getSpells = async () => {
       try {
-        const response = await axios.get(GET_SPELLS_URL);
+        const response = await axios.get(GET_SPELLS_URL + authStore.getAuthToken());
         spells.value = response.data.reverse().map((spell: any) => ({
           ...spell,
           checked: false, // Initialize checkbox state as false
@@ -129,15 +139,13 @@ export default {
     // Handle checkbox change (trigger POST API call)
     const handleCheckboxChange = async (spell: Spell) => {
       try {
-        if (spell.checked) {
           // Make POST request when checked
-          const response = await axios.post(UPDATE_SPELL_OWNED_URL, { spellId: spell.number });
+          const response = await axios.post(UPDATE_SPELL_OWNED_URL, { 
+            spellId: spell.id, 
+            authToken: authStore.getAuthToken(), 
+            isChecked: spell.owned });
           adminMessage.value = `Spell ${spell.name} saved successfully!`;
           alertType.value = 'success';
-        } else {
-          // Optionally, you could add logic for when the checkbox is unchecked
-          console.log(`Spell ${spell.name} unchecked`);
-        }
       } catch (error) {
         console.error('Error saving spell:', error);
         adminMessage.value = `Failed to save spell ${spell.name}.`;
@@ -152,22 +160,32 @@ export default {
         const response = await axios.get(GET_TARO_BOKOKINGWAY_MISSING_SPELLS_URL);
 
         const spellsToSave = response.data.map((spell: any) => ({
-          number: spell.order,
-          name: spell.name,
-          description: spell.description,
-          tooltip: spell.tooltip,
-          order: spell.order,
-          rank: spell.rank,
-          patch: spell.patch,
-          icon: spell.icon,
-          typeName: spell.type.name,
-          aspectName: spell.aspect.name,
-          sources: spell.sources.map((source: any) => {
-            const [rawEnemy, rawLocation = ''] = source.text.split('/');
-            const enemy = rawEnemy.trim();
-            const location = rawLocation.trim();
-            return { enemy, location };
-          }),
+            number: spell.order,
+            name: spell.name,
+            description: spell.description,
+            tooltip: spell.tooltip,
+            order: spell.order,
+            rank: spell.rank,
+            patch: spell.patch,
+            icon: spell.icon,
+            typeName: spell.type.name,
+            aspectName: spell.aspect.name,
+            sources: spell.sources.map((source: any) => {
+                // Split the source text by '/' and trim the parts
+                const parts = source.text.split('/').map((part: string) => part.trim());
+                let enemy = '';
+                let location = '';
+
+                // If there is only one part, assign it to location
+                if (parts.length === 1) {
+                location = parts[0];
+                } else {
+                enemy = parts[0];
+                location = parts[1];
+                }
+
+                return { enemy, location };
+            }),
         }));
 
         // Send the spells data in bulk to the server

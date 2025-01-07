@@ -26,7 +26,7 @@ public class TokenDecoder
         }
     }
 
-    public static string DecodeUserIdFromJwtToken(string token)
+    public static Guid DecodeUserIdFromJwtToken(string token)
     {
         var handler = new JwtSecurityTokenHandler();
 
@@ -38,13 +38,13 @@ public class TokenDecoder
             // Extract the 'sub' claim, which is your username (email)
             var username = jwtToken?.Claims.FirstOrDefault(c => c.Type == "user_id")?.Value;
 
-            return username;
+            return new Guid(username);
         }
         catch (Exception ex)
         {
             // Handle token parsing exceptions (e.g., invalid token format)
             Console.WriteLine($"Error decoding token: {ex.Message}");
-            return null;
+            return Guid.Empty;
         }
     }
 }
