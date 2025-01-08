@@ -11,6 +11,8 @@ namespace BlueMageParty.Server.Data
         public DbSet<Character> Characters { get; set; }
         public DbSet<ErrorLog> ErrorLogs { get; set; }
         public DbSet<SpellSource> SpellSources { get; set; }
+        public DbSet<DataCenter> DataCenters { get; set; }
+        public DbSet<HomeWorld> HomeWorlds { get; set; }
         public BlueMagePartyContext(DbContextOptions<BlueMagePartyContext> options)
             : base(options)
         {
@@ -39,6 +41,12 @@ namespace BlueMageParty.Server.Data
                 .HasOne(e => e.Spell)
                 .WithMany(u => u.Sources)
                 .HasForeignKey(e => e.SpellId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<HomeWorld>()
+                .HasOne(e => e.DataCenter)
+                .WithMany(u => u.HomeWorlds)
+                .HasForeignKey(e => e.DataCenterId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             base.OnModelCreating(modelBuilder);

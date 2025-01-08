@@ -9,6 +9,7 @@ import ResendActivationEmail from '../views/ResendActivationEmail.vue';
 import ResetPasswordRequest from '@/views/ResetPasswordRequest.vue';
 import ResetPassword from '@/views/ResetPassword.vue';
 import Parties from '@/views/Parties.vue';
+import CharacterSearch from '../views/character/Search.vue';
 
 const routes = [
   {
@@ -46,6 +47,10 @@ const routes = [
   {
     path: '/Parties',
     component: Parties
+  },
+  {
+    path: '/character/Search',
+    component: CharacterSearch
   }
 ];
 

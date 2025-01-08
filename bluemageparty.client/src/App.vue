@@ -8,14 +8,10 @@
       <!-- Drawer content goes here -->
       <v-list dense>
         <v-list-item link @click="goToHome">
-          <v-list-item-content>
             <v-list-item-title>Home</v-list-item-title>
-          </v-list-item-content>
         </v-list-item>
         <v-list-item link @click="goToParties">
-          <v-list-item-content>
             <v-list-item-title>Parties</v-list-item-title>
-          </v-list-item-content>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>

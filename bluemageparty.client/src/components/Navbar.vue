@@ -13,6 +13,10 @@
       <v-btn v-if="!isAuthenticated && isOnLoginPage" @click="goToRegisterPage" text>
         Register
       </v-btn>
+
+      <v-btn v-if="isAuthenticated" @click="goToCharacterSearch" text>
+        Select Character
+      </v-btn>
   
       <v-btn v-if="isAuthenticated" @click="logout" text>
         Logout
@@ -47,6 +51,10 @@
         authStore.logout();
         router.push('/login');
       };
+
+      const goToCharacterSearch = () => {
+        router.push('/character/search');
+      };
   
       // Emit event to toggle the drawer when the hamburger button is clicked
       const toggleDrawer = () => {
@@ -61,6 +69,7 @@
         goToRegisterPage,
         logout,
         toggleDrawer,
+        goToCharacterSearch,
         isOnLoginPage,
         isOnRegisterPage,
       };

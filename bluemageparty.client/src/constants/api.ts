@@ -13,3 +13,5 @@ export const GET_USER_ADMIN_URL = `${API_BASE_URL}/Users/IsAdmin/`
 export const GET_SPELLS_URL = `${API_BASE_URL}/Spells/`
 export const GET_TARO_BOKOKINGWAY_MISSING_SPELLS_URL = `https://ffxivcollect.com/api/characters/43958939/spells/missing`
 export const UPDATE_SPELL_OWNED_URL = `${API_BASE_URL}/SpellOwned`
+export const GET_HOME_WORLDS_URL = `${API_BASE_URL}/HomeWorld`
+export const GET_DATA_CENTERS_URL = `${API_BASE_URL}/DataCenter`
