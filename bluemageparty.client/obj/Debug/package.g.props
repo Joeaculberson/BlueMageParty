@@ -12,6 +12,7 @@
     <PackageJsonScriptsTypeCheck Condition="$(PackageJsonScriptsTypeCheck) == ''">vue-tsc --build --force</PackageJsonScriptsTypeCheck>
     <PackageJsonScriptsLint Condition="$(PackageJsonScriptsLint) == ''">eslint . --fix</PackageJsonScriptsLint>
     <PackageJsonDependenciesMdiFont Condition="$(PackageJsonDependenciesMdiFont) == ''">^7.4.47</PackageJsonDependenciesMdiFont>
+    <PackageJsonDependenciesXivapiJs Condition="$(PackageJsonDependenciesXivapiJs) == ''">^0.4.5</PackageJsonDependenciesXivapiJs>
     <PackageJsonDependenciesAxios Condition="$(PackageJsonDependenciesAxios) == ''">^1.7.9</PackageJsonDependenciesAxios>
     <PackageJsonDependenciesCoreJs Condition="$(PackageJsonDependenciesCoreJs) == ''">^3.37.1</PackageJsonDependenciesCoreJs>
     <PackageJsonDependenciesMaterialDesignIconsIconfont Condition="$(PackageJsonDependenciesMaterialDesignIconsIconfont) == ''">^6.7.0</PackageJsonDependenciesMaterialDesignIconsIconfont>

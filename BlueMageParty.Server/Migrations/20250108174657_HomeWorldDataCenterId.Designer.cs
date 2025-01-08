@@ -4,6 +4,7 @@ using BlueMageParty.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlueMageParty.Server.Migrations
 {
     [DbContext(typeof(BlueMagePartyContext))]
-    partial class BlueMagePartyContextModelSnapshot : ModelSnapshot
+    [Migration("20250108174657_HomeWorldDataCenterId")]
+    partial class HomeWorldDataCenterId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -302,13 +305,11 @@ namespace BlueMageParty.Server.Migrations
 
             modelBuilder.Entity("BlueMageParty.Server.Models.HomeWorld", b =>
                 {
-                    b.HasOne("BlueMageParty.Server.Models.DataCenter", "DataCenter")
+                    b.HasOne("BlueMageParty.Server.Models.DataCenter", null)
                         .WithMany("HomeWorlds")
                         .HasForeignKey("DataCenterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("DataCenter");
                 });
 
             modelBuilder.Entity("BlueMageParty.Server.Models.SpellOwned", b =>
