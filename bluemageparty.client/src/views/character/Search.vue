@@ -28,14 +28,12 @@
                         <span class="font-weight-black">Character Search</span>
                     </template>
 
-                    <v-list lines="two">
+                    <v-list lines="one">
                         <div v-for="character in characters">
-                            <v-list-item prepend-avatar="https://cdn.vuetifyjs.com/images/lists/1.jpg"
-                                title="Brunch this weekend?">
+                            <v-list-item :prepend-avatar="character.avatar"
+                                :title="character.name">
                                 <template v-slot:subtitle>
-                                    Character Id: {{ character.id }}
-                                    <span class="font-weight-bold">Ali Connors</span> &mdash; I'll be in your
-                                    neighborhood doing errands this weekend. Do you want to hang out?
+                                    <span class="font-weight-bold">{{ character.server }}</span>
                                 </template>
                             </v-list-item>
 
@@ -54,22 +52,15 @@ import { defineComponent, ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/authStore';
-import { GET_HOME_WORLDS_URL, GET_DATA_CENTERS_URL } from '@/constants/api';
-import XIVAPI from '@xivapi/js';
+import { GET_HOME_WORLDS_URL, GET_DATA_CENTERS_URL, SEARCH_CHARACTER_URL } from '@/constants/api';
 
 export default defineComponent({
     name: 'Home',
     setup() {
-        const xiv = new XIVAPI({
-            private_key: 'b430fb1d0624437a9f7869a0c381ad30e8807f92aa9b48bf8e8c3ddcf490df82',
-            language: 'en',
-            snake_case: true
-        })
         const router = useRouter();
         const authStore = useAuthStore();
-        const characters = ref<BasicCharacterData[]>([]);
         const name = ref('');
-
+        const characters = ref([]);
 
         // Define default values for the selects
         const selectedDataCenter = ref<string | null>('All Data Centers');
@@ -83,16 +74,9 @@ export default defineComponent({
         // Fetch Home Worlds
         const search = async () => {
             try {
-                let response = null;
-
-                if (selectedHomeWorld.value === 'All Worlds') {
-                    response = await xiv.character.search(name.value);
-                } else {
-                    response = await xiv.character.search(name.value, { server: selectedHomeWorld.value });
-                }
-
+                const response = await axios.post(SEARCH_CHARACTER_URL, { name: name.value, world: selectedHomeWorld.value });
+                characters.value = response.data;
                 console.log(response);
-                characters.value = response.Results;
             } catch (error) {
                 console.error('Searching failed:', error);
             }
