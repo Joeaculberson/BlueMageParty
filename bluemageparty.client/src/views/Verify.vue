@@ -75,7 +75,7 @@ export default {
 
             try {
                 const response = await axios.post(VERIFY_CODE_URL, { email, code: code.value });
-                authStore.clearEmail(); // Clear email after verification
+                //authStore.clearEmail(); // Clear email after verification
                 router.push('/login?verified=true');
             } catch (err) {
                 alertType.value = 'error';

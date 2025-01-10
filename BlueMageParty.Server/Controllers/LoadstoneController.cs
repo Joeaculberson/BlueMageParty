@@ -25,29 +25,27 @@ namespace BlueMageParty.Server.Controllers
             try
             {
                 var lodestoneClient = await LodestoneClient.GetClientAsync();
-                //Get Lodestone Id if not known
                 var csq = new CharacterSearchQuery();
                 csq.CharacterName = request.name;
                 csq.World = request.world;
 
                 var searchResponse = await lodestoneClient.SearchCharacter(csq);
-                /*var lodestoneCharacter =
-                    searchResponse?.Results
-                    .FirstOrDefault(entry => entry.Name == request.name);*/
 
                 if(searchResponse == null)
                     return Ok(null);
 
-                List<LodestoneCharacter> characters = new List<LodestoneCharacter>();
-                foreach(var result in searchResponse?.Results.Take(5)) //only get data for the first 5 results
+                var queriedCharacterResults =
+                    searchResponse?.Results
+                    .Where(entry => entry.Name == request.name).Take(5); //only get data for the first 5 results
+                Dictionary<string, LodestoneCharacter> characters = new Dictionary<string, LodestoneCharacter>();
+                foreach(var result in queriedCharacterResults) 
                 {
                     var character = result.GetCharacter().Result;
                     if(character != null)
                     {
-                        characters.Add(character);
+                        characters[result.Id] = character;
                     }
                 }
-                //var result = lodestoneCharacter.GetCharacter().Result;
                 return Ok(characters);
             }
             catch (HttpRequestException ex)

@@ -10,6 +10,7 @@ import ResetPasswordRequest from '@/views/ResetPasswordRequest.vue';
 import ResetPassword from '@/views/ResetPassword.vue';
 import Parties from '@/views/Parties.vue';
 import CharacterSearch from '../views/character/Search.vue';
+import VerifyCharacter from '../views/character/Verify.vue';
 
 const routes = [
   {
@@ -51,6 +52,10 @@ const routes = [
   {
     path: '/character/Search',
     component: CharacterSearch
+  },
+  {
+    path: '/character/Verify',
+    component: VerifyCharacter
   }
 ];
 
