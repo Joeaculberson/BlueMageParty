@@ -5,7 +5,7 @@
           <v-card class="elevation-2">
             <v-card-title class="text-h5 font-weight-bold d-flex justify-center">
               <v-icon icon="mdi-account-check" color="primary" class="mr-2"></v-icon>
-              Verify Your Character
+              Claim Character
             </v-card-title>
   
             <v-card-text class="bg-surface-light pt-4">
@@ -16,7 +16,7 @@
               
               <v-divider></v-divider>
   
-              <div class="character-item my-4">
+              <div class="character-item">
                 <v-avatar size="64" class="mr-3">
                 <img
                     :src="character.avatar"
@@ -40,7 +40,7 @@
   
               <v-card class="elevation-1 py-2 px-3 bg-light-grey">
                 <pre id="verification-code" class="mb-0 text-mono">
-  bluemageparty:dade238b25356c2866796bb69d995a950b89722fe3e330cee5a49e7bf48d0525
+                    {{ verificationCode }}
                 </pre>
               </v-card>
   
@@ -58,6 +58,7 @@
           </v-card>
         </v-col>
       </v-row>
+      {{ verified }}
     </v-container>
   </template>
   
@@ -65,6 +66,11 @@
   import { defineComponent, ref, onMounted } from "vue";
   import { useAuthStore } from "@/stores/authStore";
   import { useRouter } from "vue-router";
+  import axios from "axios";
+  import {
+    GET_VERIFICATION_CODE_URL,
+    VERIFY_CHARACTER_URL
+  } from "@/constants/api";
   
   export default defineComponent({
     name: "VerifyCharacter",
@@ -72,12 +78,15 @@
       const router = useRouter();
       const authStore = useAuthStore();
       const email = ref(authStore.getEmail() || '');
+      const verificationCode = ref('');
+      const verified = ref(false);
   
       const character = ref({
         avatar: '',
         name: '',
         title: '',
-        server: ''
+        server: '',
+        bio: ''
       });
   
       onMounted(() => {
@@ -87,22 +96,46 @@
         } else {
           router.push('/spellmanager');
         }
+        getLoadstoneVerificationToken();
       });
   
       const copyToClipboard = () => {
         navigator.clipboard.writeText(
-          'bluemageparty:sdfdsf5356c286asdfefadfb69d995a950b8ddddfewae3e330cee5a49e7bf48d0525'
+          verificationCode.value
         );
       };
-  
+
       const verify = async () => {
-        // Verification logic
+        try {
+
+            const response = await axios.post(VERIFY_CHARACTER_URL, {
+                loadstoneVerificationCode: verificationCode.value,
+                characterName: character.value.name,
+                characterWorld: character.value.server
+            });
+            verified.value = response.data.verificationCode;
+        } catch(error) {
+            console.log('issue verifying: ' + error);
+        }
+      };
+  
+      const getLoadstoneVerificationToken = async () => {
+        try {
+            const params = {token: authStore.getAuthToken()}
+            const response = await axios.get(GET_VERIFICATION_CODE_URL, { params });
+            verificationCode.value = response.data.verificationCode;
+        } catch(error) {
+            console.log('issue getting verification code: ' + error);
+        }
       };
   
       return {
         character,
         email,
         copyToClipboard,
+        getLoadstoneVerificationToken,
+        verificationCode,
+        verified,
         verify
       };
     }

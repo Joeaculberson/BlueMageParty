@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace BlueMageParty.Server.Models
 {
@@ -13,6 +14,7 @@ namespace BlueMageParty.Server.Models
         [ForeignKey(nameof(UserId))]
         public Guid UserId { get; set; }
 
+        [JsonIgnore]
         // Navigation property
         public User User { get; set; }
 
@@ -27,6 +29,8 @@ namespace BlueMageParty.Server.Models
         [Required]
         [MaxLength(64)]
         public string Server { get; set; }
+
+        public string Title { get; set; }
 
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 

@@ -36,7 +36,7 @@ namespace BlueMageParty.Server.Controllers
 
                 var queriedCharacterResults =
                     searchResponse?.Results
-                    .Where(entry => entry.Name == request.name).Take(5); //only get data for the first 5 results
+                    .Where(entry => entry.Name.ToLower() == request.name.ToLower()).Take(5); //only get data for the first 5 results
                 Dictionary<string, LodestoneCharacter> characters = new Dictionary<string, LodestoneCharacter>();
                 foreach(var result in queriedCharacterResults) 
                 {

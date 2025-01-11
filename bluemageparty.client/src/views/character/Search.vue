@@ -132,7 +132,7 @@
             name: response.data[id].name,
             avatar: response.data[id].avatar,
             server: response.data[id].server,
-            title: response.data[id].title,
+            title: response.data[id].title
           }));
           characters.value = result;
           console.log(response);
