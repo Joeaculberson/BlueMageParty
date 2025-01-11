@@ -16,3 +16,5 @@ export const UPDATE_SPELL_OWNED_URL = `${API_BASE_URL}/SpellOwned`
 export const GET_HOME_WORLDS_URL = `${API_BASE_URL}/HomeWorld`
 export const GET_DATA_CENTERS_URL = `${API_BASE_URL}/DataCenter`
 export const SEARCH_CHARACTER_URL = `${API_BASE_URL}/Loadstone/SearchCharacter`
+export const GET_VERIFICATION_CODE_URL = `${API_BASE_URL}/LoadstoneVerification/GetVerificationCode`
+export const VERIFY_CHARACTER_URL = `${API_BASE_URL}/LoadstoneVerification/VerifyCharacter`
