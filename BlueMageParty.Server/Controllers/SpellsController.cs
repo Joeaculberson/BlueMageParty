@@ -18,15 +18,13 @@ public class SpellsController : ControllerBase
     /// <summary>
     /// A method that returns all spells in the Spells table.
     /// </summary>
-    /// <param name="authToken"></param>
+    /// <param name="characterId"></param>
     /// <returns>All spells in the Spells table.</returns>
-    [HttpGet("{authToken}")]
-    public async Task<IActionResult> GetSpells(string authToken)
+    [HttpGet("{characterId}")]
+    public async Task<IActionResult> GetSpells(Guid characterId)
     {
         try
         {
-            Guid userId = TokenDecoder.DecodeUserIdFromJwtToken(authToken);
-
             // Retrieve spells and include ownership and sources information
             var spells = await _context.Spells
                 .Include(s => s.Sources) // Include Sources for proper loading
@@ -37,7 +35,7 @@ public class SpellsController : ControllerBase
                     s.Number,
                     s.Icon,
                     s.Patch,
-                    Owned = _context.SpellsOwned.Any(so => so.SpellId == s.Id && so.UserId == userId && so.Owned),
+                    Owned = _context.SpellsOwned.Any(so => so.SpellId == s.Id && so.CharacterId == characterId && so.Owned),
                     Sources = s.Sources.Select(source => new
                     {
                         source.Id,
@@ -75,21 +73,15 @@ public class SpellsController : ControllerBase
                 return BadRequest("Invalid spellOwned data.");
             }
 
-            var userId = TokenDecoder.DecodeEmailFromJwtToken(spellOwned.AuthToken);
-            if (userId == null)
-            {
-                return BadRequest("Invalid auth token.");
-            }
-
             var spellOwnedResult = this._context.SpellsOwned.FirstOrDefault(
-                x => x.SpellId == spellOwned.SpellId && x.UserId == new Guid(userId));
+                x => x.SpellId == spellOwned.SpellId && x.CharacterId == spellOwned.CharacterId);
             if (spellOwnedResult == null)
             {
                 //Add to table
                 await this._context.SpellsOwned.AddAsync(new SpellOwned()
                 {
                     SpellId = spellOwned.SpellId,
-                    UserId = new Guid(userId),
+                    CharacterId = spellOwned.CharacterId,
                     Owned = spellOwned.Owned
                 });
             }

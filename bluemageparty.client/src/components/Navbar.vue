@@ -14,7 +14,7 @@
               alt="avatar"
               class="character-avatar"
             />
-            {{ verifiedCharacter.name }}
+            {{ verifiedCharacter.firstName }} {{ verifiedCharacter.lastName }}
             <v-icon right>mdi-chevron-down</v-icon>
           </v-btn>
         </template>

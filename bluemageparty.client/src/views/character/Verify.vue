@@ -117,9 +117,16 @@ export default defineComponent({
                         characterName: character.value.name,
                         characterWorld: character.value.server,
                         characterTitle: character.value.title,
+                        characterAvatar: character.value.avatar,
                         authToken: authStore.getAuthToken()
                     });
                     
+                    if (!response.data.verified) {
+                        message.value = "Character verification failed. Please confirm that the verification code is in the character's bio.";
+                        messageType.value = 'error';
+                        return;
+                    }
+
                     if(response.data.alreadyVerified) {
                         messageType.value = 'success';
                         message.value = 'This character has already been verified!'
@@ -128,7 +135,7 @@ export default defineComponent({
                         messageType.value = 'success';
                         message.value = 'Character verification successful!'
                     }
-                    authStore.setVerifiedCharacter(character.value);
+                    authStore.setVerifiedCharacter(response.data.verifiedCharacter);
                     verified.value = true;
                     console.log(response);
                 } catch (error) {

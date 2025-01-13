@@ -123,8 +123,9 @@ export default {
 
     // Fetch the list of spells
     const getSpells = async () => {
+      console.log(authStore.getVerifiedCharacter().id)
       try {
-        const response = await axios.get(GET_SPELLS_URL + authStore.getAuthToken());
+        const response = await axios.get(GET_SPELLS_URL + authStore.getVerifiedCharacter().id);
         spells.value = response.data.reverse().map((spell: any) => ({
           ...spell,
           checked: false, // Initialize checkbox state as false
@@ -140,9 +141,10 @@ export default {
     const handleCheckboxChange = async (spell: Spell) => {
       try {
           // Make POST request when checked
+          console.log(authStore.getVerifiedCharacter().id)
           const response = await axios.post(UPDATE_SPELL_OWNED_URL, { 
             spellId: spell.id, 
-            authToken: authStore.getAuthToken(), 
+            characterId: authStore.getVerifiedCharacter().id, 
             isChecked: spell.owned });
           adminMessage.value = `Spell ${spell.name} saved successfully!`;
           alertType.value = 'success';

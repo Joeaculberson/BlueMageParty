@@ -19,10 +19,10 @@ namespace BlueMageParty.Server.Controllers
             _context = context;
         }
 
-        [HttpGet("{userId}")]
-        public async Task<IActionResult> GetSpellsOwnedByUserId(Guid userId)
+        [HttpGet("{characterId}")]
+        public async Task<IActionResult> GetSpellsOwnedByCharacterId(string characterId)
         {
-            var spellsOwned = await _context.SpellsOwned.Where(x => x.UserId == userId)
+            var spellsOwned = await _context.SpellsOwned.Where(x => x.CharacterId == new Guid(characterId))
                 .ToListAsync();
 
             return Ok(spellsOwned);
@@ -31,30 +31,46 @@ namespace BlueMageParty.Server.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateSpellOwned([FromBody] UpdateSpellOwnedRequest request)
         {
-            Guid userId = TokenDecoder.DecodeUserIdFromJwtToken(request.authToken);
-            var existingSpellOwned = await _context.SpellsOwned
-                .FirstOrDefaultAsync(s => s.UserId == userId && s.SpellId == request.spellId);
+            try
+            {
+                var existingSpellOwned = await _context.SpellsOwned
+    .FirstOrDefaultAsync(s => s.CharacterId == request.characterId && s.SpellId == request.spellId);
 
-            if (existingSpellOwned == null && request.isChecked)
-            {
-                SpellOwned spellOwned = new SpellOwned();
-                spellOwned.SpellId = request.spellId;
-                spellOwned.UserId = userId;
-                spellOwned.Owned = request.isChecked;
-                spellOwned.CreatedOn = DateTime.UtcNow;
-                _context.SpellsOwned.Add(spellOwned);
-            } else if(existingSpellOwned != null)
-            {
-                existingSpellOwned.Owned = request.isChecked;
-                existingSpellOwned.UpdatedOn = DateTime.UtcNow;
-                _context.SpellsOwned.Update(existingSpellOwned);
+                if (existingSpellOwned == null && request.isChecked)
+                {
+                    SpellOwned spellOwned = new SpellOwned();
+                    spellOwned.SpellId = request.spellId;
+                    spellOwned.CharacterId = request.characterId;
+                    spellOwned.Owned = request.isChecked;
+                    spellOwned.CreatedOn = DateTime.UtcNow;
+                    await _context.SpellsOwned.AddAsync(spellOwned);
+                }
+                else if (existingSpellOwned != null)
+                {
+                    existingSpellOwned.Owned = request.isChecked;
+                    existingSpellOwned.UpdatedOn = DateTime.UtcNow;
+                    _context.SpellsOwned.Update(existingSpellOwned);
+                }
+
+                await _context.SaveChangesAsync();
+
+                return NoContent();
             }
+            catch (Exception ex)
+            {
+                // Log error and return an internal server error
+                var error = new ErrorLog
+                {
+                    Message = ex.Message,
+                    StackTrace = ex.StackTrace
+                };
+                _context.ErrorLogs.Add(error);
+                await _context.SaveChangesAsync();
 
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+                return NoContent();
+            }
         }
 
-        public record UpdateSpellOwnedRequest(Guid spellId, string authToken, bool isChecked);
+        public record UpdateSpellOwnedRequest(Guid spellId, Guid characterId, bool isChecked);
     }
 }
