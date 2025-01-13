@@ -1,70 +1,60 @@
 <template>
+  <v-app>
     <v-container>
-      <v-row>
-        <v-col cols="12">
-          <v-card class="mx-auto" width="400">
-            <template v-slot:title>
-              <span class="font-weight-black">Character Search</span>
-            </template>
-  
-            <v-card-text class="bg-surface-light pt-4">
-              <!-- Data Center Dropdown -->
-              <v-select
-                label="Data Center"
-                :items="dataCenters"
-                item-title="name"
-                item-value="name"
-                v-model="selectedDataCenter"
-                @update:model-value="filterHomeWorlds"
-              ></v-select>
-  
-              <!-- Home World Dropdown -->
-              <v-select
-                label="Home World"
-                :items="filteredHomeWorlds"
-                item-title="name"
-                item-value="name"
-                v-model="selectedHomeWorld"
-              ></v-select>
-  
-              <v-text-field
-                v-model="name"
-                label="Name"
-                type="input"
-                required
-                @keyup.enter="search"
-              />
-              <v-btn @click="search" color="primary">Search</v-btn>
-            </v-card-text>
+      <v-row justify="center">
+        <v-col cols="12" md="8" lg="6">
+          <v-card title="Character Search" class="elevation-2">
+            <v-form v-model="isValid">
+              <v-card-text>
+                <!-- Data Center Dropdown -->
+                <v-select label="Data Center" :items="dataCenters" item-title="name" item-value="name"
+                  v-model="selectedDataCenter" @update:model-value="filterHomeWorlds" required></v-select>
+
+                <!-- Home World Dropdown -->
+                <v-select label="Home World" :items="filteredHomeWorlds" item-title="name" item-value="name"
+                  v-model="selectedHomeWorld" required></v-select>
+
+                <!-- Name Input -->
+                <v-text-field label="Character Name" v-model="name" required @keydown.enter="search"></v-text-field>
+              </v-card-text>
+
+              <v-card-actions class="justify-space-between">
+                <v-btn :disabled="!isValid" @click="search" color="primary">
+                  Search
+                </v-btn>
+              </v-card-actions>
+
+              <!-- Success Message Alert -->
+              <v-alert v-if="message" :type="alertType" dismissible>
+                {{ message }}
+              </v-alert>
+            </v-form>
           </v-card>
         </v-col>
-  
-        <!-- Loading state -->
-        <v-col v-if="isLoading" cols="12">
-          <v-card class="mx-auto" width="400">
+      </v-row>
+
+      <!-- Character Search Results -->
+      <v-row justify="center">
+        <v-col v-if="isLoading" cols="12" md="8" lg="6">
+          <v-card class="mx-auto">
             <template v-slot:title>
-              <span class="font-weight-black">Character Search Results</span>
+              <span>Character Search Results</span>
             </template>
             <v-card-text>
               <v-progress-circular indeterminate color="primary"></v-progress-circular>
             </v-card-text>
           </v-card>
         </v-col>
-  
-        <!-- Character Results -->
-        <v-col v-if="characters.length" cols="12">
-          <v-card class="mx-auto" width="400">
+
+        <v-col v-if="characters.length" cols="12" md="8" lg="6">
+          <v-card class="mx-auto">
             <template v-slot:title>
-              <span class="font-weight-black">Character Search Results</span>
+              <span>Character Search Results</span>
             </template>
             <div class="character-list">
               <ul>
-                <li
-                  v-for="character in characters"
-                  :key="character.id"
-                  @click="selectCharacter(character)"
-                  class="character-item"
-                >
+                <li v-for="character in characters" :key="character.id" @click="selectCharacter(character)"
+                  class="character-item">
                   <div class="character-icon">
                     <img :src="character.avatar" :alt="`${character.name} icon`" />
                   </div>
@@ -83,126 +73,117 @@
         </v-col>
       </v-row>
     </v-container>
-  </template>
-  
-  
-  <script lang="ts">
-  import { defineComponent, ref, onMounted } from "vue";
-  import axios from "axios";
-  import { useRouter } from "vue-router";
-  import { useAuthStore } from "@/stores/authStore";
-  import {
-    GET_HOME_WORLDS_URL,
-    GET_DATA_CENTERS_URL,
-    SEARCH_CHARACTER_URL,
-  } from "@/constants/api";
-  
-  export default defineComponent({
-    name: "Home",
-    setup() {
-      const router = useRouter();
-      const authStore = useAuthStore();
-      const name = ref("");
-      const characters = ref([]);
-      const isLoading = ref(false); // Track loading state
-  
-      // Define default values for the selects
-      const selectedDataCenter = ref<string | null>("All Data Centers");
-      const selectedHomeWorld = ref<string | null>("All Worlds");
-  
-      // Define the data centers and home worlds with correct types
-      const dataCenters = ref<
-        { id: string; name: string; homeWorlds: { id: string; name: string }[] }[]
-      >([]);
-      const homeWorlds = ref<
-        { id: string; name: string; dataCenter: { id: string; name: string } }[]
-      >([]);
-      const filteredHomeWorlds = ref<{ id: string; name: string }[]>([]);
-  
-      // Fetch Home Worlds
-      const search = async () => {
-        isLoading.value = true; // Set loading to true when search starts
+  </v-app>
+</template>
+
+<script lang="ts">
+import { ref, onMounted } from "vue";
+import axios from "axios";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/authStore";
+import { GET_HOME_WORLDS_URL, GET_DATA_CENTERS_URL, SEARCH_CHARACTER_URL } from "@/constants/api";
+
+export default {
+  name: "CharacterSearch",
+  setup() {
+    const router = useRouter();
+    const authStore = useAuthStore();
+    const name = ref("");
+    const characters = ref([]);
+    const isLoading = ref(false);
+    const isValid = ref(false);
+    const message = ref("");
+    const alertType = ref<"success" | "error" | "info" | "warning">("info");
+
+    const selectedDataCenter = ref<string | null>("All Data Centers");
+    const selectedHomeWorld = ref<string | null>("All Worlds");
+    const dataCenters = ref([]);
+    const homeWorlds = ref([]);
+    const filteredHomeWorlds = ref([]);
+
+    const search = async () => {
+      if (!isLoading.value) {
+        isLoading.value = true;
         try {
           const response = await axios.post(SEARCH_CHARACTER_URL, {
             name: name.value,
             world: selectedHomeWorld.value,
           });
-          const result = Object.keys(response.data).map(id => ({
+          characters.value = Object.keys(response.data).map((id) => ({
             id: id,
             name: response.data[id].name,
             avatar: response.data[id].avatar,
             server: response.data[id].server,
-            title: response.data[id].title
+            title: response.data[id].title,
           }));
-          characters.value = result;
-          console.log(response);
+
         } catch (error) {
-          console.error("Searching failed:", error);
+          console.log('There was an error searching for characters: ' + error);
         } finally {
-          isLoading.value = false; // Set loading to false once the search completes
+          isLoading.value = false;
         }
-      };
-  
-      // Fetch Home Worlds
-      const getHomeWorlds = async () => {
-        try {
-          const response = await axios.get(GET_HOME_WORLDS_URL);
-          homeWorlds.value = response.data;
-        } catch (error) {
-          console.error("Getting home worlds failed:", error);
-        }
-      };
-  
-      // Fetch Data Centers
-      const getDataCenters = async () => {
-        try {
-          const response = await axios.get(GET_DATA_CENTERS_URL);
-          dataCenters.value = response.data;
-        } catch (error) {
-          console.error("Getting data centers failed:", error);
-        }
-      };
-  
-      // Filter Home Worlds based on the selected Data Center
-      const filterHomeWorlds = () => {
-        if (!selectedDataCenter.value) {
-          filteredHomeWorlds.value = homeWorlds.value; // Show all HomeWorlds if no DataCenter is selected
-        } else {
-          selectedHomeWorld.value = "All Worlds";
-          const filteredDataCenters = dataCenters.value.filter(
-            (x) => x.name == selectedDataCenter.value
-          );
-          filteredHomeWorlds.value = filteredDataCenters[0].homeWorlds;
-        }
-      };
-  
-      const selectCharacter = (character : Character) => {
-        authStore.setSelectedCharacter(character);
-        router.push('/character/verify');
-      };
-  
-      onMounted(() => {
-        getDataCenters();
-        getHomeWorlds();
-      });
-  
-      return {
-        dataCenters,
-        homeWorlds,
-        filteredHomeWorlds,
-        selectedDataCenter,
-        selectedHomeWorld,
-        characters,
-        name,
-        filterHomeWorlds,
-        search,
-        selectCharacter,
-        isLoading, // Return isLoading to template
-      };
-    },
-  });
+      }
+
+    };
+
+    const getHomeWorlds = async () => {
+      try {
+        const response = await axios.get(GET_HOME_WORLDS_URL);
+        homeWorlds.value = response.data;
+      } catch (error) {
+        console.error("Error fetching home worlds:", error);
+      }
+    };
+
+    const getDataCenters = async () => {
+      try {
+        const response = await axios.get(GET_DATA_CENTERS_URL);
+        dataCenters.value = response.data;
+      } catch (error) {
+        console.error("Error fetching data centers:", error);
+      }
+    };
+
+    const filterHomeWorlds = () => {
+      if (!selectedDataCenter.value) {
+        filteredHomeWorlds.value = homeWorlds.value;
+      } else {
+        selectedHomeWorld.value = "All Worlds";
+        const filteredDataCenters = dataCenters.value.filter((x) => x.name === selectedDataCenter.value);
+        filteredHomeWorlds.value = filteredDataCenters[0]?.homeWorlds || [];
+      }
+    };
+
+    const selectCharacter = (character: any) => {
+      authStore.setSelectedCharacter(character);
+      router.push("/character/verify");
+    };
+
+    onMounted(() => {
+      getDataCenters();
+      getHomeWorlds();
+    });
+
+    return {
+      name,
+      characters,
+      isLoading,
+      isValid,
+      message,
+      alertType,
+      selectedDataCenter,
+      selectedHomeWorld,
+      dataCenters,
+      homeWorlds,
+      filteredHomeWorlds,
+      filterHomeWorlds,
+      search,
+      selectCharacter,
+    };
+  },
+};
 </script>
-  
+
 <style>
 .character-list {
   max-width: 600px;
@@ -238,7 +219,9 @@
 
 .character-name {
   font-weight: bold;
+  font-size: 0.9rem;
 }
+
 
 .character-server {
   font-size: 0.8rem;

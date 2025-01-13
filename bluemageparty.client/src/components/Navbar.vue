@@ -6,15 +6,15 @@
     <v-spacer></v-spacer>
 
     <template v-if="isAuthenticated">
-      <v-menu v-if="selectedCharacter" offset-y>
+      <v-menu v-if="verifiedCharacter" offset-y>
         <template v-slot:activator="{ props }">
           <v-btn text v-bind="props">
             <img
-              :src="selectedCharacter.avatar"
+              :src="verifiedCharacter.avatar"
               alt="avatar"
               class="character-avatar"
             />
-            {{ selectedCharacter.name }}
+            {{ verifiedCharacter.name }}
             <v-icon right>mdi-chevron-down</v-icon>
           </v-btn>
         </template>
@@ -56,7 +56,7 @@ export default defineComponent({
     const isAuthenticated = computed(() => authStore.isAuthenticated);
     const isOnLoginPage = computed(() => route.path === "/login");
     const isOnRegisterPage = computed(() => route.path === "/register");
-    const selectedCharacter = computed(() => authStore.getSelectedCharacter());
+    const verifiedCharacter = computed(() => authStore.getVerifiedCharacter());
 
     const goToLogin = () => router.push("/login");
     const goToRegisterPage = () => router.push("/register");
@@ -72,12 +72,13 @@ export default defineComponent({
     };
 
     const viewCharacterDetails = () => {
-      if (selectedCharacter.value) {
-        router.push(`/character/${selectedCharacter.value.id}`);
+      if (verifiedCharacter.value) {
+        router.push(`/character/${verifiedCharacter.value.id}`);
       }
     };
 
     const clearSelection = () => {
+      authStore.clearVerifiedCharacter();
       authStore.clearSelectedCharacter();
     };
 
@@ -90,9 +91,9 @@ export default defineComponent({
       goToCharacterSearch,
       isOnLoginPage,
       isOnRegisterPage,
-      selectedCharacter,
+      verifiedCharacter,
       viewCharacterDetails,
-      clearSelection,
+      clearSelection
     };
   },
 });
