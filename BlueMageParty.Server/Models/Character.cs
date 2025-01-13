@@ -31,6 +31,7 @@ namespace BlueMageParty.Server.Models
         public string Server { get; set; }
 
         public string Title { get; set; }
+        public string Avatar { get; set; }
 
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 

@@ -3,15 +3,16 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BlueMageParty.Server.Models
 {
+    [Table("SpellsOwned")]
     public class SpellOwned
     {
         [Key]
         public Guid Id { get; set; }
 
         // Foreign key to the User table
-        public Guid UserId { get; set; }
-        [ForeignKey("UserId")]
-        public virtual User User { get; set; }  // Navigation property to the User model
+        public Guid CharacterId { get; set; }
+        [ForeignKey("CharacterId")]
+        public virtual User Character { get; set; }  // Navigation property to the User model
 
         // Foreign key to the Spell table
         public Guid SpellId { get; set; }
@@ -25,7 +26,7 @@ namespace BlueMageParty.Server.Models
 
     public class SpellOwnedVM
     {
-        public string AuthToken { get; set; }
+        public Guid CharacterId { get; set; }
         public Guid SpellId { get; set; }
         public bool Owned { get; set; }
     }

@@ -51,7 +51,7 @@ public class LoadstoneVerificationController : ControllerBase
             var lastName = request.characterName.Split(' ')[1];
             var existingCharacter = await this._context.Characters.FirstOrDefaultAsync(x => x.FirstName == firstName && x.LastName == lastName && x.Server == request.characterWorld);
             if(existingCharacter != null)
-                return Ok(new { Verified = true, AlreadyVerified = true });
+                return Ok(new { Verified = true, AlreadyVerified = true, VerifiedCharacter = existingCharacter });
 
             var lodestoneClient = await LodestoneClient.GetClientAsync();
             var csq = new CharacterSearchQuery();
@@ -69,20 +69,29 @@ public class LoadstoneVerificationController : ControllerBase
 
             var character = queriedCharacterResults.GetCharacter().Result;
             var containsCode = character.Bio.Contains(request.loadstoneVerificationCode);
+            
+
             if (containsCode)
             {
-                await this._context.Characters.AddAsync(new Character()
+                Character c = new Character()
                 {
                     FirstName = request.characterName.Split(" ")[0],
                     LastName = request.characterName.Split(" ")[1],
                     Server = request.characterWorld,
                     Title = request.characterTitle,
+                    Avatar = request.characterAvatar,
                     UserId = TokenDecoder.DecodeUserIdFromJwtToken(request.authToken)
-                });
+                };
+
+                await this._context.Characters.AddAsync(c);
                 await this._context.SaveChangesAsync();
+                return Ok(new { Verified = true, AlreadyVerified = false, VerifiedCharacter = c });
+            } else
+            {
+                return Ok(new { Verified = false });
             }
 
-            return Ok(new { Verified = containsCode, AlreadyVerified = false });
+            
         }
         catch (Exception ex)
         {
@@ -98,5 +107,10 @@ public class LoadstoneVerificationController : ControllerBase
         }
     }
 
-    public record VerifyCharacterRequest(string loadstoneVerificationCode, string characterName, string characterWorld, string characterTitle, string authToken);
+    public record VerifyCharacterRequest(string loadstoneVerificationCode, 
+        string characterName, 
+        string characterWorld, 
+        string characterTitle, 
+        string characterAvatar, 
+        string authToken);
 }
