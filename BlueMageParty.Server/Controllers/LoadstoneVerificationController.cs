@@ -1,45 +1,102 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NetStone.Search.Character;
 using NetStone;
+using BlueMageParty.Server.Models;
+using BlueMageParty.Server.Data;
+using Microsoft.EntityFrameworkCore;
 
 [ApiController]
 [Route("api/[controller]")]
 public class LoadstoneVerificationController : ControllerBase
 {
+    private readonly BlueMagePartyContext _context;
+
+    public LoadstoneVerificationController(BlueMagePartyContext context, IConfiguration configuration)
+    {
+        this._context = context;
+    }
+
     [HttpGet("GetVerificationCode")]
     public async Task<IActionResult> GetVerificationCode(string token)
     {
-        var userId = TokenDecoder.DecodeUserIdFromJwtToken(token);
-        var email = TokenDecoder.DecodeEmailFromJwtToken(token);
-        string namespacePrefix = "bluemageparty:";
-        string dataToHash = $"{userId}:{email}";
+        try
+        {
+            var userId = TokenDecoder.DecodeUserIdFromJwtToken(token);
+            var email = TokenDecoder.DecodeEmailFromJwtToken(token);
+            string namespacePrefix = "bluemageparty:";
+            string dataToHash = $"{userId}:{email}";
 
-        string verificationCode = LoadstoneVerificationCodeGenerator.GenerateUniqueCode(namespacePrefix, dataToHash);
-        return Ok(new { VerificationCode = verificationCode });
+            string verificationCode = LoadstoneVerificationCodeGenerator.GenerateUniqueCode(namespacePrefix, dataToHash);
+            return Ok(new { VerificationCode = verificationCode });
+        } catch(Exception ex)
+        {
+            var error = new ErrorLog()
+            {
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            this._context.ErrorLogs.Add(error);
+            await _context.SaveChangesAsync();
+            throw ex;
+        }
     }
 
     [HttpPost("VerifyCharacter")]
     public async Task<IActionResult> VerifyCharacter(VerifyCharacterRequest request)
     {
-        var lodestoneClient = await LodestoneClient.GetClientAsync();
-        var csq = new CharacterSearchQuery();
-        csq.CharacterName = request.characterName;
-        csq.World = request.characterWorld;
+        try
+        {
+            var firstName = request.characterName.Split(' ')[0];
+            var lastName = request.characterName.Split(' ')[1];
+            var existingCharacter = await this._context.Characters.FirstOrDefaultAsync(x => x.FirstName == firstName && x.LastName == lastName && x.Server == request.characterWorld);
+            if(existingCharacter != null)
+                return Ok(new { Verified = true, AlreadyVerified = true });
 
-        var searchResponse = await lodestoneClient.SearchCharacter(csq);
+            var lodestoneClient = await LodestoneClient.GetClientAsync();
+            var csq = new CharacterSearchQuery();
+            csq.CharacterName = request.characterName;
+            csq.World = request.characterWorld;
 
-        if (searchResponse == null)
-            return Ok(null);
+            var searchResponse = await lodestoneClient.SearchCharacter(csq);
 
-        var queriedCharacterResults =
-            searchResponse?.Results
-            .FirstOrDefault(entry => entry.Name.ToLower() == request.characterName.ToLower());
+            if (searchResponse == null)
+                return Ok(null);
 
-        var character = queriedCharacterResults.GetCharacter().Result;
-        var containsCode = character.Bio.Contains(request.loadstoneVerificationCode);
+            var queriedCharacterResults =
+                searchResponse?.Results
+                .FirstOrDefault(entry => entry.Name.ToLower() == request.characterName.ToLower());
 
-        return Ok(new { Verified = containsCode });
+            var character = queriedCharacterResults.GetCharacter().Result;
+            var containsCode = character.Bio.Contains(request.loadstoneVerificationCode);
+            if (containsCode)
+            {
+                await this._context.Characters.AddAsync(new Character()
+                {
+                    FirstName = request.characterName.Split(" ")[0],
+                    LastName = request.characterName.Split(" ")[1],
+                    Server = request.characterWorld,
+                    Title = request.characterTitle,
+                    UserId = TokenDecoder.DecodeUserIdFromJwtToken(request.authToken)
+                });
+                await this._context.SaveChangesAsync();
+            }
+
+            return Ok(new { Verified = containsCode, AlreadyVerified = false });
+        }
+        catch (Exception ex)
+        {
+            var error = new ErrorLog()
+            {
+                Message = ex.Message,
+                StackTrace = ex.StackTrace
+            };
+
+            this._context.ErrorLogs.Add(error);
+            await _context.SaveChangesAsync();
+            throw ex;
+        }
     }
 
-    public record VerifyCharacterRequest(string loadstoneVerificationCode, string characterName, string characterWorld);
+    public record VerifyCharacterRequest(string loadstoneVerificationCode, string characterName, string characterWorld, string characterTitle, string authToken);
 }

@@ -7,7 +7,7 @@ namespace BlueMageParty.Server.Models
     public class Character
     {
         [Key]
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         // Foreign key to the User table
         [Required]

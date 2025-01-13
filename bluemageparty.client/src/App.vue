@@ -7,11 +7,8 @@
     <v-navigation-drawer app v-model="drawer" temporary>
       <!-- Drawer content goes here -->
       <v-list dense>
-        <v-list-item link @click="goToHome">
-            <v-list-item-title>Home</v-list-item-title>
-        </v-list-item>
-        <v-list-item link @click="goToParties">
-            <v-list-item-title>Parties</v-list-item-title>
+        <v-list-item link @click="goToSpellManager">
+            <v-list-item-title>Spell Manager</v-list-item-title>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
@@ -35,18 +32,13 @@ export default {
     const drawer = ref(false);
     const router = useRouter();
 
-    const goToHome = () => {
+    const goToSpellManager = () => {
       router.push('/spellmanager');
-    };
-
-    const goToParties = () => {
-      router.push('/parties');
     };
 
     return {
       drawer,
-      goToHome,
-      goToParties,
+      goToSpellManager
     };
   },
 };

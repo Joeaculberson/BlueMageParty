@@ -4,7 +4,8 @@ export const useAuthStore = defineStore('auth', {
   state: () => ({
     isAuthenticated: !!localStorage.getItem('auth_token'), // Initial check from localStorage
     email: localStorage.getItem("auth_email") || "",
-    selectedCharacter: JSON.parse(localStorage.getItem('selected_character') || 'null') // Load from localStorage if exists
+    selectedCharacter: JSON.parse(localStorage.getItem('selected_character') || 'null'), // Load from localStorage if exists
+    verifiedCharacter: JSON.parse(localStorage.getItem('verified_character') || 'null') // Load from localStorage if exists
   }),
   actions: {
     login(token: string) {
@@ -42,6 +43,17 @@ export const useAuthStore = defineStore('auth', {
     clearSelectedCharacter() {
       this.selectedCharacter = null;
       localStorage.removeItem('selected_character'); // Remove selected character from localStorage
+    },
+    setVerifiedCharacter(character: Character) {
+      this.verifiedCharacter = character;
+      localStorage.setItem('verified_character', JSON.stringify(character)); // Save selected character to localStorage
+    },
+    getVerifiedCharacter() {
+      return this.verifiedCharacter;
+    },
+    clearVerifiedCharacter() {
+      this.verifiedCharacter = null;
+      localStorage.removeItem('verified_character'); // Remove selected character from localStorage
     }
   },
 });
