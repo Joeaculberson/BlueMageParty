@@ -34,6 +34,10 @@
 
                         <v-text-field label="Verification Code" v-model="verificationCode" readonly
                             outlined></v-text-field>
+                        
+                        <div>
+                            If the information above is correct, please add the code below to your <a target="_blank" rel="noopener noreferrer" href="https://na.finalfantasyxiv.com/lodestone/my/setting/profile/">Lodestone profile</a>, then click Verify.
+                        </div>
 
                         <v-card-actions class="justify-space-between">
                             <v-btn @click="copyToClipboard" color="primary" outlined>
@@ -61,6 +65,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
 import { useAuthStore } from "@/stores/authStore";
+import { useCharacterStore } from "@/stores/characterStore";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import { GET_VERIFICATION_CODE_URL, VERIFY_CHARACTER_URL } from "@/constants/api";
@@ -70,6 +75,7 @@ export default defineComponent({
     setup() {
         const router = useRouter();
         const authStore = useAuthStore();
+        const characterStore = useCharacterStore();
         const email = ref(authStore.getEmail() || "");
         const verificationCode = ref("");
         const verified = ref(false);
@@ -84,7 +90,7 @@ export default defineComponent({
         const isLoading = ref(false);
 
         onMounted(() => {
-            const selectedCharacter = authStore.getSelectedCharacter();
+            const selectedCharacter = characterStore.getSelectedCharacter();
             if (selectedCharacter) {
                 character.value = selectedCharacter;
                 fetchVerificationCode();
@@ -135,7 +141,7 @@ export default defineComponent({
                         messageType.value = 'success';
                         message.value = 'Character verification successful!'
                     }
-                    authStore.setVerifiedCharacter(response.data.verifiedCharacter);
+                    characterStore.addVerifiedCharacter(response.data.verifiedCharacter);
                     verified.value = true;
                     console.log(response);
                 } catch (error) {

@@ -1,59 +1,42 @@
 import { defineStore } from 'pinia';
+import { useCharacterStore } from './characterStore';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    isAuthenticated: !!localStorage.getItem('auth_token'), // Initial check from localStorage
-    email: localStorage.getItem("auth_email") || "",
-    selectedCharacter: JSON.parse(localStorage.getItem('selected_character') || 'null'), // Load from localStorage if exists
-    verifiedCharacter: JSON.parse(localStorage.getItem('verified_character') || 'null') // Load from localStorage if exists
+    isAuthenticated: !!localStorage.getItem('auth_token'),
+    email: localStorage.getItem('auth_email') || '',
   }),
   actions: {
     login(token: string) {
-      localStorage.setItem('auth_token', token);  // Store token in localStorage
-      this.isAuthenticated = true;  // Update the state
+      localStorage.setItem('auth_token', token);
+      this.isAuthenticated = true;
+
+      const characterStore = useCharacterStore();
+      characterStore.syncVerifiedCharacters(); // Sync characters on login
     },
     logout() {
-      localStorage.removeItem('auth_token'); // Remove token from localStorage
-      localStorage.removeItem('selected_character'); // Remove selected character from localStorage
+      localStorage.removeItem('auth_token');
+      
+      const characterStore = useCharacterStore();
+      characterStore.clearVerifiedCharacters(); // Clear characters on logout
+      characterStore.clearSelectedCharacter(); // Clear selected character on logout
+
       this.email = '';
-      this.selectedCharacter = null; // Clear the selected character in state
-      this.isAuthenticated = false;  // Update the state
-    },
-    getAuthToken() {
-      return localStorage.getItem('auth_token')
+      this.isAuthenticated = false;
     },
     setEmail(newEmail: string) {
       this.email = newEmail;
-      localStorage.setItem("auth_email", this.email);
+      localStorage.setItem('auth_email', this.email);
     },
     getEmail() {
       return this.email;
     },
     clearEmail() {
-      localStorage.removeItem("auth_email"); // Clear from localStorage
-      this.email = "";
+      localStorage.removeItem('auth_email');
+      this.email = '';
     },
-    setSelectedCharacter(character: Character) {
-      this.selectedCharacter = character;
-      localStorage.setItem('selected_character', JSON.stringify(character)); // Save selected character to localStorage
+    getAuthToken() {
+      return localStorage.getItem('auth_token');
     },
-    getSelectedCharacter() {
-      return this.selectedCharacter;
-    },
-    clearSelectedCharacter() {
-      this.selectedCharacter = null;
-      localStorage.removeItem('selected_character'); // Remove selected character from localStorage
-    },
-    setVerifiedCharacter(character: Character) {
-      this.verifiedCharacter = character;
-      localStorage.setItem('verified_character', JSON.stringify(character)); // Save selected character to localStorage
-    },
-    getVerifiedCharacter() {
-      return this.verifiedCharacter;
-    },
-    clearVerifiedCharacter() {
-      this.verifiedCharacter = null;
-      localStorage.removeItem('verified_character'); // Remove selected character from localStorage
-    }
   },
 });

@@ -1,75 +1,72 @@
 <template>
-    <v-container>
-      <v-table>
-        <thead>
-          <tr>
-            <th class="text-left">
-              #<span style="visibility: hidden;">Number Space</span>
-            </th>
-            <th class="text-left">
-              <!-- Empty span to keep the column in place -->
-              <span style="visibility: hidden;">Icon Space</span>
-            </th>
-            <th class="text-left">
-              Name
-            </th>
-            <th class="text-left">
-              Enemy
-            </th>
-            <th class="text-left">
-              Location
-            </th>
-            <th class="text-left">
-              Patch
-            </th>
-            <th class="text-left">
-              Owned
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="spell in spells" :key="spell.name">
-            <td>No. {{ spell.number }}</td>
-            <td><v-img :src="spell.icon" class="spell-sprite" max-width="42" max-height="42" /></td>
-            <td>{{ spell.name }}</td>
-            <td>
-                <div v-for="source in spell.sources">
-                    {{ source.enemy }}
-                </div>
-            </td>
-            <td>
-                {{ spell.source }}
-                <div v-for="source in spell.sources">
-                    {{ source.location }}
-                </div>
-            </td>
-            <td>{{ spell.patch }}</td>
-            <td>
-              <v-checkbox
-                v-model="spell.owned"
-                @change="handleCheckboxChange(spell)"
-                color="primary"
-              />
-            </td>
-          </tr>
-        </tbody>
-      </v-table>
-  
-      <!-- Display message if no spells are available -->
-      <v-alert v-if="spells.length === 0" type="info" dismissible>
-        No spells found.
-      </v-alert>
-  
-      <v-alert v-if="adminMessage" :type="alertType" dismissible>
-        {{ adminMessage }}
-      </v-alert>
-  
-      <!-- Button to trigger Fetch and Save Spells -->
-      <v-btn v-if="isAdmin" @click="fetchAndSaveSpells" color="primary">
-        Fetch and Save Spells
-      </v-btn>
-    </v-container>
-  </template>
+  <v-container>
+    <!-- Display the warning message -->
+    <v-alert
+      v-if="characterStore.getVerifiedCharacters().length == 0"
+      type="info"
+      dismissible
+      border="start"
+    >
+      Please select a character before managing your spells.
+    </v-alert>
+
+    <v-table>
+      <thead>
+        <tr>
+          <th class="text-left">#<span style="visibility: hidden;">Number Space</span></th>
+          <th class="text-left"><span style="visibility: hidden;">Icon Space</span></th>
+          <th class="text-left">Name</th>
+          <th class="text-left">Enemy</th>
+          <th class="text-left">Location</th>
+          <th class="text-left">Patch</th>
+          <th class="text-left">Owned</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="spell in spells" :key="spell.name">
+          <td>No. {{ spell.number }}</td>
+          <td>
+            <v-img :src="spell.icon" class="spell-sprite" max-width="42" max-height="42" />
+          </td>
+          <td>{{ spell.name }}</td>
+          <td>
+            <div v-for="source in spell.sources" :key="source.enemy">
+              {{ source.enemy }}
+            </div>
+          </td>
+          <td>
+            {{ spell.source }}
+            <div v-for="source in spell.sources" :key="source.location">
+              {{ source.location }}
+            </div>
+          </td>
+          <td>{{ spell.patch }}</td>
+          <td>
+            <v-checkbox
+              v-model="spell.owned"
+              :disabled="characterStore.getVerifiedCharacters().length == 0"
+              @change="handleCheckboxChange(spell)"
+              color="primary"
+            />
+          </td>
+        </tr>
+      </tbody>
+    </v-table>
+
+    <v-card-text v-if="isLoading">
+      <v-progress-circular indeterminate color="primary"></v-progress-circular>
+    </v-card-text>
+
+    <v-alert v-if="adminMessage" :type="alertType" dismissible>
+      {{ adminMessage }}
+    </v-alert>
+
+    <v-btn v-if="isAdmin" @click="fetchAndSaveSpells" color="primary">
+      Fetch and Save Spells
+    </v-btn>
+  </v-container>
+</template>
+
   
   
   
@@ -77,6 +74,8 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/authStore';
+import { watch } from 'vue'
+import { useCharacterStore } from '@/stores/characterStore';
 import { 
     GET_USER_ADMIN_URL, 
     GET_SPELLS_URL, 
@@ -105,10 +104,12 @@ export default {
   name: 'SpellManager',
   setup() {
     const authStore = useAuthStore();
-    const alertType = ref<'success' | 'error'>('info');
+    const characterStore = useCharacterStore();
+    const alertType = ref<'success' | 'error' | 'info'>('info');
     const adminMessage = ref('');
     const isAdmin = ref(false);
     const spells = ref<Spell[]>([]); // Store spells here
+    const isLoading = ref(false);
 
     // Check if the user is an admin
     const checkAdminStatus = async () => {
@@ -123,17 +124,23 @@ export default {
 
     // Fetch the list of spells
     const getSpells = async () => {
-      console.log(authStore.getVerifiedCharacter().id)
-      try {
-        const response = await axios.get(GET_SPELLS_URL + authStore.getVerifiedCharacter().id);
-        spells.value = response.data.reverse().map((spell: any) => ({
-          ...spell,
-          checked: false, // Initialize checkbox state as false
-        }));
-        alertType.value = 'success';
-      } catch (error) {
-        alertType.value = 'error';
-        console.error('Error fetching spells:', error);
+      if(!isLoading.value) {
+        isLoading.value = true;
+        try {
+          let response = null;
+          const characterId = characterStore.getVerifiedCharacters().length > 0 ? characterStore.getVerifiedCharacters()[0].id : undefined;
+          response = await axios.get(GET_SPELLS_URL, {params: characterId ? { characterId } : undefined,});
+
+          spells.value = response.data.reverse().map((spell: any) => ({
+            ...spell,
+            checked: false, // Initialize checkbox state as false
+          }));
+          alertType.value = 'success';
+        } catch (error) {
+          alertType.value = 'error';
+          console.error('Error fetching spells:', error);
+        }
+        isLoading.value = false;
       }
     };
 
@@ -141,12 +148,10 @@ export default {
     const handleCheckboxChange = async (spell: Spell) => {
       try {
           // Make POST request when checked
-          console.log(authStore.getVerifiedCharacter().id)
           const response = await axios.post(UPDATE_SPELL_OWNED_URL, { 
             spellId: spell.id, 
-            characterId: authStore.getVerifiedCharacter().id, 
+            characterId: characterStore.getVerifiedCharacters()[0].id, 
             isChecked: spell.owned });
-          adminMessage.value = `Spell ${spell.name} saved successfully!`;
           alertType.value = 'success';
       } catch (error) {
         console.error('Error saving spell:', error);
@@ -207,19 +212,29 @@ export default {
       }
     };
 
+    watch(
+      () => characterStore.getVerifiedCharacters(),
+      () => {
+        getSpells(); // Trigger getSpells whenever the verified characters array is updated
+      },
+      { immediate: true } // Run this on initial load to fetch spells
+    );
+
     onMounted(() => {
       checkAdminStatus();
       getSpells();
     });
 
     return {
+      isLoading,
       isAdmin,
       spells,
       adminMessage,
       alertType,
       getSpells,
       handleCheckboxChange,
-      fetchAndSaveSpells
+      fetchAndSaveSpells,
+      characterStore
     };
   },
 };

@@ -6,29 +6,39 @@
     <v-spacer></v-spacer>
 
     <template v-if="isAuthenticated">
-      <v-menu v-if="verifiedCharacter" offset-y>
+      <v-menu v-if="verifiedCharacters.length" offset-y>
         <template v-slot:activator="{ props }">
           <v-btn text v-bind="props">
             <img
-              :src="verifiedCharacter.avatar"
+              :src="verifiedCharacters[0].avatar"
               alt="avatar"
               class="character-avatar"
             />
-            {{ verifiedCharacter.firstName }} {{ verifiedCharacter.lastName }}
+            {{ verifiedCharacters[0].firstName }} {{ verifiedCharacters[0].lastName }}
             <v-icon right>mdi-chevron-down</v-icon>
           </v-btn>
         </template>
         <v-list>
-          <v-list-item @click="viewCharacterDetails">
-            <v-list-item-title>View Character</v-list-item-title>
+          <div v-if="verifiedCharacters.length > 1">
+            <v-list-item v-for="character in verifiedCharacters.slice(1)" :key="character.id" @click="setAsActiveCharacter(character)">
+            <v-list-item-title>
+              <img
+                :src="character.avatar"
+                alt="avatar"
+                class="character-avatar"
+              />
+              {{ character.firstName }} {{ character.lastName }}
+            </v-list-item-title>
+          </v-list-item>
+          </div>
+          <v-list-item @click="goToCharacterSearch" text>
+            <v-list-item-title>Select Character</v-list-item-title>
           </v-list-item>
           <v-list-item @click="clearSelection">
             <v-list-item-title>Clear Selection</v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
-
-
       <v-btn v-else @click="goToCharacterSearch" text>
         Select Character
       </v-btn>
@@ -45,6 +55,7 @@
 import { computed, defineComponent } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "@/stores/authStore";
+import { useCharacterStore } from "@/stores/characterStore";
 
 export default defineComponent({
   name: "Navbar",
@@ -52,11 +63,12 @@ export default defineComponent({
     const router = useRouter();
     const route = useRoute();
     const authStore = useAuthStore();
+    const characterStore = useCharacterStore();
 
     const isAuthenticated = computed(() => authStore.isAuthenticated);
     const isOnLoginPage = computed(() => route.path === "/login");
     const isOnRegisterPage = computed(() => route.path === "/register");
-    const verifiedCharacter = computed(() => authStore.getVerifiedCharacter());
+    const verifiedCharacters = computed(() => characterStore.getVerifiedCharacters());
 
     const goToLogin = () => router.push("/login");
     const goToRegisterPage = () => router.push("/register");
@@ -71,15 +83,19 @@ export default defineComponent({
       router.push("/login");
     };
 
-    const viewCharacterDetails = () => {
-      if (verifiedCharacter.value) {
+    const setAsActiveCharacter = (character) => {
+      characterStore.setAsActiveCharacter(character);
+    };
+
+    const viewCharacterDetails = (character) => {
+      /*if (verifiedCharacter.value) {
         router.push(`/character/${verifiedCharacter.value.id}`);
-      }
+      }*/
     };
 
     const clearSelection = () => {
-      authStore.clearVerifiedCharacter();
-      authStore.clearSelectedCharacter();
+      characterStore.clearVerifiedCharacters();
+      characterStore.clearSelectedCharacter();
     };
 
     return {
@@ -91,9 +107,10 @@ export default defineComponent({
       goToCharacterSearch,
       isOnLoginPage,
       isOnRegisterPage,
-      verifiedCharacter,
+      verifiedCharacters,
       viewCharacterDetails,
-      clearSelection
+      clearSelection,
+      setAsActiveCharacter
     };
   },
 });

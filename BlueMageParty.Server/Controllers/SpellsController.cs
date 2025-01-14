@@ -20,32 +20,36 @@ public class SpellsController : ControllerBase
     /// </summary>
     /// <param name="characterId"></param>
     /// <returns>All spells in the Spells table.</returns>
-    [HttpGet("{characterId}")]
-    public async Task<IActionResult> GetSpells(Guid characterId)
+    [HttpGet("{characterId?}")]
+    public async Task<IActionResult> GetSpells([FromQuery] string characterId = "")
     {
         try
         {
-            // Retrieve spells and include ownership and sources information
-            var spells = await _context.Spells
-                .Include(s => s.Sources) // Include Sources for proper loading
-                .Select(s => new
-                {
-                    s.Id,
-                    s.Name,
-                    s.Number,
-                    s.Icon,
-                    s.Patch,
-                    Owned = _context.SpellsOwned.Any(so => so.SpellId == s.Id && so.CharacterId == characterId && so.Owned),
-                    Sources = s.Sources.Select(source => new
+            if(string.IsNullOrEmpty(characterId))
+            {
+                return Ok(await _context.Spells.Include(s => s.Sources).ToListAsync());
+            } else
+            {
+                // Retrieve spells and include ownership and sources information
+                return Ok(await _context.Spells
+                    .Include(s => s.Sources) // Include Sources for proper loading
+                    .Select(s => new
                     {
-                        source.Id,
-                        source.Enemy,
-                        source.Location
+                        s.Id,
+                        s.Name,
+                        s.Number,
+                        s.Icon,
+                        s.Patch,
+                        Owned = _context.SpellsOwned.Any(so => so.SpellId == s.Id && so.CharacterId == new Guid(characterId) && so.Owned),
+                        Sources = s.Sources.Select(source => new
+                        {
+                            source.Id,
+                            source.Enemy,
+                            source.Location
+                        })
                     })
-                })
-                .ToListAsync();
-
-            return Ok(spells);
+                    .ToListAsync());
+            }
         }
         catch (Exception ex)
         {
