@@ -80,14 +80,14 @@
 import { ref, onMounted } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
-import { useAuthStore } from "@/stores/authStore";
+import { useCharacterStore } from "@/stores/characterStore";
 import { GET_HOME_WORLDS_URL, GET_DATA_CENTERS_URL, SEARCH_CHARACTER_URL } from "@/constants/api";
 
 export default {
   name: "CharacterSearch",
   setup() {
     const router = useRouter();
-    const authStore = useAuthStore();
+    const characterStore = useCharacterStore();
     const name = ref("");
     const characters = ref([]);
     const isLoading = ref(false);
@@ -155,7 +155,7 @@ export default {
     };
 
     const selectCharacter = (character: any) => {
-      authStore.setSelectedCharacter(character);
+      characterStore.setSelectedCharacter(character);
       router.push("/character/verify");
     };
 
