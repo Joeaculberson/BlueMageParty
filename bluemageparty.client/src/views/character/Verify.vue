@@ -34,9 +34,12 @@
 
                         <v-text-field label="Verification Code" v-model="verificationCode" readonly
                             outlined></v-text-field>
-                        
+
                         <div>
-                            If the information above is correct, please add the code below to your <a target="_blank" rel="noopener noreferrer" href="https://na.finalfantasyxiv.com/lodestone/my/setting/profile/">Lodestone profile</a>, then click Verify.
+                            If the information above is correct, please add the code below to your <a target="_blank"
+                                rel="noopener noreferrer"
+                                href="https://na.finalfantasyxiv.com/lodestone/my/setting/profile/">Lodestone
+                                profile</a>, then click Verify.
                         </div>
 
                         <v-card-actions class="justify-space-between">
@@ -84,7 +87,26 @@ export default defineComponent({
             name: "",
             title: "",
             server: "",
+            id: "",
+            activeClassJobIcon: "",
+            activeClassJobLevel: null,
+            bio: "",
+            freeCompany: "",
+            gender: "",
+            grandCompanyName: "",
+            grandCompanyRank: "",
+            guardianDeityIcon: "",
+            guardianDeityName: "",
+            nameday: "",
+            portrait: "",
+            pvpTeam: "",
+            race: "",
+            raceClanGender: "",
+            townIcon: "",
+            townName: "",
+            tribe: ""
         });
+
         const messageType = ref('info');
         const message = ref('');
         const isLoading = ref(false);
@@ -118,30 +140,53 @@ export default defineComponent({
             if (!isLoading.value) {
                 isLoading.value = true;
                 try {
+                    console.log(character.value);
+
                     const response = await axios.post(VERIFY_CHARACTER_URL, {
-                        loadstoneVerificationCode: verificationCode.value,
-                        characterName: character.value.name,
-                        characterWorld: character.value.server,
-                        characterTitle: character.value.title,
-                        characterAvatar: character.value.avatar,
-                        authToken: authStore.getAuthToken()
+                        LoadstoneVerificationCode: verificationCode.value,
+                        Name: character.value.name,
+                        World: character.value.server,
+                        Title: character.value.title,
+                        Avatar: character.value.avatar,
+                        AuthToken: authStore.getAuthToken(),
+                        Id: character.value.id,
+                        Server: character.value.server,
+                        ActiveClassJobIcon: character.value.activeClassJobIcon,
+                        ActiveClassJobLevel: character.value.activeClassJobLevel,
+                        Bio: character.value.bio,
+                        FreeCompany: character.value.freeCompany,
+                        Gender: character.value.gender,
+                        GrandCompanyName: character.value.grandCompanyName,
+                        GrandCompanyRank: character.value.grandCompanyRank,
+                        GuardianDeityIcon: character.value.guardianDeityIcon,
+                        GuardianDeityName: character.value.guardianDeityName,
+                        Nameday: character.value.nameday,
+                        Portrait: character.value.portrait,
+                        PvpTeam: character.value.pvpTeam,
+                        Race: character.value.race,
+                        RaceClanGender: character.value.raceClanGender,
+                        TownIcon: character.value.townIcon,
+                        TownName: character.value.townName,
+                        Tribe: character.value.tribe,
                     });
-                    
+
+
                     if (!response.data.verified) {
                         message.value = "Character verification failed. Please confirm that the verification code is in the character's bio.";
                         messageType.value = 'error';
+                        verified.value = false;
                         return;
                     }
 
-                    if(response.data.alreadyVerified) {
+                    if (response.data.alreadyVerified) {
                         messageType.value = 'success';
-                        message.value = 'This character has already been verified!'
-                    }
-                    else if(response.data.verified) {
+                        message.value = 'This character has already been verified!';
+                    } else if (response.data.verified) {
+                        characterStore.addVerifiedCharacter(response.data.verifiedCharacter);
                         messageType.value = 'success';
-                        message.value = 'Character verification successful!'
+                        message.value = 'Character verification successful!';
                     }
-                    characterStore.addVerifiedCharacter(response.data.verifiedCharacter);
+
                     verified.value = true;
                     console.log(response);
                 } catch (error) {
@@ -151,8 +196,8 @@ export default defineComponent({
                 }
                 isLoading.value = false;
             }
-
         };
+
 
         return {
             email,

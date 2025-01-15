@@ -4,6 +4,7 @@ using BlueMageParty.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlueMageParty.Server.Migrations
 {
     [DbContext(typeof(BlueMagePartyContext))]
-    partial class BlueMagePartyContextModelSnapshot : ModelSnapshot
+    [Migration("20250115165455_CharacterInfo")]
+    partial class CharacterInfo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,6 +58,7 @@ namespace BlueMageParty.Server.Migrations
                         .HasColumnType("nvarchar(16)");
 
                     b.Property<string>("FreeCompany")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Gender")
@@ -91,6 +95,7 @@ namespace BlueMageParty.Server.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PvpTeam")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Race")
@@ -111,6 +116,7 @@ namespace BlueMageParty.Server.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TownIcon")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TownName")

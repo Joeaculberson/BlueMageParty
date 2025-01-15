@@ -115,8 +115,24 @@ export default {
             avatar: response.data[id].avatar,
             server: response.data[id].server,
             title: response.data[id].title,
+            activeClassJobIcon: response.data[id].activeClassJobIcon,
+            activeClassJobLevel: response.data[id].activeClassJobLevel, //int
+            bio: response.data[id].bio,
+            freeCompandy: response.data[id].freeCompandy,
+            gender: response.data[id].gender,
+            grandCompanyName: response.data[id].grandCompanyName,
+            grandCompanyRank: response.data[id].grandCompanyRank,
+            guardianDeityIcon: response.data[id].guardianDeityIcon,
+            guardianDeityName: response.data[id].guardianDeityName,
+            nameday: response.data[id].nameday,
+            portrait: response.data[id].portrait,
+            pvpTeam: response.data[id].pvpTeam,
+            race: response.data[id].race,
+            raceClanGender: response.data[id].raceClanGender,
+            townIcon: response.data[id].townIcon,
+            townName: response.data[id].townName,
+            tribe: response.data[id].tribe
           }));
-
         } catch (error) {
           console.log('There was an error searching for characters: ' + error);
         } finally {

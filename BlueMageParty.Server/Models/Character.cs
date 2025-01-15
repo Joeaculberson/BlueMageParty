@@ -34,6 +34,24 @@ namespace BlueMageParty.Server.Models
         public string Avatar { get; set; }
         public bool Default { get; set; }
 
+        public string ActiveClassJobIcon { get; set; }
+        public int? ActiveClassJobLevel { get; set; }
+        public string Bio { get; set; }
+        public string? FreeCompany { get; set; }
+        public string Gender { get; set; }
+        public string GrandCompanyName { get; set; }
+        public string GrandCompanyRank { get; set; }
+        public string GuardianDeityIcon { get; set; }
+        public string GuardianDeityName { get; set; }
+        public string Nameday { get; set; }
+        public string Portrait { get; set; }
+        public string? PvpTeam { get; set; }
+        public string Race { get; set; }
+        public string RaceClanGender { get; set; }
+        public string? TownIcon { get; set; }
+        public string TownName { get; set; }
+        public string Tribe { get; set; }
+
         public virtual ICollection<SpellOwned> SpellsOwned { get; set; }
 
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
