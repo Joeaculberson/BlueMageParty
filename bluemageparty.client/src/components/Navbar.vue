@@ -6,7 +6,7 @@
     <v-spacer></v-spacer>
 
     <template v-if="isAuthenticated">
-      <v-menu v-if="verifiedCharacters.length" offset-y>
+      <v-menu v-if="verifiedCharacters.length > 0" offset-y>
         <template v-slot:activator="{ props }">
           <v-btn text v-bind="props">
             <img
@@ -19,23 +19,42 @@
           </v-btn>
         </template>
         <v-list>
-          <div v-if="verifiedCharacters.length > 1">
-            <v-list-item v-for="character in verifiedCharacters.slice(1)" :key="character.id" @click="setAsActiveCharacter(character)">
-            <v-list-item-title>
-              <img
-                :src="character.avatar"
-                alt="avatar"
-                class="character-avatar"
-              />
-              {{ character.firstName }} {{ character.lastName }}
-            </v-list-item-title>
-          </v-list-item>
+          <div v-if="verifiedCharacters.length">
+            <v-list-item v-for="character in verifiedCharacters" :key="character.id" @click="setAsActiveCharacter(character)">
+              <v-list-item-title>
+                <v-row align="center" justify="space-between">
+                  <v-col cols="auto">
+                    <v-row align="center">
+                      <img
+                        :src="character.avatar"
+                        alt="avatar"
+                        class="character-avatar"
+                      />
+                      {{ character.firstName }} {{ character.lastName }}
+                    </v-row>
+                  </v-col>
+                  <v-col cols="auto">
+                    <!-- X icon to remove character -->
+                    <v-icon
+                      @click.stop="removeCharacter(character)"
+                      color="red"
+                      small
+                    >
+                      mdi-close
+                    </v-icon>
+                  </v-col>
+                </v-row>
+              </v-list-item-title>
+            </v-list-item>
           </div>
+          
           <v-list-item @click="goToCharacterSearch" text>
-            <v-list-item-title>Select Character</v-list-item-title>
-          </v-list-item>
-          <v-list-item @click="clearSelection">
-            <v-list-item-title>Clear Selection</v-list-item-title>
+            <v-list-item-title>
+              <v-row align="center" justify="space-between">
+                <span>Add Character</span>
+                <v-icon color="blue" small>mdi-plus</v-icon>
+              </v-row>
+            </v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
@@ -50,9 +69,8 @@
   </v-app-bar>
 </template>
 
-
 <script lang="ts">
-import { computed, defineComponent } from "vue";
+import { computed, defineComponent, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "@/stores/authStore";
 import { useCharacterStore } from "@/stores/characterStore";
@@ -79,10 +97,11 @@ export default defineComponent({
 
     const logout = () => {
       authStore.clearEmail();
+      characterStore.clearVerifiedCharacters()
       authStore.logout();
       router.push("/login");
     };
-
+    
     const setAsActiveCharacter = (character) => {
       characterStore.setAsActiveCharacter(character);
     };
@@ -93,10 +112,21 @@ export default defineComponent({
       }*/
     };
 
+    // Remove character from the verified list
+    const removeCharacter = (character) => {
+      characterStore.removeVerifiedCharacter(character);
+    };
+
     const clearSelection = () => {
       characterStore.clearVerifiedCharacters();
       characterStore.clearSelectedCharacter();
     };
+
+    onMounted(() => {
+      if(characterStore.getVerifiedCharacters().length == 0 || Object.keys(characterStore.getVerifiedCharacters())) {
+        characterStore.syncVerifiedCharacters();
+      }
+    });
 
     return {
       isAuthenticated,
@@ -110,7 +140,8 @@ export default defineComponent({
       verifiedCharacters,
       viewCharacterDetails,
       clearSelection,
-      setAsActiveCharacter
+      setAsActiveCharacter,
+      removeCharacter
     };
   },
 });
@@ -127,4 +158,30 @@ export default defineComponent({
   border-radius: 50%;
   margin-right: 8px;
 }
+
+.v-list-item-title {
+  padding: 8px 16px;
+}
+
+.v-row {
+  margin: 0;
+}
+
+.v-col {
+  padding: 0;
+}
+
+.v-list-item {
+  border-bottom: 1px solid #ccc;
+}
+
+.v-list-item:hover {
+  background-color: #f5f5f5;
+}
+
+.v-icon {
+  cursor: pointer;
+  margin-left: 8px;
+}
 </style>
+

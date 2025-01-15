@@ -46,7 +46,7 @@
           </v-card>
         </v-col>
 
-        <v-col v-if="characters.length" cols="12" md="8" lg="6">
+        <v-col v-if="characters.length && !isLoading" cols="12" md="8" lg="6">
           <v-card class="mx-auto">
             <template v-slot:title>
               <span>Character Search Results</span>

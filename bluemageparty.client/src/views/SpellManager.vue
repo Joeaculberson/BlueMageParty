@@ -123,19 +123,26 @@ export default {
     };
 
     // Fetch the list of spells
+// Fetch the list of spells
     const getSpells = async () => {
-      if(!isLoading.value) {
+      if (!isLoading.value) {
         isLoading.value = true;
         try {
           let response = null;
-          const characterId = characterStore.getVerifiedCharacters().length > 0 ? characterStore.getVerifiedCharacters()[0].id : undefined;
-          response = await axios.get(GET_SPELLS_URL, {params: characterId ? { characterId } : undefined,});
+          const characterId = characterStore.getVerifiedCharacters().length > 0
+            ? characterStore.getVerifiedCharacters()[0].id
+            : undefined;
 
-          spells.value = response.data.reverse().map((spell: any) => ({
-            ...spell,
-            checked: false, // Initialize checkbox state as false
-          }));
-          alertType.value = 'success';
+            // Fetch spells based on the active character
+            response = await axios.get(GET_SPELLS_URL, {
+              params: { characterId }
+            });
+
+            spells.value = response.data.reverse().map((spell: any) => ({
+              ...spell,
+              checked: false, // Initialize checkbox state as false
+            }));
+            alertType.value = 'success';
         } catch (error) {
           alertType.value = 'error';
           console.error('Error fetching spells:', error);
@@ -143,6 +150,16 @@ export default {
         isLoading.value = false;
       }
     };
+
+    // Watch for changes to the verified characters and fetch spells when the list changes
+    watch(
+      () => characterStore.getVerifiedCharacters(),
+      () => {
+        getSpells(); // Trigger getSpells whenever the verified characters array is updated
+      },
+      { immediate: true } // Run this on initial load to fetch spells
+    );
+
 
     // Handle checkbox change (trigger POST API call)
     const handleCheckboxChange = async (spell: Spell) => {

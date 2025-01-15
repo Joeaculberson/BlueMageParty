@@ -4,6 +4,7 @@ using BlueMageParty.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlueMageParty.Server.Migrations
 {
     [DbContext(typeof(BlueMagePartyContext))]
-    partial class BlueMagePartyContextModelSnapshot : ModelSnapshot
+    [Migration("20250114225622_CharacterDefault")]
+    partial class CharacterDefault
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -67,7 +70,7 @@ namespace BlueMageParty.Server.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Characters", (string)null);
+                    b.ToTable("Characters");
                 });
 
             modelBuilder.Entity("BlueMageParty.Server.Models.DataCenter", b =>
@@ -82,7 +85,7 @@ namespace BlueMageParty.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DataCenters", (string)null);
+                    b.ToTable("DataCenters");
                 });
 
             modelBuilder.Entity("BlueMageParty.Server.Models.ErrorLog", b =>
@@ -109,7 +112,7 @@ namespace BlueMageParty.Server.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ErrorLogs", (string)null);
+                    b.ToTable("ErrorLogs");
                 });
 
             modelBuilder.Entity("BlueMageParty.Server.Models.HomeWorld", b =>
@@ -129,7 +132,7 @@ namespace BlueMageParty.Server.Migrations
 
                     b.HasIndex("DataCenterId");
 
-                    b.ToTable("HomeWorlds", (string)null);
+                    b.ToTable("HomeWorlds");
                 });
 
             modelBuilder.Entity("BlueMageParty.Server.Models.Spell", b =>
@@ -177,7 +180,7 @@ namespace BlueMageParty.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Spells", (string)null);
+                    b.ToTable("Spells");
                 });
 
             modelBuilder.Entity("BlueMageParty.Server.Models.SpellOwned", b =>
@@ -207,7 +210,7 @@ namespace BlueMageParty.Server.Migrations
 
                     b.HasIndex("SpellId");
 
-                    b.ToTable("SpellsOwned", (string)null);
+                    b.ToTable("SpellsOwned");
                 });
 
             modelBuilder.Entity("BlueMageParty.Server.Models.SpellSource", b =>
@@ -231,7 +234,7 @@ namespace BlueMageParty.Server.Migrations
 
                     b.HasIndex("SpellId");
 
-                    b.ToTable("SpellSources", (string)null);
+                    b.ToTable("SpellSources");
                 });
 
             modelBuilder.Entity("BlueMageParty.Server.Models.User", b =>
@@ -284,7 +287,7 @@ namespace BlueMageParty.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("BlueMageParty.Server.Models.Character", b =>

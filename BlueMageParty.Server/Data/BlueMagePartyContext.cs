@@ -26,6 +26,12 @@ namespace BlueMageParty.Server.Data
                 .HasForeignKey(e => e.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<SpellOwned>()
+                .HasOne(s => s.Character)
+                .WithMany(c => c.SpellsOwned)
+                .HasForeignKey(s => s.CharacterId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<ErrorLog>()
                 .HasOne(e => e.User)
                 .WithMany(u => u.ErrorLogs)
