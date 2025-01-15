@@ -32,6 +32,9 @@ namespace BlueMageParty.Server.Models
 
         public string Title { get; set; }
         public string Avatar { get; set; }
+        public bool Default { get; set; }
+
+        public virtual ICollection<SpellOwned> SpellsOwned { get; set; }
 
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 

@@ -8,7 +8,11 @@
       <!-- Drawer content goes here -->
       <v-list dense>
         <v-list-item link @click="goToSpellManager">
-            <v-list-item-title>Spell Manager</v-list-item-title>
+            <v-list-item-title>
+              <v-icon color="blue" small>
+                mdi-book-account
+              </v-icon>Spell Manager
+            </v-list-item-title>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>

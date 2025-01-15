@@ -12,7 +12,7 @@ namespace BlueMageParty.Server.Models
         // Foreign key to the User table
         public Guid CharacterId { get; set; }
         [ForeignKey("CharacterId")]
-        public virtual User Character { get; set; }  // Navigation property to the User model
+        public virtual Character Character { get; set; }  // Navigation property to the User model
 
         // Foreign key to the Spell table
         public Guid SpellId { get; set; }

@@ -18,3 +18,6 @@ export const GET_DATA_CENTERS_URL = `${API_BASE_URL}/DataCenter`
 export const SEARCH_CHARACTER_URL = `${API_BASE_URL}/Loadstone/SearchCharacter`
 export const GET_VERIFICATION_CODE_URL = `${API_BASE_URL}/LoadstoneVerification/GetVerificationCode`
 export const VERIFY_CHARACTER_URL = `${API_BASE_URL}/LoadstoneVerification/VerifyCharacter`
+export const GET_CHARACTERS_URL = `${API_BASE_URL}/Character`
+export const SET_DEFAULT_CHARACTER_URL = `${API_BASE_URL}/Character/SetDefault`
+export const REMOVE_CHARACTER_URL = `${API_BASE_URL}/Character/Remove`

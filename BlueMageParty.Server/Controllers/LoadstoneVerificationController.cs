@@ -80,7 +80,8 @@ public class LoadstoneVerificationController : ControllerBase
                     Server = request.characterWorld,
                     Title = request.characterTitle,
                     Avatar = request.characterAvatar,
-                    UserId = TokenDecoder.DecodeUserIdFromJwtToken(request.authToken)
+                    UserId = TokenDecoder.DecodeUserIdFromJwtToken(request.authToken),
+                    Default = true
                 };
 
                 await this._context.Characters.AddAsync(c);
@@ -90,8 +91,6 @@ public class LoadstoneVerificationController : ControllerBase
             {
                 return Ok(new { Verified = false });
             }
-
-            
         }
         catch (Exception ex)
         {
