@@ -16,7 +16,14 @@ namespace BlueMageParty.Server.Controllers
             _context = context;
         }
 
-        [HttpGet]
+        [HttpGet("CharacterByLoadstoneId")]
+        public async Task<IActionResult> GetCharacterByLoadstoneId([FromQuery] string loadstoneCharacterId)
+        {
+            var characters = await _context.Characters.FirstOrDefaultAsync(x => x.LoadstoneCharacterId == loadstoneCharacterId);
+            return Ok(characters);
+        }
+
+        [HttpGet("Characters")]
         public async Task<IActionResult> GetCharacters([FromQuery] string authToken)
         {
             Guid userId = TokenDecoder.DecodeUserIdFromJwtToken(authToken);

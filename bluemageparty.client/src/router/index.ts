@@ -11,6 +11,7 @@ import ResetPassword from '@/views/ResetPassword.vue';
 import Parties from '@/views/Parties.vue';
 import CharacterSearch from '../views/character/Search.vue';
 import VerifyCharacter from '../views/character/Verify.vue';
+import CharacterDetails from '../views/character/Details.vue';
 
 const routes = [
   {
@@ -56,6 +57,14 @@ const routes = [
   {
     path: '/character/Verify',
     component: VerifyCharacter
+  },
+  {
+    path: '/character/:loadstoneCharacterId',
+    component: CharacterDetails
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/spellmanager',
   }
 ];
 

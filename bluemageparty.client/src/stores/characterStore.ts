@@ -1,15 +1,16 @@
 import { defineStore } from "pinia";
 import axios from "axios";
-import { GET_CHARACTERS_URL, SET_DEFAULT_CHARACTER_URL, REMOVE_CHARACTER_URL } from "@/constants/api";
+import {
+  GET_CHARACTERS_URL,
+  SET_DEFAULT_CHARACTER_URL,
+  REMOVE_CHARACTER_URL,
+} from "@/constants/api";
 
 export const useCharacterStore = defineStore("character", {
   state: () => ({
-    verifiedCharacters: JSON.parse(
-      localStorage.getItem("verified_characters") || "[]"
-    ),
-    selectedCharacter: JSON.parse(
-      localStorage.getItem("selected_character") || "null"
-    ),
+    verifiedCharacters: JSON.parse(localStorage.getItem("verified_characters") || "[]")
+      .filter((char) => char !== null), // Remove null entries
+    selectedCharacter: JSON.parse(localStorage.getItem("selected_character") || "null")
   }),
   actions: {
     async fetchVerifiedCharactersFromDB() {
@@ -18,7 +19,7 @@ export const useCharacterStore = defineStore("character", {
         const response = await axios.get(GET_CHARACTERS_URL, {
           params: { authToken: authToken },
         });
-        const characters = response.data;
+        const characters = response.data.filter((char) => char !== null); // Filter out null
         this.verifiedCharacters = characters;
         this.setVerifiedCharacters();
       } catch (error) {
@@ -38,7 +39,9 @@ export const useCharacterStore = defineStore("character", {
     async removeCharacterFromDB(character) {
       try {
         // Use the character ID in the URL path
-        const response = await axios.delete(`${REMOVE_CHARACTER_URL}/${character.id}`);
+        const response = await axios.delete(
+          `${REMOVE_CHARACTER_URL}/${character.id}`
+        );
         console.log("Character removed from database");
       } catch (error) {
         console.error("Failed to remove character from database:", error);
@@ -48,15 +51,21 @@ export const useCharacterStore = defineStore("character", {
       this.fetchVerifiedCharactersFromDB();
     },
     setVerifiedCharacters() {
-      this.verifiedCharacters = [
+      if(this.verifiedCharacters > 0) {
+        //sort characters. Default first then by first name.
+        this.verifiedCharacters = [
           this.verifiedCharacters[0], // Keep the 0th element as is
-          ...this.verifiedCharacters.slice(1).sort((a, b) => a.firstName.localeCompare(b.firstName))
-      ];
+          ...this.verifiedCharacters
+            .slice(1)
+            .filter((char) => char !== null) // Filter out null
+            .sort((a, b) => a.firstName.localeCompare(b.firstName))
+        ];
+      }
       localStorage.setItem("verified_characters", JSON.stringify(this.verifiedCharacters));
-    },    
+    },
     addVerifiedCharacter(character: Character) {
       this.verifiedCharacters.unshift(character);
-      this.setVerifiedCharacters()
+      this.setVerifiedCharacters();
     },
     setAsActiveCharacter(character) {
       character.default = true;
@@ -69,7 +78,10 @@ export const useCharacterStore = defineStore("character", {
 
       this.setAsDefault(character);
       this.setVerifiedCharacters();
-      localStorage.setItem("verified_characters", JSON.stringify(this.verifiedCharacters));
+      localStorage.setItem(
+        "verified_characters",
+        JSON.stringify(this.verifiedCharacters)
+      );
     },
     removeVerifiedCharacter(character) {
       const index = this.verifiedCharacters.findIndex(
@@ -86,7 +98,7 @@ export const useCharacterStore = defineStore("character", {
       localStorage.removeItem("verified_characters");
     },
     getVerifiedCharacters() {
-      return this.verifiedCharacters;
+      return this.verifiedCharacters.filter((char) => char !== null);
     },
     setSelectedCharacter(character: Character) {
       this.selectedCharacter = character;

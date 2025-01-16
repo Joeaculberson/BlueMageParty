@@ -43,20 +43,22 @@ public class LoadstoneVerificationController : ControllerBase
     }
 
     [HttpPost("VerifyCharacter")]
-    public async Task<IActionResult> VerifyCharacter(VerifyCharacterRequest request)
+    public async Task<IActionResult> VerifyCharacter([FromBody] VerifyCharacterRequest request)
     {
         try
         {
-            var firstName = request.Name.Split(' ')[0];
-            var lastName = request.Name.Split(' ')[1];
-            var existingCharacter = await this._context.Characters.FirstOrDefaultAsync(x => x.FirstName == firstName && x.LastName == lastName && x.Server == request.World);
+            var existingCharacter = await this._context.Characters.FirstOrDefaultAsync(x => 
+            x.FirstName == request.Character.FirstName
+            && x.LastName == request.Character.LastName
+            && x.Server == request.Character.Server);
+
             if(existingCharacter != null)
                 return Ok(new { Verified = true, AlreadyVerified = true, VerifiedCharacter = existingCharacter });
 
             var lodestoneClient = await LodestoneClient.GetClientAsync();
             var csq = new CharacterSearchQuery();
-            csq.CharacterName = request.Name;
-            csq.World = request.World;
+            csq.CharacterName = request.Character.FirstName + " " + request.Character.LastName;
+            csq.World = request.Character.Server;
 
             var searchResponse = await lodestoneClient.SearchCharacter(csq);
 
@@ -65,7 +67,7 @@ public class LoadstoneVerificationController : ControllerBase
 
             var queriedCharacterResults =
                 searchResponse?.Results
-                .FirstOrDefault(entry => entry.Name.ToLower() == request.Name.ToLower());
+                .FirstOrDefault(entry => entry.Name.ToLower() == request.Character.FirstName.ToLower() + " " + request.Character.LastName.ToLower());
 
             var character = queriedCharacterResults.GetCharacter().Result;
             var containsCode = character.Bio.Contains(request.LoadstoneVerificationCode);
@@ -75,30 +77,31 @@ public class LoadstoneVerificationController : ControllerBase
             {
                 Character c = new Character()
                 {
-                    FirstName = request.Name.Split(" ")[0],
-                    LastName = request.Name.Split(" ")[1],
-                    Server = request.World,
-                    Title = request.Title,
-                    Avatar = request.Avatar,
+                    FirstName = request.Character.FirstName,
+                    LastName = request.Character.LastName,
+                    Server = request.Character.Server,
+                    Title = request.Character.Title,
+                    Avatar = request.Character.Avatar,
+                    LoadstoneCharacterId = request.Character.LoadstoneCharacterId,
                     UserId = TokenDecoder.DecodeUserIdFromJwtToken(request.AuthToken),
                     Default = true,
-                    ActiveClassJobIcon = request.ActiveClassJobIcon,
-                    ActiveClassJobLevel = request.ActiveClassJobLevel,
-                    Bio = request.Bio,
-                    FreeCompany = request.FreeCompany,
-                    Gender = request.Gender,
-                    GrandCompanyName = request.GrandCompanyName,
-                    GrandCompanyRank = request.GrandCompanyRank,
-                    GuardianDeityIcon = request.GuardianDeityIcon,
-                    GuardianDeityName = request.GuardianDeityName,
-                    Nameday = request.Nameday,
-                    Portrait = request.Portrait,
-                    PvpTeam = request.PvpTeam,
-                    Race = request.Race,
-                    RaceClanGender = request.RaceClanGender,
-                    TownIcon = request.TownIcon,
-                    TownName = request.TownName,
-                    Tribe = request.Tribe
+                    ActiveClassJobIcon = request.Character.ActiveClassJobIcon,
+                    ActiveClassJobLevel = request.Character.ActiveClassJobLevel,
+                    Bio = request.Character.Bio,
+                    FreeCompany = request.Character.FreeCompany,
+                    Gender = request.Character.Gender,
+                    GrandCompanyName = request.Character.GrandCompanyName,
+                    GrandCompanyRank = request.Character.GrandCompanyRank,
+                    GuardianDeityIcon = request.Character.GuardianDeityIcon,
+                    GuardianDeityName = request.Character.GuardianDeityName,
+                    Nameday = request.Character.Nameday,
+                    Portrait = request.Character.Portrait,
+                    PvpTeam = request.Character.PvpTeam,
+                    Race = request.Character.Race,
+                    RaceClanGender = request.Character.RaceClanGender,
+                    TownIcon = request.Character.TownIcon,
+                    TownName = request.Character.TownName,
+                    Tribe = request.Character.Tribe
                 };
 
                 await this._context.Characters.AddAsync(c);
@@ -125,30 +128,8 @@ public class LoadstoneVerificationController : ControllerBase
 
     public record VerifyCharacterRequest(
         string LoadstoneVerificationCode,
-        string Name,
-        string World,
-        string Title,
-        string Avatar,
         string AuthToken,
-        string Id,
-        string Server,
-        string ActiveClassJobIcon,
-        int? ActiveClassJobLevel,
-        string Bio,
-        string? FreeCompany,
-        string Gender,
-        string GrandCompanyName,
-        string GrandCompanyRank,
-        string GuardianDeityIcon,
-        string GuardianDeityName,
-        string Nameday,
-        string Portrait,
-        string? PvpTeam,
-        string Race,
-        string RaceClanGender,
-        string? TownIcon,
-        string TownName,
-        string Tribe
+        CharacterVM Character
     );
 
 }
