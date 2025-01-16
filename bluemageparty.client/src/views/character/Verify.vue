@@ -140,36 +140,38 @@ export default defineComponent({
             if (!isLoading.value) {
                 isLoading.value = true;
                 try {
-                    console.log(character.value);
-
-                    const response = await axios.post(VERIFY_CHARACTER_URL, {
+                    const payload = {
                         LoadstoneVerificationCode: verificationCode.value,
-                        Name: character.value.name,
-                        World: character.value.server,
-                        Title: character.value.title,
-                        Avatar: character.value.avatar,
                         AuthToken: authStore.getAuthToken(),
-                        Id: character.value.id,
-                        Server: character.value.server,
-                        ActiveClassJobIcon: character.value.activeClassJobIcon,
-                        ActiveClassJobLevel: character.value.activeClassJobLevel,
-                        Bio: character.value.bio,
-                        FreeCompany: character.value.freeCompany,
-                        Gender: character.value.gender,
-                        GrandCompanyName: character.value.grandCompanyName,
-                        GrandCompanyRank: character.value.grandCompanyRank,
-                        GuardianDeityIcon: character.value.guardianDeityIcon,
-                        GuardianDeityName: character.value.guardianDeityName,
-                        Nameday: character.value.nameday,
-                        Portrait: character.value.portrait,
-                        PvpTeam: character.value.pvpTeam,
-                        Race: character.value.race,
-                        RaceClanGender: character.value.raceClanGender,
-                        TownIcon: character.value.townIcon,
-                        TownName: character.value.townName,
-                        Tribe: character.value.tribe,
-                    });
-
+                        Character: { 
+                            FirstName: character.value.name.split(' ')[0],
+                            LastName: character.value.name.split(' ')[1],
+                            World: character.value.server,
+                            Title: character.value.title,
+                            Avatar: character.value.avatar,
+                            LoadstoneCharacterId: character.value.id,
+                            Server: character.value.server,
+                            ActiveClassJobIcon: character.value.activeClassJobIcon,
+                            ActiveClassJobLevel: character.value.activeClassJobLevel,
+                            Bio: character.value.bio,
+                            FreeCompany: character.value.freeCompany,
+                            Gender: character.value.gender,
+                            GrandCompanyName: character.value.grandCompanyName,
+                            GrandCompanyRank: character.value.grandCompanyRank,
+                            GuardianDeityIcon: character.value.guardianDeityIcon,
+                            GuardianDeityName: character.value.guardianDeityName,
+                            Nameday: character.value.nameday,
+                            Portrait: character.value.portrait,
+                            PvpTeam: character.value.pvpTeam,
+                            Race: character.value.race,
+                            RaceClanGender: character.value.raceClanGender,
+                            TownIcon: character.value.townIcon,
+                            TownName: character.value.townName,
+                            Tribe: character.value.tribe
+                        }
+                    }; 
+                    //console.log('payload ' + JSON.stringify(payload))
+                    const response = await axios.post(VERIFY_CHARACTER_URL, payload);
 
                     if (!response.data.verified) {
                         message.value = "Character verification failed. Please confirm that the verification code is in the character's bio.";
@@ -188,7 +190,6 @@ export default defineComponent({
                     }
 
                     verified.value = true;
-                    console.log(response);
                 } catch (error) {
                     message.value = "Character verification failed. Please confirm that the verification code is in the character's bio.";
                     messageType.value = 'error';

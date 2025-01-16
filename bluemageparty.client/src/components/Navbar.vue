@@ -19,8 +19,12 @@
           </v-btn>
         </template>
         <v-list>
-          <div v-if="verifiedCharacters.length">
-            <v-list-item v-for="character in verifiedCharacters" :key="character.id" @click="setAsActiveCharacter(character)">
+          <div v-if="verifiedCharacters.length > 0">
+            <v-list-item
+              v-for="character in verifiedCharacters"
+              :key="character.id"
+              @click="setAsActiveCharacter(character)"
+            >
               <v-list-item-title>
                 <v-row align="center" justify="space-between">
                   <v-col cols="auto">
@@ -34,7 +38,11 @@
                     </v-row>
                   </v-col>
                   <v-col cols="auto">
-                    <!-- X icon to remove character -->
+                    <v-icon @click.stop="goToCharacterDetails(character)" small>
+                      mdi-account-outline
+                    </v-icon>
+                  </v-col>
+                  <v-col cols="auto">
                     <v-icon
                       @click.stop="removeCharacter(character)"
                       color="red"
@@ -47,7 +55,6 @@
               </v-list-item-title>
             </v-list-item>
           </div>
-          
           <v-list-item @click="goToCharacterSearch" text>
             <v-list-item-title>
               <v-row align="center" justify="space-between">
@@ -66,11 +73,17 @@
     <v-btn v-if="isAuthenticated" @click="logout" text>
       Logout
     </v-btn>
+    <v-btn v-if="!isAuthenticated && isOnLoginPage" @click="goToRegisterPage" text>
+      Register
+    </v-btn>
+    <v-btn v-if="!isAuthenticated && !isOnLoginPage" @click="goToLogin" text>
+      Login
+    </v-btn>
   </v-app-bar>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted } from "vue";
+import { ref, computed, defineComponent, onMounted, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "@/stores/authStore";
 import { useCharacterStore } from "@/stores/characterStore";
@@ -86,7 +99,16 @@ export default defineComponent({
     const isAuthenticated = computed(() => authStore.isAuthenticated);
     const isOnLoginPage = computed(() => route.path === "/login");
     const isOnRegisterPage = computed(() => route.path === "/register");
-    const verifiedCharacters = computed(() => characterStore.getVerifiedCharacters());
+    const verifiedCharacters = ref(characterStore.getVerifiedCharacters());
+
+    // Watch for changes in the character store and update the local verifiedCharacters
+    watch(
+      () => characterStore.getVerifiedCharacters(),
+      (newCharacters) => {
+        verifiedCharacters.value = newCharacters;
+      },
+      { immediate: true, deep: true }
+    );
 
     const goToLogin = () => router.push("/login");
     const goToRegisterPage = () => router.push("/register");
@@ -97,24 +119,21 @@ export default defineComponent({
 
     const logout = () => {
       authStore.clearEmail();
-      characterStore.clearVerifiedCharacters()
+      characterStore.clearVerifiedCharacters();
       authStore.logout();
       router.push("/login");
     };
-    
+
     const setAsActiveCharacter = (character) => {
       characterStore.setAsActiveCharacter(character);
     };
 
-    const viewCharacterDetails = (character) => {
-      /*if (verifiedCharacter.value) {
-        router.push(`/character/${verifiedCharacter.value.id}`);
-      }*/
-    };
-
-    // Remove character from the verified list
     const removeCharacter = (character) => {
       characterStore.removeVerifiedCharacter(character);
+    };
+
+    const goToCharacterDetails = (character) => {
+      router.push(`/character/${character.loadstoneCharacterId}`);
     };
 
     const clearSelection = () => {
@@ -123,7 +142,10 @@ export default defineComponent({
     };
 
     onMounted(() => {
-      if(characterStore.getVerifiedCharacters().length == 0 || Object.keys(characterStore.getVerifiedCharacters())) {
+      if (
+        characterStore.getVerifiedCharacters().length === 0 ||
+        Object.keys(characterStore.getVerifiedCharacters())
+      ) {
         characterStore.syncVerifiedCharacters();
       }
     });
@@ -138,10 +160,10 @@ export default defineComponent({
       isOnLoginPage,
       isOnRegisterPage,
       verifiedCharacters,
-      viewCharacterDetails,
       clearSelection,
       setAsActiveCharacter,
-      removeCharacter
+      removeCharacter,
+      goToCharacterDetails,
     };
   },
 });
@@ -184,4 +206,3 @@ export default defineComponent({
   margin-left: 8px;
 }
 </style>
-
