@@ -58,7 +58,7 @@
                         <v-card-actions>
                             <v-btn color="primary" @click="refreshCharacterData"><v-icon small>mdi-refresh</v-icon> Refresh Character Data</v-btn>
                             <v-spacer></v-spacer>
-                            <v-btn color="primary" @click="removeCharacter"><v-icon small>mdi-close</v-icon> Remove Character</v-btn>
+                            
                         </v-card-actions>
                     </div>
                 </v-card>

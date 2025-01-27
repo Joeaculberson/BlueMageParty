@@ -47,7 +47,7 @@ public class SpellsController : ControllerBase
                             source.Enemy,
                             source.Location
                         })
-                    })
+                    }).OrderBy(x => x.Number)
                     .ToListAsync());
             }
         }

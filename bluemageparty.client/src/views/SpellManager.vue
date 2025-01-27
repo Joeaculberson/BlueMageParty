@@ -138,7 +138,7 @@ export default {
               params: { characterId }
             });
 
-            spells.value = response.data.reverse().map((spell: any) => ({
+            spells.value = response.data.map((spell: any) => ({
               ...spell,
               checked: false, // Initialize checkbox state as false
             }));
