@@ -4,6 +4,7 @@ using BlueMageParty.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlueMageParty.Server.Migrations
 {
     [DbContext(typeof(BlueMagePartyContext))]
-    partial class BlueMagePartyContextModelSnapshot : ModelSnapshot
+    [Migration("20250127195437_SpellPartyRequirement")]
+    partial class SpellPartyRequirement
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -218,15 +221,6 @@ namespace BlueMageParty.Server.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsFullParty")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsLightParty")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsSolo")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -242,6 +236,9 @@ namespace BlueMageParty.Server.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Rank")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SpellPartyRequirement")
                         .HasColumnType("int");
 
                     b.Property<string>("Tooltip")

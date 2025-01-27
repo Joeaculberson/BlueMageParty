@@ -48,7 +48,7 @@
                       color="red"
                       small
                     >
-                      mdi-close
+                      mdi-trash-can
                     </v-icon>
                   </v-col>
                 </v-row>
