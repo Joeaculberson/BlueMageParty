@@ -10,6 +10,36 @@
       Please select a character before managing your spells.
     </v-alert>
 
+    <v-row>
+      <v-col cols="12" md="3">
+        
+        <v-checkbox
+          v-model="filters.isSolo"
+          label="Solo"
+        ></v-checkbox>
+
+      </v-col>
+      <v-col cols="12" md="3">
+        <v-checkbox
+          v-model="filters.isLightParty"
+          label="Light Party"
+        ></v-checkbox>
+      </v-col>
+      <v-col cols="12" md="3">
+        <v-checkbox
+          v-model="filters.isFullParty"
+          label="Full Party"
+        ></v-checkbox>
+      </v-col>
+      <v-col cols="12" md="3">
+        <v-checkbox
+          v-model="filters.hideOwned"
+          label="Hide Owned Spells"
+          @change="applyFilters"
+        ></v-checkbox>
+      </v-col>
+    </v-row>
+
     <v-table>
       <thead>
         <tr>
@@ -23,7 +53,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="spell in spells" :key="spell.name">
+        <tr v-for="spell in filteredSpells" :key="spell.name">
           <td>No. {{ spell.number }}</td>
           <td>
             <v-img :src="spell.icon" class="spell-sprite" max-width="42" max-height="42" />
@@ -67,25 +97,22 @@
   </v-container>
 </template>
 
-  
-  
-  
-  <script lang="ts">
-import { ref, onMounted } from 'vue';
+<script lang="ts">
+import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/authStore';
-import { watch } from 'vue'
+import { watch } from 'vue';
 import { useCharacterStore } from '@/stores/characterStore';
-import { 
-    GET_USER_ADMIN_URL, 
-    GET_SPELLS_URL, 
-    SAVE_SPELLS_BULK_URL, 
-    UPDATE_SPELL_OWNED_URL,
-    GET_TARO_BOKOKINGWAY_MISSING_SPELLS_URL 
+import {
+  GET_USER_ADMIN_URL,
+  GET_SPELLS_URL,
+  SAVE_SPELLS_BULK_URL,
+  UPDATE_SPELL_OWNED_URL,
+  GET_TARO_BOKOKINGWAY_MISSING_SPELLS_URL,
 } from '@/constants/api';
 
 interface Spell {
-    id: string,
+  id: string;
   name: string;
   number: number;
   description: string;
@@ -98,6 +125,9 @@ interface Spell {
   aspect: { id: number; name: string };
   sources: { enemy: string; location: string }[];
   owned: boolean; // Track checkbox state
+  isSolo: boolean;
+  isLightParty: boolean;
+  isFullParty: boolean;
 }
 
 export default {
@@ -110,11 +140,30 @@ export default {
     const isAdmin = ref(false);
     const spells = ref<Spell[]>([]); // Store spells here
     const isLoading = ref(false);
+    const filters = ref({
+      isSolo: false,
+      isLightParty: false,
+      isFullParty: false,
+      hideOwned: true
+    });
+
+    const filteredSpells = computed(() => {
+      return spells.value.filter((spell) => {
+        return (
+          (!filters.value.isSolo || spell.isSolo) &&
+          (!filters.value.isLightParty || spell.isLightParty) &&
+          (!filters.value.isFullParty || spell.isFullParty) &&
+          (!filters.value.hideOwned || !spell.owned)
+        );
+      });
+    });
 
     // Check if the user is an admin
     const checkAdminStatus = async () => {
       try {
-        const response = await axios.get(GET_USER_ADMIN_URL + authStore.getAuthToken());
+        const response = await axios.get(
+          GET_USER_ADMIN_URL + authStore.getAuthToken()
+        );
         isAdmin.value = response.data;
       } catch (error) {
         console.error('Error checking admin status:', error);
@@ -123,26 +172,26 @@ export default {
     };
 
     // Fetch the list of spells
-// Fetch the list of spells
     const getSpells = async () => {
       if (!isLoading.value) {
         isLoading.value = true;
         try {
-          let response = null;
-          const characterId = characterStore.getVerifiedCharacters().length > 0
-            ? characterStore.getVerifiedCharacters()[0].id
-            : undefined;
+          const characterId =
+            characterStore.getVerifiedCharacters().length > 0
+              ? characterStore.getVerifiedCharacters()[0].id
+              : undefined;
 
-            // Fetch spells based on the active character
-            response = await axios.get(GET_SPELLS_URL, {
-              params: { characterId }
-            });
+          // Fetch spells based on the active character
+          const response = await axios.get(GET_SPELLS_URL, {
+            params: { characterId },
+          });
 
-            spells.value = response.data.map((spell: any) => ({
-              ...spell,
-              checked: false, // Initialize checkbox state as false
-            }));
-            alertType.value = 'success';
+          spells.value = response.data.map((spell: any) => ({
+            ...spell,
+            checked: false, // Initialize checkbox state as false
+          }));
+          console.log(JSON.stringify(spells.value));
+          alertType.value = 'success';
         } catch (error) {
           alertType.value = 'error';
           console.error('Error fetching spells:', error);
@@ -160,16 +209,16 @@ export default {
       { immediate: true } // Run this on initial load to fetch spells
     );
 
-
     // Handle checkbox change (trigger POST API call)
     const handleCheckboxChange = async (spell: Spell) => {
       try {
-          // Make POST request when checked
-          const response = await axios.post(UPDATE_SPELL_OWNED_URL, { 
-            spellId: spell.id, 
-            characterId: characterStore.getVerifiedCharacters()[0].id, 
-            isChecked: spell.owned });
-          alertType.value = 'success';
+        // Make POST request when checked
+        await axios.post(UPDATE_SPELL_OWNED_URL, {
+          spellId: spell.id,
+          characterId: characterStore.getVerifiedCharacters()[0].id,
+          isChecked: spell.owned,
+        });
+        alertType.value = 'success';
       } catch (error) {
         console.error('Error saving spell:', error);
         adminMessage.value = `Failed to save spell ${spell.name}.`;
@@ -177,39 +226,48 @@ export default {
       }
     };
 
-     // Fetch and save spells in bulk from external API
-     const fetchAndSaveSpells = async (): Promise<void> => {
+    // Apply filters to the spells
+    const applyFilters = () => {
+      // Trigger recomputation of filteredSpells
+    };
+
+    // Fetch and save spells in bulk from external API
+    const fetchAndSaveSpells = async (): Promise<void> => {
       try {
         // Fetch the spell data from the external API
-        const response = await axios.get(GET_TARO_BOKOKINGWAY_MISSING_SPELLS_URL);
+        const response = await axios.get(
+          GET_TARO_BOKOKINGWAY_MISSING_SPELLS_URL
+        );
 
         const spellsToSave = response.data.map((spell: any) => ({
-            number: spell.order,
-            name: spell.name,
-            description: spell.description,
-            tooltip: spell.tooltip,
-            order: spell.order,
-            rank: spell.rank,
-            patch: spell.patch,
-            icon: spell.icon,
-            typeName: spell.type.name,
-            aspectName: spell.aspect.name,
-            sources: spell.sources.map((source: any) => {
-                // Split the source text by '/' and trim the parts
-                const parts = source.text.split('/').map((part: string) => part.trim());
-                let enemy = '';
-                let location = '';
+          number: spell.order,
+          name: spell.name,
+          description: spell.description,
+          tooltip: spell.tooltip,
+          order: spell.order,
+          rank: spell.rank,
+          patch: spell.patch,
+          icon: spell.icon,
+          typeName: spell.type.name,
+          aspectName: spell.aspect.name,
+          sources: spell.sources.map((source: any) => {
+            // Split the source text by '/' and trim the parts
+            const parts = source.text.split('/').map((part: string) =>
+              part.trim()
+            );
+            let enemy = '';
+            let location = '';
 
-                // If there is only one part, assign it to location
-                if (parts.length === 1) {
-                location = parts[0];
-                } else {
-                enemy = parts[0];
-                location = parts[1];
-                }
+            // If there is only one part, assign it to location
+            if (parts.length === 1) {
+              location = parts[0];
+            } else {
+              enemy = parts[0];
+              location = parts[1];
+            }
 
-                return { enemy, location };
-            }),
+            return { enemy, location };
+          }),
         }));
 
         // Send the spells data in bulk to the server
@@ -229,14 +287,6 @@ export default {
       }
     };
 
-    watch(
-      () => characterStore.getVerifiedCharacters(),
-      () => {
-        getSpells(); // Trigger getSpells whenever the verified characters array is updated
-      },
-      { immediate: true } // Run this on initial load to fetch spells
-    );
-
     onMounted(() => {
       checkAdminStatus();
       getSpells();
@@ -251,20 +301,22 @@ export default {
       getSpells,
       handleCheckboxChange,
       fetchAndSaveSpells,
-      characterStore
+      characterStore,
+      filters,
+      filteredSpells,
+      applyFilters,
     };
   },
 };
 </script>
 
-  
-  <style scoped>
-  tbody tr:nth-of-type(odd) {
-   background-color: rgba(0, 0, 0, 0.391);
- }
+<style scoped>
+tbody tr:nth-of-type(odd) {
+  background-color: rgba(0, 0, 0, 0.391);
+}
 
- .spell-sprite {
-        border-radius: 0.3rem;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-    }
-  </style>
+.spell-sprite {
+  border-radius: 0.3rem;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+</style>
