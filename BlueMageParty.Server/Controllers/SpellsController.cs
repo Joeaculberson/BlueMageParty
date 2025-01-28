@@ -40,6 +40,9 @@ public class SpellsController : ControllerBase
                         s.Number,
                         s.Icon,
                         s.Patch,
+                        s.IsSolo,
+                        s.IsLightParty,
+                        s.IsFullParty,
                         Owned = _context.SpellsOwned.Any(so => so.SpellId == s.Id && so.CharacterId == new Guid(characterId) && so.Owned),
                         Sources = s.Sources.Select(source => new
                         {

@@ -11,7 +11,6 @@
                             </div>
 
                             <img :src="character.portrait" class="rcorners" alt="Character Portrait" />
-
                         </v-row>
                     </v-card-title>
 
@@ -56,9 +55,19 @@
 
                     <div v-if="ownsCharacter">
                         <v-card-actions>
-                            <v-btn color="primary" @click="refreshCharacterData"><v-icon small>mdi-refresh</v-icon> Refresh Character Data</v-btn>
+                            <v-btn
+                                v-if="!isRefreshing"
+                                color="primary"
+                                @click="refreshCharacterData"
+                            >
+                                <v-icon small>mdi-refresh</v-icon> Refresh Character Data
+                            </v-btn>
+                            <v-progress-circular
+                                v-else
+                                indeterminate
+                                color="primary"
+                            ></v-progress-circular>
                             <v-spacer></v-spacer>
-                            
                         </v-card-actions>
                     </div>
                 </v-card>
@@ -68,10 +77,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, watch } from "vue";
+import { defineComponent, watch, ref, reactive } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import axios from "axios";
-import { GET_CHARACTER_BY_LOADSTONE_ID_URL } from "@/constants/api";
+import { GET_CHARACTER_BY_LOADSTONE_ID_URL, REFRESH_CHARACTER_DATA_FROM_LOADSTONE_URL } from "@/constants/api";
 import { useCharacterStore } from "@/stores/characterStore";
 
 export default defineComponent({
@@ -80,7 +89,32 @@ export default defineComponent({
         const router = useRouter();
         const route = useRoute();
         const ownsCharacter = ref(false);
-        const character = reactive({});
+        const isRefreshing = ref(false);
+        const character = reactive({
+            avatar: "",
+            firstName: "",
+            lastName: "",
+            title: "",
+            server: "",
+            id: "",
+            activeClassJobIcon: "",
+            activeClassJobLevel: null,
+            bio: "",
+            freeCompany: "",
+            gender: "",
+            grandCompanyName: "",
+            grandCompanyRank: "",
+            guardianDeityIcon: "",
+            guardianDeityName: "",
+            nameday: "",
+            portrait: "",
+            pvpTeam: "",
+            race: "",
+            raceClanGender: "",
+            townIcon: "",
+            townName: "",
+            tribe: ""
+        });
         const characterStore = useCharacterStore();
 
         const getCharacterDetails = async () => {
@@ -90,45 +124,52 @@ export default defineComponent({
                 });
 
                 if (response.data) {
-                    Object.assign(character, response.data);  // Updates character data
+                    Object.assign(character, response.data); // Updates character data
                 } else {
-                    router.push("/spellbook");
+                    console.log("Error fetching character data.");
                 }
             } catch (error) {
-                console.error('Error fetching character data:', error);
+                console.error("Error fetching character data:", error);
             }
         };
 
-        
-        ownsCharacter.value = characterStore.getVerifiedCharacters().some(character => character.loadstoneCharacterId === route.params.loadstoneCharacterId);
-        
+        ownsCharacter.value = characterStore
+            .getVerifiedCharacters()
+            .some(character => character.loadstoneCharacterId === route.params.loadstoneCharacterId);
 
-        const removeCharacter = async () => {
-            
+        const refreshCharacterData = async () => {
+            isRefreshing.value = true;
+            try {
+                const response = await axios.post(REFRESH_CHARACTER_DATA_FROM_LOADSTONE_URL, {
+                    Name: character.firstName + " " + character.lastName,
+                    Server: character.server
+                });
+                Object.assign(character, response.data);
+            } catch (error) {
+                console.error("Error fetching verification code:", error);
+            } finally {
+                isRefreshing.value = false;
+            }
         };
 
-        // Watch for changes to the route parameters
         watch(
             () => route.params.loadstoneCharacterId,
-            (newCharacterId) => {
-                getCharacterDetails();  // Fetch data when the route changes
+            () => {
+                getCharacterDetails(); // Fetch data when the route changes
             },
-            { immediate: true }  // Call this immediately on mount
+            { immediate: true } // Call this immediately on mount
         );
-
-        const refreshCharacterData = () => {
-            router.push("/character/search");
-        };
 
         return {
             character,
             refreshCharacterData,
             ownsCharacter,
-            removeCharacter
+            isRefreshing
         };
-    },
+    }
 });
 </script>
+
 
 <style scoped>
 .rcorners {
