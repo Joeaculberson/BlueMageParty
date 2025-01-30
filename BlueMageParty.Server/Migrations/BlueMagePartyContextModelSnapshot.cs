@@ -200,6 +200,58 @@ namespace BlueMageParty.Server.Migrations
                     b.ToTable("HomeWorlds");
                 });
 
+            modelBuilder.Entity("BlueMageParty.Server.Models.Party", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Parties");
+                });
+
+            modelBuilder.Entity("BlueMageParty.Server.Models.PartyMember", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CharacterId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsHost")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("PartyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CharacterId");
+
+                    b.HasIndex("PartyId");
+
+                    b.ToTable("PartyMembers");
+                });
+
             modelBuilder.Entity("BlueMageParty.Server.Models.Spell", b =>
                 {
                     b.Property<Guid>("Id")
@@ -397,6 +449,36 @@ namespace BlueMageParty.Server.Migrations
                     b.Navigation("DataCenter");
                 });
 
+            modelBuilder.Entity("BlueMageParty.Server.Models.Party", b =>
+                {
+                    b.HasOne("BlueMageParty.Server.Models.User", "User")
+                        .WithMany("Parties")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BlueMageParty.Server.Models.PartyMember", b =>
+                {
+                    b.HasOne("BlueMageParty.Server.Models.Character", "Character")
+                        .WithMany()
+                        .HasForeignKey("CharacterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BlueMageParty.Server.Models.Party", "Party")
+                        .WithMany("PartyMembers")
+                        .HasForeignKey("PartyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Character");
+
+                    b.Navigation("Party");
+                });
+
             modelBuilder.Entity("BlueMageParty.Server.Models.SpellOwned", b =>
                 {
                     b.HasOne("BlueMageParty.Server.Models.Character", "Character")
@@ -437,6 +519,11 @@ namespace BlueMageParty.Server.Migrations
                     b.Navigation("HomeWorlds");
                 });
 
+            modelBuilder.Entity("BlueMageParty.Server.Models.Party", b =>
+                {
+                    b.Navigation("PartyMembers");
+                });
+
             modelBuilder.Entity("BlueMageParty.Server.Models.Spell", b =>
                 {
                     b.Navigation("Sources");
@@ -447,6 +534,8 @@ namespace BlueMageParty.Server.Migrations
                     b.Navigation("Characters");
 
                     b.Navigation("ErrorLogs");
+
+                    b.Navigation("Parties");
                 });
 #pragma warning restore 612, 618
         }

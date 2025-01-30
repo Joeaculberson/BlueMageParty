@@ -23,3 +23,6 @@ export const SET_DEFAULT_CHARACTER_URL = `${API_BASE_URL}/Character/SetDefault`
 export const REMOVE_CHARACTER_URL = `${API_BASE_URL}/Character/Remove`
 export const GET_CHARACTER_BY_LOADSTONE_ID_URL = `${API_BASE_URL}/Character/CharacterByLoadstoneId`
 export const REFRESH_CHARACTER_DATA_FROM_LOADSTONE_URL = `${API_BASE_URL}/Character/RefreshCharacterData`
+export const GET_PARTIES_BY_USER_ID_URL = `${API_BASE_URL}/Party/GetPartiesByUserId`
+export const CREATE_PARTY_URL = `${API_BASE_URL}/Party/Create` 
+export const DELETE_PARTY_URL = `${API_BASE_URL}/Party/Delete`

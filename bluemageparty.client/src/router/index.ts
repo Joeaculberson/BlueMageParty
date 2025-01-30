@@ -8,7 +8,8 @@ import Verify from '../views/Verify.vue';
 import ResendActivationEmail from '../views/ResendActivationEmail.vue';
 import ResetPasswordRequest from '@/views/ResetPasswordRequest.vue';
 import ResetPassword from '@/views/ResetPassword.vue';
-import Parties from '@/views/Parties.vue';
+import PartyManager from '@/views/party/Manager.vue';
+import PartyDetails from '@/views/party/Details.vue';
 import CharacterSearch from '../views/character/Search.vue';
 import VerifyCharacter from '../views/character/Verify.vue';
 import CharacterDetails from '../views/character/Details.vue';
@@ -47,10 +48,6 @@ const routes = [
     component: ResetPassword
   },
   {
-    path: '/Parties',
-    component: Parties
-  },
-  {
     path: '/character/Search',
     component: CharacterSearch
   },
@@ -63,8 +60,12 @@ const routes = [
     component: CharacterDetails
   },
   {
-    path: '/:pathMatch(.*)*',
-    redirect: '/spellmanager',
+    path: '/partymanager',
+    component: PartyManager
+  },
+  {
+    path: '/:partyId',
+    component: PartyDetails
   }
 ];
 

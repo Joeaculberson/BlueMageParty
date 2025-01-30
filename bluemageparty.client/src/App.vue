@@ -14,6 +14,13 @@
               </v-icon>Spell Manager
             </v-list-item-title>
         </v-list-item>
+        <v-list-item link @click="goToPartyManager">
+            <v-list-item-title>
+              <v-icon color="blue" small>
+                mdi-party-popper
+              </v-icon>Party Manager
+            </v-list-item-title>
+        </v-list-item>
       </v-list>
     </v-navigation-drawer>
 
@@ -40,9 +47,14 @@ export default {
       router.push('/spellmanager');
     };
 
+    const goToPartyManager = () => {
+      router.push('/partymanager');
+    };
+
     return {
       drawer,
-      goToSpellManager
+      goToSpellManager,
+      goToPartyManager
     };
   },
 };
