@@ -31,5 +31,6 @@ namespace BlueMageParty.Server.Models
         // Navigation Property for ErrorLogs
         public ICollection<ErrorLog> ErrorLogs { get; set; }
         public ICollection<Character> Characters { get; set; }
+        public ICollection<Party> Parties { get; set; }
     }
 }

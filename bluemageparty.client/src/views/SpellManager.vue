@@ -190,7 +190,6 @@ export default {
             ...spell,
             checked: false, // Initialize checkbox state as false
           }));
-          console.log(JSON.stringify(spells.value));
           alertType.value = 'success';
         } catch (error) {
           alertType.value = 'error';

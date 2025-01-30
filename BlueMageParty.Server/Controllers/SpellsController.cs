@@ -1,5 +1,4 @@
 ﻿using BlueMageParty.Server.Data;
-using BlueMageParty.Server.Migrations;
 using BlueMageParty.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

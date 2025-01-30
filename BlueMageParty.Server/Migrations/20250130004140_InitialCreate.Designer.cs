@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlueMageParty.Server.Migrations
 {
     [DbContext(typeof(BlueMagePartyContext))]
-    [Migration("20250114171413_LatestChanges")]
-    partial class LatestChanges
+    [Migration("20250130004140_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,22 +31,82 @@ namespace BlueMageParty.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("ActiveClassJobIcon")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ActiveClassJobLevel")
+                        .HasColumnType("int");
+
                     b.Property<string>("Avatar")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Bio")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("Default")
+                        .HasColumnType("bit");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(16)
                         .HasColumnType("nvarchar(16)");
 
+                    b.Property<string>("FreeCompany")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GrandCompanyName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GrandCompanyRank")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GuardianDeityIcon")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GuardianDeityName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(16)
                         .HasColumnType("nvarchar(16)");
+
+                    b.Property<string>("LoadstoneCharacterId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nameday")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Portrait")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PvpTeam")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Race")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RaceClanGender")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Server")
                         .IsRequired()
@@ -54,6 +114,17 @@ namespace BlueMageParty.Server.Migrations
                         .HasColumnType("nvarchar(64)");
 
                     b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TownIcon")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TownName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Tribe")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -132,6 +203,58 @@ namespace BlueMageParty.Server.Migrations
                     b.ToTable("HomeWorlds");
                 });
 
+            modelBuilder.Entity("BlueMageParty.Server.Models.Party", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Parties");
+                });
+
+            modelBuilder.Entity("BlueMageParty.Server.Models.PartyMember", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CharacterId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsHost")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("PartyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CharacterId");
+
+                    b.HasIndex("PartyId");
+
+                    b.ToTable("PartyMembers");
+                });
+
             modelBuilder.Entity("BlueMageParty.Server.Models.Spell", b =>
                 {
                     b.Property<Guid>("Id")
@@ -149,6 +272,15 @@ namespace BlueMageParty.Server.Migrations
                     b.Property<string>("Icon")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsFullParty")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsLightParty")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSolo")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -320,10 +452,40 @@ namespace BlueMageParty.Server.Migrations
                     b.Navigation("DataCenter");
                 });
 
+            modelBuilder.Entity("BlueMageParty.Server.Models.Party", b =>
+                {
+                    b.HasOne("BlueMageParty.Server.Models.User", "User")
+                        .WithMany("Parties")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BlueMageParty.Server.Models.PartyMember", b =>
+                {
+                    b.HasOne("BlueMageParty.Server.Models.Character", "Character")
+                        .WithMany()
+                        .HasForeignKey("CharacterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BlueMageParty.Server.Models.Party", "Party")
+                        .WithMany("PartyMembers")
+                        .HasForeignKey("PartyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Character");
+
+                    b.Navigation("Party");
+                });
+
             modelBuilder.Entity("BlueMageParty.Server.Models.SpellOwned", b =>
                 {
-                    b.HasOne("BlueMageParty.Server.Models.User", "Character")
-                        .WithMany()
+                    b.HasOne("BlueMageParty.Server.Models.Character", "Character")
+                        .WithMany("SpellsOwned")
                         .HasForeignKey("CharacterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -350,9 +512,19 @@ namespace BlueMageParty.Server.Migrations
                     b.Navigation("Spell");
                 });
 
+            modelBuilder.Entity("BlueMageParty.Server.Models.Character", b =>
+                {
+                    b.Navigation("SpellsOwned");
+                });
+
             modelBuilder.Entity("BlueMageParty.Server.Models.DataCenter", b =>
                 {
                     b.Navigation("HomeWorlds");
+                });
+
+            modelBuilder.Entity("BlueMageParty.Server.Models.Party", b =>
+                {
+                    b.Navigation("PartyMembers");
                 });
 
             modelBuilder.Entity("BlueMageParty.Server.Models.Spell", b =>
@@ -365,6 +537,8 @@ namespace BlueMageParty.Server.Migrations
                     b.Navigation("Characters");
 
                     b.Navigation("ErrorLogs");
+
+                    b.Navigation("Parties");
                 });
 #pragma warning restore 612, 618
         }
