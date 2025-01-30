@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace BlueMageParty.Server.Models
 {
@@ -7,6 +8,7 @@ namespace BlueMageParty.Server.Models
         public Guid Id { get; set; }
         public Guid PartyId { get; set; }
         [ForeignKey("PartyId")]
+        [JsonIgnore]
         public virtual Party Party { get; set; }
         public Guid CharacterId { get; set; }
         [ForeignKey("CharacterId")]

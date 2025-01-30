@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlueMageParty.Server.Migrations
 {
     [DbContext(typeof(BlueMagePartyContext))]
-    [Migration("20250130004140_InitialCreate")]
+    [Migration("20250130194834_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -468,7 +468,7 @@ namespace BlueMageParty.Server.Migrations
                     b.HasOne("BlueMageParty.Server.Models.Character", "Character")
                         .WithMany()
                         .HasForeignKey("CharacterId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("BlueMageParty.Server.Models.Party", "Party")
