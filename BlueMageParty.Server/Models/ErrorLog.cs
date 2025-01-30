@@ -7,6 +7,7 @@ namespace BlueMageParty.Server.Models
         public Guid Id { get; set; }
         public string Message { get; set; }
         public string StackTrace { get; set; }
+        public string InnerException { get; set; }
 
         // Foreign Key
         public Guid UserId { get; set; }

@@ -242,7 +242,7 @@ namespace BlueMageParty.Server.Migrations
                         column: x => x.CharacterId,
                         principalTable: "Characters",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_PartyMembers_Parties_PartyId",
                         column: x => x.PartyId,

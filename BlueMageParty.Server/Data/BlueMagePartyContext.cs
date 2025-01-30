@@ -57,17 +57,23 @@ namespace BlueMageParty.Server.Data
                 .HasForeignKey(e => e.DataCenterId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<PartyMember>()
-                .HasOne(e => e.Party)
-                .WithMany(u => u.PartyMembers)
-                .HasForeignKey(e => e.PartyId)
-                .OnDelete(DeleteBehavior.Cascade);
-
             modelBuilder.Entity<Party>()
                 .HasOne(e => e.User)
                 .WithMany(u => u.Parties)
                 .HasForeignKey(e => e.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Party>()
+                .HasMany(p => p.PartyMembers)
+                .WithOne(pm => pm.Party)
+                .HasForeignKey(pm => pm.PartyId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<PartyMember>()
+                .HasOne(pm => pm.Character)
+                .WithMany()
+                .HasForeignKey(pm => pm.CharacterId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(modelBuilder);
         }
