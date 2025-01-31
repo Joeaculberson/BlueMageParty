@@ -22,6 +22,18 @@ namespace BlueMageParty.Server.Models
         public ICollection<SpellSource> Sources { get; set; }
     }
 
+    public class SpellDto
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public string Icon { get; set; }
+        public string Description { get; set; }
+        public int Number { get; set; }
+        public bool IsSolo { get; set; }
+        public bool IsLightParty { get; set; }
+        public bool IsFullParty { get; set; }
+    }
+
     public class SpellVM
     {
         public int Number { get; set; }

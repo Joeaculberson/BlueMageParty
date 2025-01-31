@@ -1,17 +1,12 @@
 <template>
     <div class="party-details">
-        <h2 class="text-2xl font-bold mb-4">Party Details</h2>
-        <div v-if="loading" class="text-gray-600">
-            <v-card-text v-if="isLoading">
+        <div v-if="!loading">
+            <SpellComparison :party="party" />
+        </div>
+        <div v-else class="text-gray-600">
+            <v-card-text>
                 <v-progress-circular indeterminate color="primary"></v-progress-circular>
             </v-card-text>
-        </div>
-        <div v-else>
-            <ul class="space-y-4">
-                <li v-for="member in party.partyMembers" :key="member.id" class="border p-4 rounded shadow-md">
-                    <h3 class="text-lg font-semibold">Member ID: {{ member.id }}</h3>
-                </li>
-            </ul>
         </div>
     </div>
 </template>
@@ -19,30 +14,31 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
 import axios from "axios";
-import { useRouter } from "vue-router";
-import { useAuthStore } from "@/stores/authStore"; // Assuming auth token is stored here
-import {
-    GET_PARTY_URL
-} from '@/constants/api';
+import { useRoute } from "vue-router";
+import { useAuthStore } from "@/stores/authStore";
+import SpellComparison from "@/components/SpellComparison.vue";
+import { GET_PARTY_DETAILS_URL } from '@/constants/api';
 
 export default defineComponent({
     name: "PartyDetails",
+    components: {
+        SpellComparison
+    },
     setup() {
-        const router = useRouter();
         const route = useRoute();
         const party = ref({});
-        const loading = ref(false);
-        const authStore = useAuthStore(); // Assuming a store that holds the auth token
+        const loading = ref(true);
+        const authStore = useAuthStore();
 
         const getPartyDetails = async () => {
             loading.value = true;
             try {
-                const response = await axios.get(GET_PARTY_URL, {
+                const response = await axios.get(GET_PARTY_DETAILS_URL, {
                     params: { partyId: route.params.partyId }
                 });
 
                 if (response.data) {
-                    Object.assign(party, response.data); // Updates party data
+                    party.value = response.data; // Directly assign the response data
                 } else {
                     console.log("Error fetching party data.");
                 }
@@ -52,10 +48,6 @@ export default defineComponent({
             loading.value = false;
         };
 
-        const formatDate = (dateString: string) => {
-            return new Date(dateString).toLocaleDateString();
-        };
-
         onMounted(() => {
             getPartyDetails();
         });
@@ -63,8 +55,16 @@ export default defineComponent({
         return {
             party,
             loading,
-            formatDate,
+            route
         };
     },
 });
 </script>
+<style>
+.character-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+</style>
