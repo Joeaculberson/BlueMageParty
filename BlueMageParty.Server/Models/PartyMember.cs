@@ -17,4 +17,12 @@ namespace BlueMageParty.Server.Models
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; } = DateTime.UtcNow;
     }
+
+    public class PartyMemberDto
+    {
+        public Guid Id { get; set; }
+        public Guid CharacterId { get; set; }
+        public CharacterDto Character { get; set; }
+        public bool IsHost { get; set; }
+    }
 }

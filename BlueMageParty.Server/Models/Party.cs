@@ -17,4 +17,14 @@ namespace BlueMageParty.Server.Models
         public ICollection<PartyMember> PartyMembers { get; set; } = new List<PartyMember>();
 
     }
+
+    public class PartyDto
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public List<SpellDto> Spells { get; set; }
+        public List<SpellDto> EveryoneNeeds { get; set; }
+        public List<PartyMemberDto> PartyMembers { get; set; }
+        public bool IsHost { get; set; }
+    }
 }

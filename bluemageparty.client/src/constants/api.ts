@@ -27,3 +27,4 @@ export const GET_PARTIES_BY_USER_ID_URL = `${API_BASE_URL}/Party/GetPartiesByUse
 export const CREATE_PARTY_URL = `${API_BASE_URL}/Party/Create` 
 export const DELETE_PARTY_URL = `${API_BASE_URL}/Party/Delete`
 export const GET_PARTY_URL = `${API_BASE_URL}/Party/GetParty`
+export const GET_PARTY_DETAILS_URL = `${API_BASE_URL}/Party/GetPartyDetails`

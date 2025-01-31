@@ -53,10 +53,22 @@ namespace BlueMageParty.Server.Models
         public string Tribe { get; set; }
 
         public virtual ICollection<SpellOwned> SpellsOwned { get; set; }
+        [NotMapped]
+        public List<Spell> MissingSpells { get; set; } = new();
 
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 
         public DateTime UpdatedOn { get; set; } = DateTime.UtcNow;
+    }
+
+    public class CharacterDto
+    {
+        public Guid Id { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Avatar { get; set; }
+        public List<SpellOwnedDto> SpellsOwned { get; set; }
+        public List<SpellDto> MissingSpells { get; set; }
     }
 
     public class CharacterVM
