@@ -19,6 +19,49 @@ namespace BlueMageParty.Server.Controllers
             _context = context;
         }
 
+        [HttpGet("SearchDatabaseCharacters")]
+        public async Task<IActionResult> SearchDatabaseCharacters([FromQuery] string query)
+        {
+            if (string.IsNullOrWhiteSpace(query) || query.Length < 3)
+            {
+                return BadRequest("Query must be at least 3 characters.");
+            }
+            
+            var characters = await _context.Characters
+                .Where(c => EF.Functions.Like(c.FirstName, $"%{query}%") || EF.Functions.Like(c.LastName, $"%{query}%"))
+                .Select(c => new
+                {
+                    Id = c.Id,
+                    FirstName = c.FirstName,
+                    LastName = c.LastName,
+                    Avatar = c.Avatar,
+                    Server = c.Server
+                })
+                .Take(10)
+                .ToListAsync();
+
+            return Ok(characters);
+        }
+
+        [HttpGet("GetMissingSpells")]
+        public async Task<IActionResult> GetMissingSpells([FromQuery] string characterId)
+        {
+            var character = await _context.Characters
+                .Include(c => c.SpellsOwned)
+                .FirstOrDefaultAsync(c => c.Id == new Guid(characterId));
+
+            if (character == null)
+            {
+                return BadRequest("Character not found.");
+            }
+
+            var allSpellIds = await _context.Spells.Select(s => s.Id).ToListAsync();
+            var ownedSpellIds = character.SpellsOwned.Select(s => s.SpellId).ToList();
+            var missingSpellIds = allSpellIds.Except(ownedSpellIds).ToList();
+
+            return Ok(missingSpellIds);
+        }
+
         [HttpGet("CharacterByLoadstoneId")]
         public async Task<IActionResult> GetCharacterByLoadstoneId([FromQuery] string loadstoneCharacterId)
         {
@@ -87,7 +130,16 @@ namespace BlueMageParty.Server.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                var error = new ErrorLog
+                {
+                    Message = ex.Message,
+                    StackTrace = ex.StackTrace,
+                    InnerException = ex.InnerException?.Message
+                };
+
+                _context.ErrorLogs.Add(error);
+                await _context.SaveChangesAsync();
+                throw;
             } 
         }
 

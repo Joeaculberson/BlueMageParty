@@ -67,8 +67,10 @@ namespace BlueMageParty.Server.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Avatar { get; set; }
+        public string Server { get; set; }
         public List<SpellOwnedDto> SpellsOwned { get; set; }
         public List<SpellDto> MissingSpells { get; set; }
+        public string LoadstoneCharacterId { get; internal set; }
     }
 
     public class CharacterVM
