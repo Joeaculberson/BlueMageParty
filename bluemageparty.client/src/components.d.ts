@@ -16,5 +16,6 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SpellComparison: typeof import('./components/SpellComparison.vue')['default']
+    SpellTable: typeof import('./components/SpellTable.vue')['default']
   }
 }

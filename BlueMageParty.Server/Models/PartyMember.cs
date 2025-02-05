@@ -13,7 +13,7 @@ namespace BlueMageParty.Server.Models
         public Guid CharacterId { get; set; }
         [ForeignKey("CharacterId")]
         public virtual Character Character { get; set; }
-        public bool IsHost { get; set; }
+        public bool IsHost { get; set; } = false;
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; } = DateTime.UtcNow;
     }

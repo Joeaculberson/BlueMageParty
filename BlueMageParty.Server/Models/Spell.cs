@@ -29,6 +29,9 @@ namespace BlueMageParty.Server.Models
         public string Icon { get; set; }
         public string Description { get; set; }
         public int Number { get; set; }
+        public string Enemy { get; set; }
+        public string Patch { get; set; }
+        public List<SpellSource> Sources { get; set; }
         public bool IsSolo { get; set; }
         public bool IsLightParty { get; set; }
         public bool IsFullParty { get; set; }

@@ -28,3 +28,7 @@ export const CREATE_PARTY_URL = `${API_BASE_URL}/Party/Create`
 export const DELETE_PARTY_URL = `${API_BASE_URL}/Party/Delete`
 export const GET_PARTY_URL = `${API_BASE_URL}/Party/GetParty`
 export const GET_PARTY_DETAILS_URL = `${API_BASE_URL}/Party/GetPartyDetails`
+export const SEARCH_DATABASE_CHARACTERS_URL = `${API_BASE_URL}/Character/SearchDatabaseCharacters`
+export const GET_MISSING_SPELLS_URL = `${API_BASE_URL}/Character/GetMissingSpells`
+export const ADD_PARTY_MEMBER_URL = `${API_BASE_URL}/PartyMember/AddPartyMember` 
+export const REMOVE_PARTY_MEMBER_URL = `${API_BASE_URL}/PartyMember/DeletePartyMember`

@@ -63,7 +63,7 @@ namespace BlueMageParty.Server.Controllers
                 }
 
                 // Fetch all spells
-                var allSpells = await _context.Spells.ToListAsync();
+                var allSpells = await _context.Spells.Include(x => x.Sources).OrderBy(spell => spell.Number).ToListAsync();
 
                 var everyoneNeeds = new List<SpellDto>();
                 // Map to DTOs
@@ -74,13 +74,15 @@ namespace BlueMageParty.Server.Controllers
                     EveryoneNeeds = allSpells.Select(spells => new SpellDto
                     {
                         Id = spells.Id
-                    }).OrderByDescending(spell => spell.Number).ToList(),
+                    }).OrderBy(spell => spell.Number).ToList(),
                     Spells = allSpells.Select(spell => new SpellDto
                     {
                         Id = spell.Id,
                         Name = spell.Name,
                         Description = spell.Description,
                         Number = spell.Number,
+                        Sources = spell.Sources.ToList(),
+                        Patch = spell.Patch,
                         Icon = spell.Icon,
                         IsSolo = spell.IsSolo,
                         IsLightParty = spell.IsLightParty,
@@ -96,7 +98,9 @@ namespace BlueMageParty.Server.Controllers
                             Id = member.Character.Id,
                             FirstName = member.Character.FirstName,
                             LastName = member.Character.LastName,
+                            LoadstoneCharacterId = member.Character.LoadstoneCharacterId,
                             Avatar = member.Character.Avatar,
+                            Server = member.Character.Server,
                             SpellsOwned = member.Character.SpellsOwned.Select(spellOwned => new SpellOwnedDto
                             {
                                 Id = spellOwned.Id,
@@ -110,9 +114,8 @@ namespace BlueMageParty.Server.Controllers
                                 .Where(spell => !member.Character.SpellsOwned.Any(s => s.SpellId == spell.Id))
                                 .Select(spell => new SpellDto
                                 {
-                                    Id = spell.Id,
-                                    Number = spell.Number
-                                }).OrderByDescending(spell => spell.Number).ToList()
+                                    Id = spell.Id
+                                }).ToList()
                         }
                     }).ToList()
                 };
@@ -149,7 +152,8 @@ namespace BlueMageParty.Server.Controllers
                 var error = new ErrorLog
                 {
                     Message = ex.Message,
-                    StackTrace = ex.StackTrace
+                    StackTrace = ex.StackTrace,
+                    InnerException = ex.InnerException?.Message
                 };
 
                 _context.ErrorLogs.Add(error);

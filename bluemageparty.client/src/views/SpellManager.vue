@@ -1,91 +1,33 @@
 <template>
   <v-container>
     <!-- Display the warning message -->
-    <v-alert
-      v-if="characterStore.getVerifiedCharacters().length == 0"
-      type="info"
-      dismissible
-      border="start"
-    >
+    <v-alert v-if="characterStore.getVerifiedCharacters().length == 0" type="info" dismissible border="start">
       Please select a character before managing your spells.
     </v-alert>
 
     <v-row>
       <v-col cols="12" md="3">
-        
-        <v-checkbox
-          v-model="filters.isSolo"
-          label="Solo"
-        ></v-checkbox>
+
+        <v-checkbox v-model="filters.isSolo" label="Solo"></v-checkbox>
 
       </v-col>
       <v-col cols="12" md="3">
-        <v-checkbox
-          v-model="filters.isLightParty"
-          label="Light Party"
-        ></v-checkbox>
+        <v-checkbox v-model="filters.isLightParty" label="Light Party"></v-checkbox>
       </v-col>
       <v-col cols="12" md="3">
-        <v-checkbox
-          v-model="filters.isFullParty"
-          label="Full Party"
-        ></v-checkbox>
+        <v-checkbox v-model="filters.isFullParty" label="Full Party"></v-checkbox>
       </v-col>
       <v-col cols="12" md="3">
-        <v-checkbox
-          v-model="filters.hideOwned"
-          label="Hide Owned Spells"
-          @change="applyFilters"
-        ></v-checkbox>
+        <v-checkbox v-model="filters.hideOwned" label="Hide Owned Spells" @change="applyFilters"></v-checkbox>
       </v-col>
     </v-row>
-
-    <v-table>
-      <thead>
-        <tr>
-          <th class="text-left">#<span style="visibility: hidden;">Number Space</span></th>
-          <th class="text-left"><span style="visibility: hidden;">Icon Space</span></th>
-          <th class="text-left">Name</th>
-          <th class="text-left">Enemy</th>
-          <th class="text-left">Location</th>
-          <th class="text-left">Patch</th>
-          <th class="text-left">Owned</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="spell in filteredSpells" :key="spell.name">
-          <td>No. {{ spell.number }}</td>
-          <td>
-            <v-img :src="spell.icon" class="spell-sprite" max-width="42" max-height="42" />
-          </td>
-          <td>{{ spell.name }}</td>
-          <td>
-            <div v-for="source in spell.sources" :key="source.enemy">
-              {{ source.enemy }}
-            </div>
-          </td>
-          <td>
-            {{ spell.source }}
-            <div v-for="source in spell.sources" :key="source.location">
-              {{ source.location }}
-            </div>
-          </td>
-          <td>{{ spell.patch }}</td>
-          <td>
-            <v-checkbox
-              v-model="spell.owned"
-              :disabled="characterStore.getVerifiedCharacters().length == 0"
-              @change="handleCheckboxChange(spell)"
-              color="primary"
-            />
-          </td>
-        </tr>
-      </tbody>
-    </v-table>
 
     <v-card-text v-if="isLoading">
       <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </v-card-text>
+    <v-container v-else>
+      <SpellTable :spells="filteredSpells" :characterId="selectedCharacterId" @spell-updated="handleSpellUpdate" />
+    </v-container>
 
     <v-alert v-if="adminMessage" :type="alertType" dismissible>
       {{ adminMessage }}
@@ -98,6 +40,7 @@
 </template>
 
 <script lang="ts">
+import SpellTable from "@/components/SpellTable.vue";
 import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/authStore';
@@ -107,7 +50,6 @@ import {
   GET_USER_ADMIN_URL,
   GET_SPELLS_URL,
   SAVE_SPELLS_BULK_URL,
-  UPDATE_SPELL_OWNED_URL,
   GET_TARO_BOKOKINGWAY_MISSING_SPELLS_URL,
 } from '@/constants/api';
 
@@ -140,6 +82,7 @@ export default {
     const isAdmin = ref(false);
     const spells = ref<Spell[]>([]); // Store spells here
     const isLoading = ref(false);
+    const selectedCharacterId = ref(characterStore.getVerifiedCharacters()[0].id);
     const filters = ref({
       isSolo: false,
       isLightParty: false,
@@ -157,6 +100,12 @@ export default {
         );
       });
     });
+
+    // Handle spell ownership updates
+    const handleSpellUpdate = (data: { spellId: string; owned: boolean }) => {
+      // console.log("Spell ownership updated:", data);
+      // Update the spells array if needed
+    };
 
     // Check if the user is an admin
     const checkAdminStatus = async () => {
@@ -199,35 +148,22 @@ export default {
       }
     };
 
+    watch(filters, () => {
+      applyFilters();
+    }, { deep: true });
+
     // Watch for changes to the verified characters and fetch spells when the list changes
     watch(
       () => characterStore.getVerifiedCharacters(),
       () => {
         getSpells(); // Trigger getSpells whenever the verified characters array is updated
       },
-      { immediate: true } // Run this on initial load to fetch spells
+      { immediate: false } // Run this on initial load to fetch spells
     );
-
-    // Handle checkbox change (trigger POST API call)
-    const handleCheckboxChange = async (spell: Spell) => {
-      try {
-        // Make POST request when checked
-        await axios.post(UPDATE_SPELL_OWNED_URL, {
-          spellId: spell.id,
-          characterId: characterStore.getVerifiedCharacters()[0].id,
-          isChecked: spell.owned,
-        });
-        alertType.value = 'success';
-      } catch (error) {
-        console.error('Error saving spell:', error);
-        adminMessage.value = `Failed to save spell ${spell.name}.`;
-        alertType.value = 'error';
-      }
-    };
 
     // Apply filters to the spells
     const applyFilters = () => {
-      // Trigger recomputation of filteredSpells
+      spells.value = spells.value.map(spell => ({ ...spell })); // Forces reactivity update
     };
 
     // Fetch and save spells in bulk from external API
@@ -298,24 +234,18 @@ export default {
       adminMessage,
       alertType,
       getSpells,
-      handleCheckboxChange,
+      handleSpellUpdate,
       fetchAndSaveSpells,
       characterStore,
       filters,
       filteredSpells,
       applyFilters,
+      selectedCharacterId
     };
   },
 };
 </script>
 
 <style scoped>
-tbody tr:nth-of-type(odd) {
-  background-color: rgba(0, 0, 0, 0.391);
-}
 
-.spell-sprite {
-  border-radius: 0.3rem;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-}
 </style>
