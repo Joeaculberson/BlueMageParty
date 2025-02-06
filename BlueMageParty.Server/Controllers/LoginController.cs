@@ -57,7 +57,7 @@
                         await _context.SaveChangesAsync();
 
                         var token = GenerateJwtToken(request.Email, user.Id);
-                        return Ok(new { auth_token = token });
+                        return Ok(new { auth_token = token, is_admin = user.IsAdmin });
                     }
                     else
                     {

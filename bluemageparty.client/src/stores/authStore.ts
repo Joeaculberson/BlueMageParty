@@ -5,6 +5,7 @@ export const useAuthStore = defineStore('auth', {
   state: () => ({
     isAuthenticated: !!localStorage.getItem('auth_token'),
     email: localStorage.getItem('auth_email') || '',
+    isAdmin: localStorage.getItem('is_admin') === 'true'
   }),
   actions: {
     login(token: string) {
@@ -23,6 +24,7 @@ export const useAuthStore = defineStore('auth', {
 
       this.email = '';
       this.isAuthenticated = false;
+      this.isAdmin = false;
     },
     setEmail(newEmail: string) {
       this.email = newEmail;
@@ -35,8 +37,12 @@ export const useAuthStore = defineStore('auth', {
       localStorage.removeItem('auth_email');
       this.email = '';
     },
-    getAuthToken() {
-      return localStorage.getItem('auth_token');
+    getIsAdmin() {
+      return localStorage.getItem('is_admin') === 'true';
     },
+    setIsAdmin(isAdmin: boolean) {
+
+      localStorage.setItem('is_admin', isAdmin ? 'true' : 'false');
+    }
   },
 });

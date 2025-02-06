@@ -152,7 +152,10 @@ public class SpellsController : ControllerBase
                         Patch = spellVM.Patch,
                         Icon = spellVM.Icon,
                         TypeName = spellVM.TypeName,
-                        AspectName = spellVM.AspectName
+                        AspectName = spellVM.AspectName,
+                        IsSolo  = false, //Have to do these manually afterward
+                        IsLightParty = false,
+                        IsFullParty = false,
                     };
 
                     newSpells.Add(newSpell);
