@@ -48,11 +48,11 @@ namespace BlueMageParty.Server.Controllers
         public record AddPartyMemberRequest(Guid characterId, Guid partyId);
 
         [HttpDelete("RemovePartyMember")]
-        public async Task<IActionResult> DeletePartyMember([FromQuery] Guid memberId)
+        public async Task<IActionResult> DeletePartyMember([FromQuery] Guid Id)
         {
             try
             {
-                var partyMember = await _context.PartyMembers.FirstOrDefaultAsync(x => x.Id == memberId);
+                var partyMember = await _context.PartyMembers.FirstOrDefaultAsync(x => x.Id == Id);
                 if (partyMember == null)
                 {
                     return BadRequest("Party member not found");

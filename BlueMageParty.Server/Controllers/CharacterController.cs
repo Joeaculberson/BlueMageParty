@@ -35,7 +35,8 @@ namespace BlueMageParty.Server.Controllers
                     FirstName = c.FirstName,
                     LastName = c.LastName,
                     Avatar = c.Avatar,
-                    Server = c.Server
+                    Server = c.Server,
+                    LoadstoneCharacterId = c.LoadstoneCharacterId
                 })
                 .Take(10)
                 .ToListAsync();
@@ -55,11 +56,12 @@ namespace BlueMageParty.Server.Controllers
                 return BadRequest("Character not found.");
             }
 
-            var allSpellIds = await _context.Spells.Select(s => s.Id).ToListAsync();
-            var ownedSpellIds = character.SpellsOwned.Select(s => s.SpellId).ToList();
-            var missingSpellIds = allSpellIds.Except(ownedSpellIds).ToList();
+            var allSpells = await _context.Spells.Select(s => new Spell { Id = s.Id }).ToListAsync();
+            var ownedSpellIds = character.SpellsOwned.Select(s => s.SpellId).ToHashSet();
 
-            return Ok(missingSpellIds);
+            var missingSpells = allSpells.Where(s => !ownedSpellIds.Contains(s.Id)).ToList();
+
+            return Ok(missingSpells);
         }
 
         [HttpGet("CharacterByLoadstoneId")]

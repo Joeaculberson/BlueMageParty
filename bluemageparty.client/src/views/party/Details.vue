@@ -1,23 +1,11 @@
 <template>
     <div class="party-details">
         <!-- Search and add character to party -->
-        <v-autocomplete
-            v-model="selectedCharacter"
-            :items="filteredCharacters"
-            label="Search Character"
-            item-value="id"
-            item-title="fullName"
-            return-object
-            :loading="searchLoading"
-            @update:search="(value) => {
+        <v-autocomplete v-model="selectedCharacter" :items="filteredCharacters" label="Search Character" item-value="id"
+            item-title="fullName" return-object :loading="searchLoading" @update:search="(value) => {
                 searchQuery = value;
                 characters = []; // Reset before searching
-            }"
-            @blur="clearSearch"
-            no-data-text="No characters found"
-            @update:model-value="addCharacterToParty"
-        >
-
+            }" @blur="clearSearch" no-data-text="No characters found" @update:model-value="addCharacterToParty">
             <template v-slot:item="{ item }">
                 <v-list-item @click="addCharacterToParty(item.raw)">
                     <div class="d-flex align-center">
@@ -25,20 +13,19 @@
                             <img width="50px" :src="item.raw.avatar" alt="Character Avatar" />
                         </v-avatar>
                         <v-list-item-title>
-                            {{ item.raw.fullName }} 
+                            {{ item.raw.fullName }}
                             ({{ item.raw.server }})
                         </v-list-item-title>
                     </div>
-                    <div class="align-right">
-                        
-                    </div>
+                    <div class="align-right"></div>
                 </v-list-item>
             </template>
         </v-autocomplete>
 
         <!-- Display Party Details -->
         <div v-if="!loading">
-            <SpellComparison :party="party" :showRemoveIcon="true" />
+            <SpellComparison :party="party" :showRemoveIcon="true" @update-party-members="updatePartyMembers"
+                @update-everyone-needs="recalculateEveryoneNeeds" />
         </div>
 
         <!-- Loading state -->
@@ -56,8 +43,9 @@ import axios from "axios";
 import { useRoute } from "vue-router";
 import { useAuthStore } from "@/stores/authStore";
 import SpellComparison from "@/components/SpellComparison.vue";
-import { GET_PARTY_DETAILS_URL, 
-    SEARCH_DATABASE_CHARACTERS_URL, 
+import {
+    GET_PARTY_DETAILS_URL,
+    SEARCH_DATABASE_CHARACTERS_URL,
     GET_MISSING_SPELLS_URL,
     ADD_PARTY_MEMBER_URL
 } from '@/constants/api';
@@ -69,12 +57,15 @@ export default defineComponent({
     },
     setup() {
         const route = useRoute();
-        const party = ref({}); // Party data
-        const loading = ref(true); // Loading state for fetching party details
-        const searchLoading = ref(false); // Loading state for searching characters
-        const searchQuery = ref(""); // Search query state
-        const selectedCharacter = ref(null); // Selected character for adding to the party
-        const characters = ref([]); // List of characters
+        const party = ref({
+            partyMembers: [],
+            everyoneNeeds: [] // Add everyoneNeeds to the party object
+        });
+        const loading = ref(true);
+        const searchLoading = ref(false);
+        const searchQuery = ref("");
+        const selectedCharacter = ref(null);
+        const characters = ref([]);
         const authStore = useAuthStore();
 
         // Fetch party details from the API
@@ -95,6 +86,42 @@ export default defineComponent({
             loading.value = false;
         };
 
+        const recalculateEveryoneNeeds = () => {
+            if (!party.value.partyMembers || !party.value.spells) {
+                console.error("Party members or spells are undefined.");
+                return;
+            }
+
+            const allSpells = party.value.spells;
+            //console.log("All Spells:", allSpells);
+
+            // Log missingSpells for each party member
+            /* party.value.partyMembers.forEach(member => {
+                console.log(`Member ${member.character.firstName} missing spells:`, member.character.missingSpells);
+            });*/
+
+            // Create a Set of spell IDs that each member is missing
+            const memberOwnedSpells = party.value.partyMembers
+                .map(member => {
+                    if (!member.character.missingSpells || !Array.isArray(member.character.missingSpells)) {
+                        //console.error(`Member ${member.character.firstName} has invalid missingSpells.`);
+                        return new Set(); // Return an empty Set if missingSpells is invalid
+                    }
+                    return new Set(member.character.missingSpells.map(spell => spell.id));
+                });
+
+            //console.log("Member Owned Spells (as Sets):", memberOwnedSpells);
+
+            // Filter spells that are missing for all members
+            party.value.everyoneNeeds = allSpells.filter(spell => {
+                const isMissingForEveryone = memberOwnedSpells.every(ownedSpells => ownedSpells.has(spell.id));
+                //console.log(`Spell ${spell.id} (${spell.name}): Is missing for everyone?`, isMissingForEveryone);
+                return isMissingForEveryone;
+            });
+
+            //console.log("Everyone Needs:", party.value.everyoneNeeds);
+        };
+
         // Search characters based on the query
         const searchCharacters = async () => {
             if (searchQuery.value.length < 3) return;
@@ -110,57 +137,62 @@ export default defineComponent({
             searchLoading.value = false;
         };
 
+        // Clear the search query and results
         const clearSearch = () => {
             searchQuery.value = "";
             characters.value = [];
         };
 
-        const memberSpells = (character) => {
-            if (!character?.missingSpells || !Array.isArray(character.missingSpells)) {
-                return []; // Return an empty array if missingSpells is undefined or not an array
-            }
-
-            return props.party.spells.filter(spell =>
-                character.missingSpells.some(missing => missing.id === spell.id)
-            );
+        // Update partyMembers when an event is emitted
+        const updatePartyMembers = (updatedPartyMembers) => {
+            party.value.partyMembers = updatedPartyMembers;
+            recalculateEveryoneNeeds(); // Recalculate everyoneNeeds after updating party members
         };
 
         // Add character to the party and fetch missing spells
         const addCharacterToParty = async (character) => {
             if (!character) return;
             try {
-                console.log("Adding character:", JSON.stringify(character)); // Check the character data
                 const response = await axios.get(GET_MISSING_SPELLS_URL, {
                     params: { characterId: character.id }
                 });
                 const missingSpells = response.data;
-                //console.log("Missing Spells:", missingSpells); // Log missing spells
+
+                const addResponse = await axios.post(ADD_PARTY_MEMBER_URL, {
+                    characterId: character.id,
+                    partyId: party.value.id
+                });
 
                 if (!party.value.partyMembers) {
                     party.value.partyMembers = [];
                 }
 
                 party.value.partyMembers.push({
-                    character: { ...character, missingSpells: missingSpells }
+                    id: addResponse.data.id,
+                    character: { ...character, missingSpells: missingSpells },
+                    isHost: false
                 });
 
-                console.log('Updated Party:', JSON.stringify(party.value)); // Log updated party
+                recalculateEveryoneNeeds(); // Recalculate everyoneNeeds after adding a member
             } catch (error) {
                 console.error("Error fetching missing spells:", error);
             }
         };
 
+        // Compute filtered characters for the autocomplete
         const filteredCharacters = computed(() => {
             return characters.value.map(char => ({
-                ...char, // Keep all original properties
-                fullName: `${char.firstName} ${char.lastName}` // Add fullName property
+                ...char,
+                fullName: `${char.firstName} ${char.lastName}`
             }));
         });
 
+        // Watch for changes to the search query and trigger search
         watch(searchQuery, (newValue) => {
             searchCharacters();
         });
 
+        // Fetch party details when the component mounts
         onMounted(() => {
             getPartyDetails();
         });
@@ -173,13 +205,10 @@ export default defineComponent({
             selectedCharacter,
             filteredCharacters,
             addCharacterToParty,
-            clearSearch
+            clearSearch,
+            updatePartyMembers,
+            recalculateEveryoneNeeds
         };
     },
 });
 </script>
-
-
-<style>
-
-</style>

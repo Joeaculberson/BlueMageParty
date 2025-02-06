@@ -49,33 +49,46 @@ namespace BlueMageParty.Server.Controllers
         {
             try
             {
-                // Fetch the party with related data
+                // Fetch the party with related data (include necessary fields)
                 var party = await _context.Parties
                     .Include(x => x.PartyMembers)
                         .ThenInclude(x => x.Character)
-                            .ThenInclude(x => x.SpellsOwned)
-                                .ThenInclude(x => x.Spell) // Include the Spell navigation property
-                    .FirstOrDefaultAsync(x => x.Id == partyId);
+                            .ThenInclude(x => x.SpellsOwned) // Only fetch SpellsOwned for ownership checks
+                    .Where(x => x.Id == partyId)
+                    .Select(x => new
+                    {
+                        x.Id,
+                        x.Name,
+                        PartyMembers = x.PartyMembers.Select(member => new
+                        {
+                            member.Id,
+                            member.IsHost,
+                            Character = new
+                            {
+                                member.Character.Id,
+                                member.Character.FirstName, // Include FirstName
+                                member.Character.LastName, // Include LastName
+                                member.Character.LoadstoneCharacterId, // Include LoadstoneCharacterId
+                                member.Character.Avatar, // Include Avatar
+                                member.Character.Server, // Include Server
+                                SpellsOwned = member.Character.SpellsOwned
+                                    .Where(so => so.Owned) // Only fetch owned spells
+                                    .Select(so => so.SpellId)
+                                    .ToList()
+                            }
+                        }).ToList()
+                    })
+                    .FirstOrDefaultAsync();
 
                 if (party == null)
                 {
                     return BadRequest("Invalid party id.");
                 }
 
-                // Fetch all spells
-                var allSpells = await _context.Spells.Include(x => x.Sources).OrderBy(spell => spell.Number).ToListAsync();
-
-                var everyoneNeeds = new List<SpellDto>();
-                // Map to DTOs
-                var partyDto = new PartyDto
-                {
-                    Id = party.Id,
-                    Name = party.Name,
-                    EveryoneNeeds = allSpells.Select(spells => new SpellDto
-                    {
-                        Id = spells.Id
-                    }).OrderBy(spell => spell.Number).ToList(),
-                    Spells = allSpells.Select(spell => new SpellDto
+                // Fetch all spells (only necessary fields)
+                var allSpells = await _context.Spells
+                    .OrderBy(spell => spell.Number)
+                    .Select(spell => new SpellDto
                     {
                         Id = spell.Id,
                         Name = spell.Name,
@@ -87,35 +100,62 @@ namespace BlueMageParty.Server.Controllers
                         IsSolo = spell.IsSolo,
                         IsLightParty = spell.IsLightParty,
                         IsFullParty = spell.IsFullParty
-                    }).ToList(),
+                    })
+                    .ToListAsync();
+
+                // Precompute spells owned by each party member
+                var memberOwnedSpells = party.PartyMembers
+                    .Select(member => new HashSet<Guid>(member.Character.SpellsOwned))
+                    .ToList();
+
+                // Initialize the list for tracking spells that every party member needs
+                var everyoneNeeds = new List<SpellDto>();
+
+                // Find spells that no party member owns
+                foreach (var spell in allSpells)
+                {
+                    bool isMissingForEveryone = memberOwnedSpells
+                        .All(ownedSpells => !ownedSpells.Contains(spell.Id));
+
+                    if (isMissingForEveryone)
+                    {
+                        everyoneNeeds.Add(spell);
+                    }
+                }
+
+                // Map to DTOs for the full party data
+                var partyDto = new PartyDto
+                {
+                    Id = party.Id,
+                    Name = party.Name,
+                    EveryoneNeeds = everyoneNeeds,
+                    Spells = allSpells,
                     PartyMembers = party.PartyMembers.Select(member => new PartyMemberDto
                     {
                         Id = member.Id,
-                        CharacterId = member.CharacterId,
                         IsHost = member.IsHost,
                         Character = new CharacterDto
                         {
                             Id = member.Character.Id,
-                            FirstName = member.Character.FirstName,
-                            LastName = member.Character.LastName,
-                            LoadstoneCharacterId = member.Character.LoadstoneCharacterId,
-                            Avatar = member.Character.Avatar,
-                            Server = member.Character.Server,
-                            SpellsOwned = member.Character.SpellsOwned.Select(spellOwned => new SpellOwnedDto
-                            {
-                                Id = spellOwned.Id,
-                                CharacterId = spellOwned.CharacterId,
-                                SpellId = spellOwned.SpellId,
-                                Owned = spellOwned.Owned,
-                                CreatedOn = spellOwned.CreatedOn,
-                                UpdatedOn = spellOwned.UpdatedOn
-                            }).ToList(),
+                            FirstName = member.Character.FirstName, // Now available
+                            LastName = member.Character.LastName, // Now available
+                            LoadstoneCharacterId = member.Character.LoadstoneCharacterId, // Now available
+                            Avatar = member.Character.Avatar, // Now available
+                            Server = member.Character.Server, // Now available
+                            SpellsOwned = member.Character.SpellsOwned
+                                .Select(spellId => new SpellOwnedDto
+                                {
+                                    SpellId = spellId,
+                                    Owned = true // Since we only fetched owned spells
+                                })
+                                .ToList(),
                             MissingSpells = allSpells
-                                .Where(spell => !member.Character.SpellsOwned.Any(s => s.SpellId == spell.Id))
+                                .Where(spell => !member.Character.SpellsOwned.Contains(spell.Id))
                                 .Select(spell => new SpellDto
                                 {
                                     Id = spell.Id
-                                }).ToList()
+                                })
+                                .ToList()
                         }
                     }).ToList()
                 };
