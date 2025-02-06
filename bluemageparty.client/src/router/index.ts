@@ -13,6 +13,7 @@ import PartyDetails from '@/views/party/Details.vue';
 import CharacterSearch from '../views/character/Search.vue';
 import VerifyCharacter from '../views/character/Verify.vue';
 import CharacterDetails from '../views/character/Details.vue';
+import Admin from '../views/Admin.vue';
 
 const routes = [
   {
@@ -66,6 +67,10 @@ const routes = [
   {
     path: '/:partyId',
     component: PartyDetails
+  },
+  {
+    path: '/admin',
+    component: Admin
   }
 ];
 
@@ -76,13 +81,20 @@ const router = createRouter({
 
 // Global navigation guard
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = useAuthStore().isAuthenticated;
+  const authStore = useAuthStore();
+  const isAuthenticated = authStore.isAuthenticated;
+  const isAdmin = authStore.getIsAdmin();
 
-  // If the user is logged in and tries to access login or register, redirect to dashboard
+  // Redirect logged-in users away from login/register
   if (isAuthenticated && (to.path === '/login' || to.path === '/register')) {
-    next('/spellmanager'); // Redirect if logged in
-  } else {
-    next(); // Proceed to the requested route if not logged in or accessing other routes
+    next('/spellmanager');
+  } 
+  // Restrict access to the admin route
+  else if (to.path === '/admin' && !isAdmin) {
+    next('/'); // Redirect non-admin users to home or another page
+  } 
+  else {
+    next(); // Proceed normally
   }
 });
 

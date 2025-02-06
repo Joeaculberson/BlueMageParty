@@ -8,7 +8,7 @@
               <th class="text-left">Enemy</th>
               <th class="text-left">Location</th>
               <th class="text-left">Patch</th>
-              <th class="text-left">Owned</th>
+              <th class="text-left" v-if="characterId">Owned</th>
           </tr>
       </thead>
       <tbody>
@@ -29,8 +29,8 @@
                   </div>
               </td>
               <td>{{ spell.patch }}</td>
-              <td>
-                  <v-checkbox v-model="spell.owned" :disabled="!characterId" @change="handleCheckboxChange(spell)" color="primary" />
+              <td v-if="characterId">
+                  <v-checkbox v-model="spell.owned" @change="handleCheckboxChange(spell)" color="primary" />
               </td>
           </tr>
       </tbody>

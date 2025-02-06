@@ -7,9 +7,7 @@
 
     <v-row>
       <v-col cols="12" md="3">
-
         <v-checkbox v-model="filters.isSolo" label="Solo"></v-checkbox>
-
       </v-col>
       <v-col cols="12" md="3">
         <v-checkbox v-model="filters.isLightParty" label="Light Party"></v-checkbox>
@@ -28,14 +26,6 @@
     <v-container v-else>
       <SpellTable :spells="filteredSpells" :characterId="selectedCharacterId" @spell-updated="handleSpellUpdate" />
     </v-container>
-
-    <v-alert v-if="adminMessage" :type="alertType" dismissible>
-      {{ adminMessage }}
-    </v-alert>
-
-    <v-btn v-if="isAdmin" @click="fetchAndSaveSpells" color="primary">
-      Fetch and Save Spells
-    </v-btn>
   </v-container>
 </template>
 
@@ -47,10 +37,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { watch } from 'vue';
 import { useCharacterStore } from '@/stores/characterStore';
 import {
-  GET_USER_ADMIN_URL,
-  GET_SPELLS_URL,
-  SAVE_SPELLS_BULK_URL,
-  GET_TARO_BOKOKINGWAY_MISSING_SPELLS_URL,
+  GET_SPELLS_URL
 } from '@/constants/api';
 
 interface Spell {
@@ -75,7 +62,6 @@ interface Spell {
 export default {
   name: 'SpellManager',
   setup() {
-    const authStore = useAuthStore();
     const characterStore = useCharacterStore();
     const alertType = ref<'success' | 'error' | 'info'>('info');
     const adminMessage = ref('');
@@ -105,19 +91,6 @@ export default {
     const handleSpellUpdate = (data: { spellId: string; owned: boolean }) => {
       // console.log("Spell ownership updated:", data);
       // Update the spells array if needed
-    };
-
-    // Check if the user is an admin
-    const checkAdminStatus = async () => {
-      try {
-        const response = await axios.get(
-          GET_USER_ADMIN_URL + authStore.getAuthToken()
-        );
-        isAdmin.value = response.data;
-      } catch (error) {
-        console.error('Error checking admin status:', error);
-        isAdmin.value = false;
-      }
     };
 
     // Fetch the list of spells
@@ -166,64 +139,7 @@ export default {
       spells.value = spells.value.map(spell => ({ ...spell })); // Forces reactivity update
     };
 
-    // Fetch and save spells in bulk from external API
-    const fetchAndSaveSpells = async (): Promise<void> => {
-      try {
-        // Fetch the spell data from the external API
-        const response = await axios.get(
-          GET_TARO_BOKOKINGWAY_MISSING_SPELLS_URL
-        );
-
-        const spellsToSave = response.data.map((spell: any) => ({
-          number: spell.order,
-          name: spell.name,
-          description: spell.description,
-          tooltip: spell.tooltip,
-          order: spell.order,
-          rank: spell.rank,
-          patch: spell.patch,
-          icon: spell.icon,
-          typeName: spell.type.name,
-          aspectName: spell.aspect.name,
-          sources: spell.sources.map((source: any) => {
-            // Split the source text by '/' and trim the parts
-            const parts = source.text.split('/').map((part: string) =>
-              part.trim()
-            );
-            let enemy = '';
-            let location = '';
-
-            // If there is only one part, assign it to location
-            if (parts.length === 1) {
-              location = parts[0];
-            } else {
-              enemy = parts[0];
-              location = parts[1];
-            }
-
-            return { enemy, location };
-          }),
-        }));
-
-        // Send the spells data in bulk to the server
-        const bulkResponse = await axios.post(SAVE_SPELLS_BULK_URL, spellsToSave, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        alertType.value = 'success';
-        adminMessage.value = bulkResponse.data.message;
-        getSpells();
-      } catch (error) {
-        alertType.value = 'error';
-        adminMessage.value = 'Failed to fetch or save spells.';
-        console.error('Error response:', error.response?.data || error.message);
-      }
-    };
-
     onMounted(() => {
-      checkAdminStatus();
       getSpells();
     });
 
@@ -235,7 +151,6 @@ export default {
       alertType,
       getSpells,
       handleSpellUpdate,
-      fetchAndSaveSpells,
       characterStore,
       filters,
       filteredSpells,
