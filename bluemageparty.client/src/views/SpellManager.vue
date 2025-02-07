@@ -24,7 +24,8 @@
       <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </v-card-text>
     <v-container v-else>
-      <SpellTable :spells="filteredSpells" :characterId="selectedCharacterId" @spell-updated="handleSpellUpdate" />
+      <SpellTable :spells="filteredSpells" :character-id="selectedCharacterId" :show-owned-column="true"
+        @spell-updated="handleSpellUpdate" />
     </v-container>
   </v-container>
 </template>
@@ -37,7 +38,8 @@ import { useAuthStore } from '@/stores/authStore';
 import { watch } from 'vue';
 import { useCharacterStore } from '@/stores/characterStore';
 import {
-  GET_SPELLS_URL
+  GET_SPELLS_URL,
+  GET_CHARACTER_OWNER
 } from '@/constants/api';
 
 interface Spell {
@@ -68,22 +70,31 @@ export default {
     const isAdmin = ref(false);
     const spells = ref<Spell[]>([]); // Store spells here
     const isLoading = ref(false);
-    const selectedCharacterId = ref(characterStore.getVerifiedCharacters()[0].id);
+    const selectedCharacterId = ref(characterStore.getVerifiedCharacters().length > 0
+      ? characterStore.getVerifiedCharacters()[0].id
+      : undefined);
+    const authStore = useAuthStore();
+    const currentUserId = authStore.getUserId();
     const filters = ref({
-      isSolo: false,
-      isLightParty: false,
-      isFullParty: false,
-      hideOwned: true
+      isSolo: true, // Start checked
+      isLightParty: true, // Start checked
+      isFullParty: true, // Start checked
+      hideOwned: true // Start checked
     });
 
     const filteredSpells = computed(() => {
       return spells.value.filter((spell) => {
-        return (
-          (!filters.value.isSolo || spell.isSolo) &&
-          (!filters.value.isLightParty || spell.isLightParty) &&
-          (!filters.value.isFullParty || spell.isFullParty) &&
-          (!filters.value.hideOwned || !spell.owned)
-        );
+        // Check if the spell matches any of the selected party types
+        const matchesPartyType =
+          (filters.value.isSolo && spell.isSolo) ||
+          (filters.value.isLightParty && spell.isLightParty) ||
+          (filters.value.isFullParty && spell.isFullParty);
+
+        // Check if the spell should be hidden based on ownership
+        const matchesOwnership = !filters.value.hideOwned || !spell.owned;
+
+        // Only include the spell if it matches at least one party type and the ownership filter
+        return matchesPartyType && matchesOwnership;
       });
     });
 
@@ -91,6 +102,18 @@ export default {
     const handleSpellUpdate = (data: { spellId: string; owned: boolean }) => {
       // console.log("Spell ownership updated:", data);
       // Update the spells array if needed
+    };
+    
+
+    const selectedCharacterOwnerId = ref<string | null>(null);
+    const getCharacterUserId = async (characterId: string) => {
+      try {
+        const response = await axios.get(GET_CHARACTER_OWNER + '/' + characterId);
+        console.log(response.data);
+        selectedCharacterOwnerId.value = response.data.userId;
+      } catch (error) {
+        console.error("Error fetching character owner ID:", error);
+      }
     };
 
     // Fetch the list of spells
@@ -155,12 +178,11 @@ export default {
       filters,
       filteredSpells,
       applyFilters,
-      selectedCharacterId
+      selectedCharacterId,
+      currentUserId
     };
   },
 };
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

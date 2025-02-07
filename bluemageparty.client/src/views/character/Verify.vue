@@ -55,7 +55,7 @@
                         <v-card-text v-if="isLoading">
                             <v-progress-circular indeterminate color="primary"></v-progress-circular>
                         </v-card-text>
-                        <v-alert v-if="verified" :type="messageType" class="mt-4" dismissible>
+                        <v-alert v-if="message" :type="messageType" class="mt-4" dismissible>
                             {{ message }}
                         </v-alert>
                     </v-card-text>
@@ -172,11 +172,11 @@ export default defineComponent({
                     }; 
                     //console.log('payload ' + JSON.stringify(payload))
                     const response = await axios.post(VERIFY_CHARACTER_URL, payload);
-
                     if (!response.data.verified) {
                         message.value = "Character verification failed. Please confirm that the verification code is in the character's bio.";
                         messageType.value = 'error';
                         verified.value = false;
+                        isLoading.value = false;
                         return;
                     }
 

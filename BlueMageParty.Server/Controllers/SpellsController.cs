@@ -26,7 +26,7 @@ public class SpellsController : ControllerBase
         {
             if(string.IsNullOrEmpty(characterId))
             {
-                return Ok(await _context.Spells.Include(s => s.Sources).ToListAsync());
+                return Ok(await _context.Spells.Include(s => s.Sources).OrderBy(x => x.Number).ToListAsync());
             } else
             {
                 // Retrieve spells and include ownership and sources information

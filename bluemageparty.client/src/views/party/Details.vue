@@ -24,8 +24,8 @@
 
         <!-- Display Party Details -->
         <div v-if="!loading">
-            <SpellComparison :party="party" :showRemoveIcon="true" @update-party-members="updatePartyMembers"
-                @update-everyone-needs="recalculateEveryoneNeeds" />
+            <SpellComparison :party="party" :showRemoveIcon="true" :currentUserId="currentUserId"
+                @update-party-members="updatePartyMembers" @update-everyone-needs="recalculateEveryoneNeeds" />
         </div>
 
         <!-- Loading state -->
@@ -59,7 +59,7 @@ export default defineComponent({
         const route = useRoute();
         const party = ref({
             partyMembers: [],
-            everyoneNeeds: [] // Add everyoneNeeds to the party object
+            everyoneNeeds: [],
         });
         const loading = ref(true);
         const searchLoading = ref(false);
@@ -67,13 +67,14 @@ export default defineComponent({
         const selectedCharacter = ref(null);
         const characters = ref([]);
         const authStore = useAuthStore();
+        const currentUserId = authStore.getUserId(); // Get the current user's ID
 
         // Fetch party details from the API
         const getPartyDetails = async () => {
             loading.value = true;
             try {
                 const response = await axios.get(GET_PARTY_DETAILS_URL, {
-                    params: { partyId: route.params.partyId }
+                    params: { partyId: route.params.partyId },
                 });
                 if (response.data) {
                     party.value = response.data;
@@ -207,7 +208,8 @@ export default defineComponent({
             addCharacterToParty,
             clearSearch,
             updatePartyMembers,
-            recalculateEveryoneNeeds
+            recalculateEveryoneNeeds,
+            currentUserId, // Pass the current user's ID to the template
         };
     },
 });
