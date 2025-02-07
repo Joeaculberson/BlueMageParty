@@ -53,6 +53,7 @@ namespace BlueMageParty.Server.Models
         public string Tribe { get; set; }
 
         public virtual ICollection<SpellOwned> SpellsOwned { get; set; }
+        public virtual ICollection<PartyMember> PartyMembers { get; set; } = new List<PartyMember>();
         [NotMapped]
         public List<Spell> MissingSpells { get; set; } = new();
 
@@ -68,6 +69,7 @@ namespace BlueMageParty.Server.Models
         public string LastName { get; set; }
         public string Avatar { get; set; }
         public string Server { get; set; }
+        public Guid UserId { get; set; }
         public List<SpellOwnedDto> SpellsOwned { get; set; }
         public List<SpellDto> MissingSpells { get; set; }
         public string LoadstoneCharacterId { get; internal set; }

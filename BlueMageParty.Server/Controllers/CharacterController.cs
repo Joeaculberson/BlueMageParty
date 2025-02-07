@@ -64,6 +64,27 @@ namespace BlueMageParty.Server.Controllers
             return Ok(missingSpells);
         }
 
+        // GET: api/characters/owner/{characterId}
+        [HttpGet("owner/{characterId}")]
+        public async Task<ActionResult<string>> GetCharacterOwner(Guid characterId)
+        {
+            if(characterId == Guid.Empty)
+            {
+                return BadRequest("Character id invalid");
+            }
+            // Find the character by ID
+            var character = await _context.Characters
+                .FirstOrDefaultAsync(c => c.Id == characterId);
+
+            if (character == null)
+            {
+                return NotFound("Character not found.");
+            }
+
+            // Return the owner ID of the character
+            return Ok(new { ownerId = character.UserId });
+        }
+
         [HttpGet("CharacterByLoadstoneId")]
         public async Task<IActionResult> GetCharacterByLoadstoneId([FromQuery] string loadstoneCharacterId)
         {
@@ -117,15 +138,48 @@ namespace BlueMageParty.Server.Controllers
         {
             try
             {
+                // Find the character and include related PartyMembers and their Parties
                 var character = await _context.Characters
-                    .Include(x => x.SpellsOwned)
+                    .Include(c => c.SpellsOwned) // Include spells if needed
+                    .Include(c => c.PartyMembers) // Include PartyMembers to remove them
+                        .ThenInclude(pm => pm.Party) // Include the Party for each PartyMember
                     .FirstOrDefaultAsync(c => c.Id == characterId);
+
                 if (character == null)
                 {
                     return NotFound("Character not found.");
                 }
 
+                // Find all parties where the character is a host
+                var hostedParties = character.PartyMembers
+                    .Where(pm => pm.IsHost)
+                    .Select(pm => pm.Party)
+                    .ToList();
+
+                // Delete each hosted party and its associated party members
+                foreach (var hostedParty in hostedParties)
+                {
+                    if (hostedParty != null)
+                    {
+                        // Delete all PartyMembers associated with the hosted party
+                        var partyMembersToDelete = await _context.PartyMembers
+                            .Where(pm => pm.PartyId == hostedParty.Id)
+                            .ToListAsync();
+
+                        _context.PartyMembers.RemoveRange(partyMembersToDelete);
+
+                        // Delete the hosted party
+                        _context.Parties.Remove(hostedParty);
+                    }
+                }
+
+                // Remove the character from all parties (delete related PartyMembers)
+                _context.PartyMembers.RemoveRange(character.PartyMembers);
+
+                // Remove the character
                 _context.Characters.Remove(character);
+
+                // Save changes to the database
                 await _context.SaveChangesAsync();
 
                 return Ok();
@@ -142,8 +196,9 @@ namespace BlueMageParty.Server.Controllers
                 _context.ErrorLogs.Add(error);
                 await _context.SaveChangesAsync();
                 throw;
-            } 
+            }
         }
+
 
         [HttpPost("RefreshCharacterData")]
         public async Task<IActionResult> RefreshCharacterData(RefreshCharacterDataRequest request)

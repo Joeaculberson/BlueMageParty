@@ -32,3 +32,5 @@ export const SEARCH_DATABASE_CHARACTERS_URL = `${API_BASE_URL}/Character/SearchD
 export const GET_MISSING_SPELLS_URL = `${API_BASE_URL}/Character/GetMissingSpells`
 export const ADD_PARTY_MEMBER_URL = `${API_BASE_URL}/PartyMember/AddPartyMember` 
 export const REMOVE_PARTY_MEMBER_URL = `${API_BASE_URL}/PartyMember/RemovePartyMember`
+export const GET_USER_URL = `${API_BASE_URL}/Users/GetUser`
+export const GET_CHARACTER_OWNER = `${API_BASE_URL}/Character/Owner`

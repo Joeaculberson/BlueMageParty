@@ -76,6 +76,8 @@ export default {
                   authStore.login(response.data.auth_token);
                   authStore.setEmail(email.value);
                   authStore.setIsAdmin(response.data.is_admin);
+                  console.log('setUserId ' + response.data.id)
+                  authStore.setUserId(response.data.id);
                   router.push('/spellmanager'); // Redirect to the dashboard after login
               } else {
                   alertType.value = 'error';

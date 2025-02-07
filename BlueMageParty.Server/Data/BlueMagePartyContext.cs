@@ -75,6 +75,12 @@ namespace BlueMageParty.Server.Data
                 .HasForeignKey(pm => pm.CharacterId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<PartyMember>()
+            .HasOne(pm => pm.Character)
+            .WithMany(c => c.PartyMembers)
+            .HasForeignKey(pm => pm.CharacterId)
+            .OnDelete(DeleteBehavior.Cascade);
+
             base.OnModelCreating(modelBuilder);
         }
     }

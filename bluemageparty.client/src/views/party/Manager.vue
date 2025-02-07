@@ -3,12 +3,16 @@
     <v-row>
       <!-- Card with Party Name Input and Create Party Button -->
       <v-col cols="12">
+        <v-alert v-if="characterStore.getVerifiedCharacters().length == 0" type="info" dismissible border="start">
+          Please select a character before creating a party.
+        </v-alert>
         <v-card>
           <v-card-title class="text-h5">Create a Party</v-card-title>
           <v-card-text>
             <v-text-field
               v-model="partyName"
               label="Enter party name"
+              :disabled="characterStore.getVerifiedCharacters().length == 0"
               maxlength="255"
               counter
               outlined
@@ -16,12 +20,7 @@
             ></v-text-field>
           </v-card-text>
           <v-card-actions>
-            <v-btn
-              @click="createParty"
-              :disabled="!partyName"
-              color="blue"
-              class="w-full"
-            >
+            <v-btn @click="createParty" :disabled="!partyName" color="blue" class="w-full">
               Create Party
             </v-btn>
           </v-card-actions>
@@ -34,40 +33,28 @@
       </v-col>
 
       <!-- No Parties Found Message -->
-      <v-col
-        cols="12"
-        v-else-if="parties.length === 0"
-        class="text-center grey--text"
-      >
+      <v-col cols="12" v-else-if="parties.length === 0" class="text-center grey--text">
         No parties found.
       </v-col>
 
       <!-- Party List -->
       <v-col cols="12" v-else>
         <v-list>
-          <v-list-item-group v-for="party in parties" :key="party.id">
-            <v-list-item>
-              <v-list-item-content>
-                <v-list-item-title class="text-h6">{{ party.name }}</v-list-item-title>
-                <v-list-item-subtitle>Created On: {{ formatDate(party.createdOn) }}</v-list-item-subtitle>
-                <v-list-item-subtitle>Members: {{ party.partyMembers.length }}</v-list-item-subtitle>
-              </v-list-item-content>
-              <v-icon
-                @click="editParty(party.id)"
-                color="warning"
-                small
-              >
+          <v-list-item v-for="party in parties" :key="party.id">
+            <template v-slot:prepend>
+              <v-list-item-title class="text-h6">{{ party.name }}</v-list-item-title>
+              <v-list-item-subtitle>Created On: {{ formatDate(party.createdOn) }}</v-list-item-subtitle>
+              <v-list-item-subtitle>Members: {{ party.partyMembers.length }}</v-list-item-subtitle>
+            </template>
+            <template v-slot:append>
+              <v-icon @click="editParty(party.id)" color="warning" small>
                 mdi-pencil
               </v-icon>
-              <v-icon
-                @click="deleteParty(party.id)"
-                color="red"
-                small
-              >
+              <v-icon @click="deleteParty(party.id)" color="red" small>
                 mdi-trash-can
               </v-icon>
-            </v-list-item>
-          </v-list-item-group>
+            </template>
+          </v-list-item>
         </v-list>
       </v-col>
     </v-row>
@@ -95,6 +82,7 @@ export default defineComponent({
     const partyName = ref("");
     const authStore = useAuthStore();
     const characterStore = useCharacterStore();
+    const message = ref("");
 
     const getUsersParties = async () => {
       loading.value = true;
@@ -112,17 +100,18 @@ export default defineComponent({
 
     const createParty = async () => {
       if (!partyName.value) return;
-      try {
-        const response = await axios.post(CREATE_PARTY_URL, {
-          authToken: authStore.getAuthToken(),
-          characterId: characterStore.getVerifiedCharacters()[0].id,
-          partyName: partyName.value
-        });
+      
+        try {
+          const response = await axios.post(CREATE_PARTY_URL, {
+            authToken: authStore.getAuthToken(),
+            characterId: characterStore.getVerifiedCharacters()[0].id,
+            partyName: partyName.value
+          });
 
-        if (response.data) {
-          parties.value.push(response.data);
-          partyName.value = ""; // Reset input after creation
-        }
+          if (response.data) {
+            parties.value.push(response.data);
+            partyName.value = ""; // Reset input after creation
+          }
       } catch (error) {
         console.error("Error creating party:", error);
       }
@@ -130,7 +119,7 @@ export default defineComponent({
 
     const editParty = async (partyId: string) => {
       try {
-        router.push("/"+partyId)
+        router.push("/" + partyId)
       } catch (error) {
         console.error("Error editing party:", error);
       }
@@ -161,6 +150,8 @@ export default defineComponent({
       editParty,
       deleteParty,
       formatDate,
+      message,
+      characterStore
     };
   },
 });

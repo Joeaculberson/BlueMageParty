@@ -1,5 +1,18 @@
 <template>
   <v-container>
+    <!-- Checkboxes for filtering -->
+    <v-row>
+      <v-col>
+        <v-checkbox v-model="filters.solo" label="Solo" color="primary"></v-checkbox>
+      </v-col>
+      <v-col>
+        <v-checkbox v-model="filters.lightParty" label="Light Party" color="primary"></v-checkbox>
+      </v-col>
+      <v-col>
+        <v-checkbox v-model="filters.fullParty" label="Full Party" color="primary"></v-checkbox>
+      </v-col>
+    </v-row>
+
     <v-expansion-panels v-model="panel" multiple>
       <v-expansion-panel>
         <v-expansion-panel-title>
@@ -10,7 +23,7 @@
             <v-progress-circular indeterminate color="primary"></v-progress-circular>
           </v-card-text>
           <v-container v-else>
-            <SpellTable :spells="memberSpells(party.everyoneNeeds)" />
+            <SpellTable :spells="filteredSpells(memberSpells(party.everyoneNeeds))" />
           </v-container>
         </v-expansion-panel-text>
       </v-expansion-panel>
@@ -37,8 +50,12 @@
             <v-progress-circular indeterminate color="primary"></v-progress-circular>
           </v-card-text>
           <v-container v-else>
-            <SpellTable :spells="memberSpells(member.character.missingSpells)" :characterId="member.character.id"
-              @spell-updated="handleSpellUpdate" />
+            <SpellTable
+              :spells="filteredSpells(memberSpells(member.character.missingSpells))"
+              :character-id="member.character.id"
+              :show-owned-column="ownsCharacter(member.character.userId)"
+              @spell-updated="handleSpellUpdate"
+            />
           </v-container>
         </v-expansion-panel-text>
       </v-expansion-panel>
@@ -47,10 +64,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
 import { useCharacterStore } from '@/stores/characterStore';
 import axios from "axios";
 import { REMOVE_PARTY_MEMBER_URL } from '@/constants/api';
+import { useAuthStore } from '@/stores/authStore';
 
 export default defineComponent({
   name: 'SpellComparison',
@@ -69,6 +87,31 @@ export default defineComponent({
     const panel = ref([]);
     const loading = ref(false);
     const characterStore = useCharacterStore();
+    const authStore = useAuthStore();
+    const currentUserId = authStore.getUserId(); // Get the current user's ID
+
+    // State for filters
+    const filters = ref({
+      solo: true,
+      lightParty: true,
+      fullParty: true,
+    });
+
+    const ownsCharacter = (partyMemberUserId) => {
+      return authStore.getUserId() == partyMemberUserId
+    };
+
+    // Computed property to filter spells based on the checkbox values
+    const filteredSpells = (spells) => {
+      return spells.filter(spell => {
+        const matchesPartyType =
+          (filters.value.solo && spell.isSolo) ||
+          (filters.value.lightParty && spell.isLightParty) ||
+          (filters.value.fullParty && spell.isFullParty);
+
+        return matchesPartyType;
+      });
+    };
 
     const memberSpells = (missingSpells) => {
       if (!missingSpells || !Array.isArray(missingSpells)) {
@@ -89,10 +132,8 @@ export default defineComponent({
           return;
         }
 
-        // Update the spell ownership in the party state
         const { spellId, owned, characterId } = data;
 
-        // Find the character who owns the spell
         const member = props.party.partyMembers.find(
           (member) => member.character.id === data.characterId
         );
@@ -108,42 +149,42 @@ export default defineComponent({
           }
         }
 
-        // Emit the event to notify the parent that the spell ownership was updated
         emit('update-everyone-needs');
-    } catch (error) {
-      console.error("Error updating spell ownership:", error);
-    }
-  };
+      } catch (error) {
+        console.error("Error updating spell ownership:", error);
+      }
+    };
 
+    const removeMemberFromParty = async (memberId) => {
+      if (!memberId) return;
 
-  const removeMemberFromParty = async (memberId) => {
-    if (!memberId) return;
+      try {
+        const response = await axios.delete(REMOVE_PARTY_MEMBER_URL, {
+          params: { Id: memberId }
+        });
 
-    try {
-      const response = await axios.delete(REMOVE_PARTY_MEMBER_URL, {
-        params: { Id: memberId }
-      });
+        const updatedPartyMembers = props.party.partyMembers.filter(
+          (member) => member.id !== memberId
+        );
 
-      const updatedPartyMembers = props.party.partyMembers.filter(
-        (member) => member.id !== memberId
-      );
+        emit('update-party-members', updatedPartyMembers);
+        emit('update-everyone-needs');
+      } catch (error) {
+        console.error("Failed to remove member:", error);
+      }
+    };
 
-      // Emit the updated partyMembers to the parent component
-      emit('update-party-members', updatedPartyMembers);
-      // Emit an event to recalculate everyoneNeeds
-      emit('update-everyone-needs');
-    } catch (error) {
-      console.error("Failed to remove member:", error);
-    }
-  };
-
-  return {
-    panel,
-    loading,
-    memberSpells,
-    handleSpellUpdate,
-    removeMemberFromParty
-  };
-}
+    return {
+      panel,
+      loading,
+      filters,
+      filteredSpells,
+      memberSpells,
+      handleSpellUpdate,
+      removeMemberFromParty,
+      currentUserId,
+      ownsCharacter
+    };
+  }
 });
 </script>

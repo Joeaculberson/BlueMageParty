@@ -68,6 +68,7 @@ namespace BlueMageParty.Server.Controllers
                                 member.Character.Id,
                                 member.Character.FirstName, // Include FirstName
                                 member.Character.LastName, // Include LastName
+                                member.Character.UserId,
                                 member.Character.LoadstoneCharacterId, // Include LoadstoneCharacterId
                                 member.Character.Avatar, // Include Avatar
                                 member.Character.Server, // Include Server
@@ -137,6 +138,7 @@ namespace BlueMageParty.Server.Controllers
                         Character = new CharacterDto
                         {
                             Id = member.Character.Id,
+                            UserId = member.Character.UserId,
                             FirstName = member.Character.FirstName, // Now available
                             LastName = member.Character.LastName, // Now available
                             LoadstoneCharacterId = member.Character.LoadstoneCharacterId, // Now available

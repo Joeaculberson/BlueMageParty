@@ -72,7 +72,7 @@ namespace BlueMageParty.Server.Controllers
             return NoContent();
         }
 
-        [HttpGet("JWT/{jwt}")]
+        [HttpGet("GetUser/{jwt}")]
         public async Task<ActionResult<User>> GetUser(string jwt)
         {
             string email = TokenDecoder.DecodeEmailFromJwtToken(jwt);
@@ -93,7 +93,7 @@ namespace BlueMageParty.Server.Controllers
             user.Password = string.Empty;
             user.PasswordResetToken = string.Empty;
 
-            return user;
+            return Ok(user);
         }
 
         [HttpGet("IsAdmin/{jwt}")]
