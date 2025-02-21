@@ -56,7 +56,7 @@
                     <div v-if="ownsCharacter">
                         <v-card-actions>
                             <v-btn
-                                v-if="!isRefreshing"
+                                v-if="!loading"
                                 color="primary"
                                 @click="refreshCharacterData"
                             >
@@ -71,6 +71,7 @@
                         </v-card-actions>
                     </div>
                 </v-card>
+                
             </v-col>
         </v-row>
     </v-container>
@@ -89,7 +90,7 @@ export default defineComponent({
         const router = useRouter();
         const route = useRoute();
         const ownsCharacter = ref(false);
-        const isRefreshing = ref(false);
+        const loading = ref(false);
         const character = reactive({
             avatar: "",
             firstName: "",
@@ -138,7 +139,7 @@ export default defineComponent({
             .some(character => character.loadstoneCharacterId === route.params.loadstoneCharacterId);
 
         const refreshCharacterData = async () => {
-            isRefreshing.value = true;
+            loading.value = true;
             try {
                 const response = await axios.post(REFRESH_CHARACTER_DATA_FROM_LOADSTONE_URL, {
                     Name: character.firstName + " " + character.lastName,
@@ -148,7 +149,7 @@ export default defineComponent({
             } catch (error) {
                 console.error("Error fetching verification code:", error);
             } finally {
-                isRefreshing.value = false;
+                loading.value = false;
             }
         };
 
@@ -164,7 +165,7 @@ export default defineComponent({
             character,
             refreshCharacterData,
             ownsCharacter,
-            isRefreshing
+            loading
         };
     }
 });
