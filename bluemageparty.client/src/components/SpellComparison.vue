@@ -33,12 +33,17 @@
             <img width="80px" :src="member.character.avatar" alt="avatar" />
           </v-avatar>
 
-          <h2>{{ member.character.firstName }} {{ member.character.lastName }} ({{ member.character.server }})
+          <h2>
+            {{ member.character.firstName }} {{ member.character.lastName }} ({{ member.character.server }})
             <span v-if="member.isHost">
               <v-icon color="black" small>
                 mdi-bullhorn-variant-outline
               </v-icon>
             </span>
+            <v-icon @click.stop="goToCharacterPage(member.character.loadstoneCharacterId)"
+              small>
+              mdi-account-outline
+            </v-icon>
             <v-icon v-if="showRemoveIcon && !member.isHost" @click.stop="removeMemberFromParty(member.id)" color="red"
               small>
               mdi-trash-can
@@ -66,6 +71,7 @@
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue';
 import { useCharacterStore } from '@/stores/characterStore';
+import { useRouter, useRoute } from "vue-router";
 import axios from "axios";
 import { REMOVE_PARTY_MEMBER_URL } from '@/constants/api';
 import { useAuthStore } from '@/stores/authStore';
@@ -86,6 +92,7 @@ export default defineComponent({
   setup(props, { emit }) {
     const panel = ref([]);
     const loading = ref(false);
+    const router = useRouter();
     const characterStore = useCharacterStore();
     const authStore = useAuthStore();
     const currentUserId = authStore.getUserId(); // Get the current user's ID
@@ -96,6 +103,10 @@ export default defineComponent({
       lightParty: true,
       fullParty: true,
     });
+
+    const goToCharacterPage = (loadstoneCharacterId) => {
+      router.push('/character/' + loadstoneCharacterId);
+    };
 
     const ownsCharacter = (partyMemberUserId) => {
       return authStore.getUserId() == partyMemberUserId
@@ -183,7 +194,8 @@ export default defineComponent({
       handleSpellUpdate,
       removeMemberFromParty,
       currentUserId,
-      ownsCharacter
+      ownsCharacter,
+      goToCharacterPage
     };
   }
 });

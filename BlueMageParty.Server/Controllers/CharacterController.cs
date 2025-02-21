@@ -229,7 +229,7 @@ namespace BlueMageParty.Server.Controllers
             if (character == null)
                 BadRequest("Character doesn't exist in database.");
 
-            character.FirstName = loadstoneCharacter.Name.Split(' ')[0] + " Test";
+            character.FirstName = loadstoneCharacter.Name.Split(' ')[0];
             character.LastName = loadstoneCharacter.Name.Split(' ')[1];
             character.Server = loadstoneCharacter.Server;
             character.Title = loadstoneCharacter.Title;
