@@ -20,15 +20,48 @@ namespace BlueMageParty.Server.Controllers
         }
 
         [HttpGet("SearchDatabaseCharacters")]
-        public async Task<IActionResult> SearchDatabaseCharacters([FromQuery] string query)
+        public async Task<IActionResult> SearchDatabaseCharacters([FromQuery] string query, Guid partyId)
         {
             if (string.IsNullOrWhiteSpace(query) || query.Length < 3)
             {
                 return BadRequest("Query must be at least 3 characters.");
             }
-            
-            var characters = await _context.Characters
-                .Where(c => EF.Functions.Like(c.FirstName, $"%{query}%") || EF.Functions.Like(c.LastName, $"%{query}%"))
+
+            if (partyId == Guid.Empty)
+            {
+                return BadRequest("PartyId cannot be empty.");
+            }
+
+            var characterIds = await _context.PartyMembers
+                .Where(x => x.PartyId == partyId)
+                .Select(x => x.CharacterId)
+                .ToListAsync();
+
+            var queryParts = query.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+            var charactersQuery = _context.Characters
+                .Where(c => !characterIds.Contains(c.Id));
+
+            if (queryParts.Length == 1)
+            {
+                string singleQuery = $"%{queryParts[0]}%";
+                charactersQuery = charactersQuery.Where(c =>
+                    EF.Functions.Like(c.FirstName, singleQuery) ||
+                    EF.Functions.Like(c.LastName, singleQuery));
+            }
+            else if (queryParts.Length >= 2)
+            {
+                string firstNameQuery = $"%{queryParts[0]}%";
+                string lastNameQuery = $"%{queryParts[1]}%";
+                charactersQuery = charactersQuery.Where(c =>
+                    (EF.Functions.Like(c.FirstName, firstNameQuery) &&
+                     EF.Functions.Like(c.LastName, lastNameQuery)) ||
+                    (EF.Functions.Like(c.FirstName, lastNameQuery) &&
+                     EF.Functions.Like(c.LastName, firstNameQuery))
+                );
+            }
+
+            var characters = await charactersQuery
                 .Select(c => new
                 {
                     Id = c.Id,
