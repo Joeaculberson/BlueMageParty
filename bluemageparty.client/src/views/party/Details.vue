@@ -129,7 +129,7 @@ export default defineComponent({
             searchLoading.value = true;
             try {
                 const response = await axios.get(SEARCH_DATABASE_CHARACTERS_URL, {
-                    params: { query: searchQuery.value }
+                    params: { query: searchQuery.value, partyId: party.value.id }
                 });
                 characters.value = response.data;
             } catch (error) {
@@ -150,33 +150,46 @@ export default defineComponent({
             recalculateEveryoneNeeds(); // Recalculate everyoneNeeds after updating party members
         };
 
-        // Add character to the party and fetch missing spells
         const addCharacterToParty = async (character) => {
             if (!character) return;
+
+            // Check if the character is already in the party
+            const isCharacterInParty = party.value.partyMembers?.some(member => member.character.id === character.id);
+            if (isCharacterInParty) {
+                alert(`${character.firstName} ${character.lastName} is already in the party.`);
+                console.log(`${character.firstName} ${character.lastName} is already in the party.`);
+                return; // Exit if the character is already in the party
+            }
+
             try {
+                // Fetch missing spells for the character
                 const response = await axios.get(GET_MISSING_SPELLS_URL, {
                     params: { characterId: character.id }
                 });
                 const missingSpells = response.data;
 
+                // Add the character to the party via API
                 const addResponse = await axios.post(ADD_PARTY_MEMBER_URL, {
                     characterId: character.id,
                     partyId: party.value.id
                 });
 
+                // Initialize partyMembers array if it doesn't exist
                 if (!party.value.partyMembers) {
                     party.value.partyMembers = [];
                 }
 
+                // Add the character to the local party state
                 party.value.partyMembers.push({
                     id: addResponse.data.id,
                     character: { ...character, missingSpells: missingSpells },
                     isHost: false
                 });
 
-                recalculateEveryoneNeeds(); // Recalculate everyoneNeeds after adding a member
+                // Recalculate everyone's needs after adding a member
+                recalculateEveryoneNeeds();
             } catch (error) {
-                console.error("Error fetching missing spells:", error);
+                console.error("Error fetching missing spells or adding character to party:", error);
             }
         };
 
