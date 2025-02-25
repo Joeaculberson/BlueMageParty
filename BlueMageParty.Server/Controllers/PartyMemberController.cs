@@ -21,15 +21,17 @@ namespace BlueMageParty.Server.Controllers
         {
             try
             {
-                await this._context.PartyMembers.AddAsync(new PartyMember()
+                var partyMember = new PartyMember()
                 {
                     PartyId = request.partyId,
                     CharacterId = request.characterId,
                     CreatedOn = DateTime.UtcNow
-                });
+                };
 
+                await this._context.PartyMembers.AddAsync(partyMember);
                 await this._context.SaveChangesAsync();
-                return Ok();
+
+                return Ok(new { Id = partyMember.Id });
             }
             catch (Exception e)
             {

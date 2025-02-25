@@ -40,8 +40,7 @@
                 mdi-bullhorn-variant-outline
               </v-icon>
             </span>
-            <v-icon @click.stop="goToCharacterPage(member.character.loadstoneCharacterId)"
-              small>
+            <v-icon @click.stop="goToCharacterPage(member.character.loadstoneCharacterId)" small>
               mdi-account-outline
             </v-icon>
             <v-icon v-if="showRemoveIcon && !member.isHost" @click.stop="removeMemberFromParty(member.id)" color="red"
@@ -55,12 +54,9 @@
             <v-progress-circular indeterminate color="primary"></v-progress-circular>
           </v-card-text>
           <v-container v-else>
-            <SpellTable
-              :spells="filteredSpells(memberSpells(member.character.missingSpells))"
-              :character-id="member.character.id"
-              :show-owned-column="ownsCharacter(member.character.userId)"
-              @spell-updated="handleSpellUpdate"
-            />
+            <SpellTable :spells="filteredSpells(memberSpells(member.character.missingSpells))"
+              :character-id="member.character.id" :show-owned-column="ownsCharacter(member.character.userId)"
+              @spell-updated="handleSpellUpdate" />
           </v-container>
         </v-expansion-panel-text>
       </v-expansion-panel>
@@ -69,9 +65,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
+import { defineComponent, ref, watch } from 'vue';
 import { useCharacterStore } from '@/stores/characterStore';
-import { useRouter, useRoute } from "vue-router";
+import { useRouter } from "vue-router";
 import axios from "axios";
 import { REMOVE_PARTY_MEMBER_URL } from '@/constants/api';
 import { useAuthStore } from '@/stores/authStore';
@@ -85,7 +81,7 @@ export default defineComponent({
       default: () => ({
         partyMembers: [],  // Default empty array for safety
       })
-    }, // Full party object with members and their spells
+    },
     showRemoveIcon: Boolean // Determines if the trashcan should be shown
   },
   emits: ['update-party-members', 'update-everyone-needs'], // Define custom events
@@ -104,13 +100,57 @@ export default defineComponent({
       fullParty: true,
     });
 
+    // Track the previous state of verifiedCharacters
+    const previousVerifiedCharacters = ref(characterStore.getVerifiedCharacters());
+
     const goToCharacterPage = (loadstoneCharacterId) => {
       router.push('/character/' + loadstoneCharacterId);
     };
 
     const ownsCharacter = (partyMemberUserId) => {
-      return authStore.getUserId() == partyMemberUserId
+      return characterStore.getVerifiedCharacters().some(character => character.userId === partyMemberUserId);
     };
+
+    // Watch for changes to verifiedCharacters
+    watch(
+      () => characterStore.getVerifiedCharacters(),
+      (newVerifiedCharacters) => {
+        if(newVerifiedCharacters.length == previousVerifiedCharacters.value.length)
+          return;
+
+        console.log('New verified characters:', newVerifiedCharacters);
+        console.log('Previous verified characters:', previousVerifiedCharacters.value); 
+
+        // Only proceed if the array got smaller
+        if (newVerifiedCharacters.length < previousVerifiedCharacters.value.length) {
+          // Find the character that was removed
+          const removedCharacter = previousVerifiedCharacters.value.find(
+            oldChar => !newVerifiedCharacters.some(newChar => newChar.id === oldChar.id)
+          );
+
+          console.log('Removed character:', removedCharacter); // Debug log
+
+          if (removedCharacter) {
+            // Remove the specific character from the party
+            const updatedPartyMembers = props.party.partyMembers.filter(
+              member => member.character.id !== removedCharacter.id
+            );
+
+            console.log('Updated party members:', updatedPartyMembers); // Debug log
+
+            if (updatedPartyMembers.length !== props.party.partyMembers.length) {
+              // Emit the updated party members to the parent
+              console.log('Emitting update-party-members'); // Debug log
+              emit('update-party-members', updatedPartyMembers);
+            }
+          }
+        }
+
+        // Update the previous state
+        previousVerifiedCharacters.value = newVerifiedCharacters;
+      },
+      { deep: true }
+    );
 
     // Computed property to filter spells based on the checkbox values
     const filteredSpells = (spells) => {

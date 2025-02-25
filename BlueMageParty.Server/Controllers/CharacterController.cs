@@ -69,7 +69,8 @@ namespace BlueMageParty.Server.Controllers
                     LastName = c.LastName,
                     Avatar = c.Avatar,
                     Server = c.Server,
-                    LoadstoneCharacterId = c.LoadstoneCharacterId
+                    LoadstoneCharacterId = c.LoadstoneCharacterId,
+                    UserId = c.UserId
                 })
                 .Take(10)
                 .ToListAsync();
