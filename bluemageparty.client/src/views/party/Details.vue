@@ -152,7 +152,6 @@ export default defineComponent({
 
         const addCharacterToParty = async (character) => {
             if (!character) return;
-
             // Check if the character is already in the party
             const isCharacterInParty = party.value.partyMembers?.some(member => member.character.id === character.id);
             if (isCharacterInParty) {
@@ -179,15 +178,20 @@ export default defineComponent({
                     party.value.partyMembers = [];
                 }
 
+                console.log(addResponse.data.id)
                 // Add the character to the local party state
-                party.value.partyMembers.push({
+                const newPartyMember = {
                     id: addResponse.data.id,
                     character: { ...character, missingSpells: missingSpells },
                     isHost: false
-                });
+                };
+                
+                party.value.partyMembers.push(newPartyMember);
 
                 // Recalculate everyone's needs after adding a member
                 recalculateEveryoneNeeds();
+
+                clearSearch();
             } catch (error) {
                 console.error("Error fetching missing spells or adding character to party:", error);
             }
@@ -222,7 +226,7 @@ export default defineComponent({
             clearSearch,
             updatePartyMembers,
             recalculateEveryoneNeeds,
-            currentUserId, // Pass the current user's ID to the template
+            currentUserId,
         };
     },
 });
