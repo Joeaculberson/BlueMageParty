@@ -34,3 +34,4 @@ export const ADD_PARTY_MEMBER_URL = `${API_BASE_URL}/PartyMember/AddPartyMember`
 export const REMOVE_PARTY_MEMBER_URL = `${API_BASE_URL}/PartyMember/RemovePartyMember`
 export const GET_USER_URL = `${API_BASE_URL}/Users/GetUser`
 export const GET_CHARACTER_OWNER = `${API_BASE_URL}/Character/Owner`
+export const GET_MOCK_PARTY_FROM_CHARACTER_IDS_URL = `${API_BASE_URL}/Party/GetMockPartyFromCharacterIds`
