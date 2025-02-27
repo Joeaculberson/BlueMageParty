@@ -44,6 +44,134 @@ namespace BlueMageParty.Server.Controllers
             }
         }
 
+        [HttpGet("GetMockPartyFromCharacterIds")]
+        public async Task<IActionResult> GetMockPartyFromCharacterIds([FromQuery] Guid[] characterIds)
+        {
+            try
+            {
+                if (characterIds.Length != 2)
+                {
+                    return BadRequest("Exactly two character IDs are required.");
+                }
+
+                // Fetch the two characters with their spells owned
+                var characters = await _context.Characters
+                    .Include(c => c.SpellsOwned)
+                    .Where(c => characterIds.Contains(c.Id))
+                    .Select(c => new
+                    {
+                        c.Id,
+                        c.FirstName,
+                        c.LastName,
+                        c.UserId,
+                        c.LoadstoneCharacterId,
+                        c.Avatar,
+                        c.Server,
+                        SpellsOwned = c.SpellsOwned
+                            .Where(so => so.Owned) // Only fetch owned spells
+                            .Select(so => so.SpellId)
+                            .ToList()
+                    })
+                    .ToListAsync();
+
+                if (characters.Count != 2)
+                {
+                    return BadRequest("One or both characters could not be found.");
+                }
+
+                // Fetch all spells (only necessary fields)
+                var allSpells = await _context.Spells
+                    .OrderBy(spell => spell.Number)
+                    .Select(spell => new SpellDto
+                    {
+                        Id = spell.Id,
+                        Name = spell.Name,
+                        Description = spell.Description,
+                        Number = spell.Number,
+                        Sources = spell.Sources.ToList(),
+                        Patch = spell.Patch,
+                        Icon = spell.Icon,
+                        IsSolo = spell.IsSolo,
+                        IsLightParty = spell.IsLightParty,
+                        IsFullParty = spell.IsFullParty
+                    })
+                    .ToListAsync();
+
+                // Precompute spells owned by each character
+                var memberOwnedSpells = characters
+                    .Select(character => new HashSet<Guid>(character.SpellsOwned))
+                    .ToList();
+
+                // Initialize the list for tracking spells that every party member needs
+                var everyoneNeeds = new List<SpellDto>();
+
+                // Find spells that no party member owns
+                foreach (var spell in allSpells)
+                {
+                    bool isMissingForEveryone = memberOwnedSpells
+                        .All(ownedSpells => !ownedSpells.Contains(spell.Id));
+
+                    if (isMissingForEveryone)
+                    {
+                        everyoneNeeds.Add(spell);
+                    }
+                }
+
+                // Map to DTOs for the mock party data
+                var mockParty = new
+                {
+                    Id = Guid.Empty, // Empty GUID for mock party
+                    Name = "Mock Party",
+                    EveryoneNeeds = everyoneNeeds,
+                    Spells = allSpells,
+                    PartyMembers = characters.Select((character, index) => new
+                    {
+                        Id = Guid.Empty, // Empty GUID for mock party member
+                        IsHost = false,
+                        Character = new
+                        {
+                            character.Id,
+                            character.UserId,
+                            character.FirstName,
+                            character.LastName,
+                            character.LoadstoneCharacterId,
+                            character.Avatar,
+                            character.Server,
+                            SpellsOwned = character.SpellsOwned
+                                .Select(spellId => new
+                                {
+                                    SpellId = spellId,
+                                    Owned = true // Since we only fetched owned spells
+                                })
+                                .ToList(),
+                            MissingSpells = allSpells
+                                .Where(spell => !character.SpellsOwned.Contains(spell.Id))
+                                .Select(spell => new
+                                {
+                                    Id = spell.Id
+                                })
+                                .ToList()
+                        }
+                    }).ToList()
+                };
+
+                return Ok(mockParty);
+            }
+            catch (Exception ex)
+            {
+                var error = new ErrorLog
+                {
+                    Message = ex.Message,
+                    StackTrace = ex.StackTrace,
+                    InnerException = ex.InnerException?.Message
+                };
+
+                _context.ErrorLogs.Add(error);
+                await _context.SaveChangesAsync();
+                throw;
+            }
+        }
+
         [HttpGet("GetPartyDetails")]
         public async Task<IActionResult> GetPartyDetails([FromQuery] Guid partyId)
         {
