@@ -5,28 +5,32 @@
       Please select a character before managing your spells.
     </v-alert>
 
-    <v-row>
-      <v-col cols="12" md="3">
-        <v-checkbox v-model="filters.isSolo" label="Solo"></v-checkbox>
-      </v-col>
-      <v-col cols="12" md="3">
-        <v-checkbox v-model="filters.isLightParty" label="Light Party"></v-checkbox>
-      </v-col>
-      <v-col cols="12" md="3">
-        <v-checkbox v-model="filters.isFullParty" label="Full Party"></v-checkbox>
-      </v-col>
-      <v-col cols="12" md="3">
-        <v-checkbox v-model="filters.hideOwned" label="Hide Owned Spells" @change="applyFilters"></v-checkbox>
-      </v-col>
-    </v-row>
+    <div v-else>
+      <v-row>
+        <v-col cols="12" md="3">
+          <v-checkbox v-model="filters.isSolo" label="Solo"></v-checkbox>
+        </v-col>
+        <v-col cols="12" md="3">
+          <v-checkbox v-model="filters.isLightParty" label="Light Party"></v-checkbox>
+        </v-col>
+        <v-col cols="12" md="3">
+          <v-checkbox v-model="filters.isFullParty" label="Full Party"></v-checkbox>
+        </v-col>
+        <v-col cols="12" md="3">
+          <v-checkbox v-model="filters.hideOwned" label="Hide Owned Spells" @change="applyFilters"></v-checkbox>
+        </v-col>
+      </v-row>
 
-    <v-card-text v-if="isLoading">
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
-    </v-card-text>
-    <v-container v-else>
-      <SpellTable :spells="filteredSpells" :character-id="selectedCharacterId" :show-owned-column="true"
-        @spell-updated="handleSpellUpdate" />
-    </v-container>
+      <v-card-text v-if="isLoading">
+        <v-progress-circular indeterminate color="primary"></v-progress-circular>
+      </v-card-text>
+      <v-container v-else>
+        <SpellTable :spells="filteredSpells" 
+        :character-id="characterStore.getVerifiedCharacters()[0]?.id" 
+        :show-owned-column="characterStore.getVerifiedCharacters().length > 0"
+          @spell-updated="handleSpellUpdate" />
+      </v-container>
+    </div>
   </v-container>
 </template>
 
@@ -38,8 +42,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { watch } from 'vue';
 import { useCharacterStore } from '@/stores/characterStore';
 import {
-  GET_SPELLS_URL,
-  GET_CHARACTER_OWNER
+  GET_SPELLS_URL
 } from '@/constants/api';
 
 interface Spell {
@@ -70,9 +73,6 @@ export default {
     const isAdmin = ref(false);
     const spells = ref<Spell[]>([]); // Store spells here
     const isLoading = ref(false);
-    const selectedCharacterId = ref(characterStore.getVerifiedCharacters().length > 0
-      ? characterStore.getVerifiedCharacters()[0].id
-      : undefined);
     const authStore = useAuthStore();
     const currentUserId = authStore.getUserId();
     const filters = ref({
@@ -102,18 +102,6 @@ export default {
     const handleSpellUpdate = (data: { spellId: string; owned: boolean }) => {
       // console.log("Spell ownership updated:", data);
       // Update the spells array if needed
-    };
-    
-
-    const selectedCharacterOwnerId = ref<string | null>(null);
-    const getCharacterUserId = async (characterId: string) => {
-      try {
-        const response = await axios.get(GET_CHARACTER_OWNER + '/' + characterId);
-        console.log(response.data);
-        selectedCharacterOwnerId.value = response.data.userId;
-      } catch (error) {
-        console.error("Error fetching character owner ID:", error);
-      }
     };
 
     // Fetch the list of spells
@@ -151,10 +139,12 @@ export default {
     // Watch for changes to the verified characters and fetch spells when the list changes
     watch(
       () => characterStore.getVerifiedCharacters(),
-      () => {
-        getSpells(); // Trigger getSpells whenever the verified characters array is updated
+      (newCharacters) => {
+        if (newCharacters.length > 0) {
+          getSpells(); // Only fetch spells when characters are available
+        }
       },
-      { immediate: false } // Run this on initial load to fetch spells
+      { deep: true, immediate: true }
     );
 
     // Apply filters to the spells
@@ -163,7 +153,7 @@ export default {
     };
 
     onMounted(() => {
-      getSpells();
+      //getSpells();
     });
 
     return {
@@ -178,7 +168,6 @@ export default {
       filters,
       filteredSpells,
       applyFilters,
-      selectedCharacterId,
       currentUserId
     };
   },

@@ -43,8 +43,7 @@
           <v-list-item v-for="party in parties" :key="party.id">
             <template v-slot:prepend>
               <v-list-item-title class="text-h6">{{ party.name }}</v-list-item-title>
-              <v-list-item-subtitle>Created On: {{ formatDate(party.createdOn) }}</v-list-item-subtitle>
-              <v-list-item-subtitle>Members: {{ party.partyMembers.length }}</v-list-item-subtitle>
+              <v-list-item-subtitle>Created On: {{ formatDate(party.createdOn) }} | Members: {{ party.partyMembers.length }}</v-list-item-subtitle>
             </template>
             <template v-slot:append>
               <v-icon @click="editParty(party.id)" color="warning" small>
@@ -111,6 +110,7 @@ export default defineComponent({
           if (response.data) {
             parties.value.push(response.data);
             partyName.value = ""; // Reset input after creation
+            router.push('/' + response.data.id)
           }
       } catch (error) {
         console.error("Error creating party:", error);

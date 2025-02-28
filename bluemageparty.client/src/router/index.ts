@@ -79,19 +79,22 @@ const router = createRouter({
   routes,
 });
 
-// Global navigation guard
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
   const isAuthenticated = authStore.isAuthenticated;
   const isAdmin = authStore.getIsAdmin();
 
-  // Redirect logged-in users away from login/register
+  // Allow access if the route matches a UUID pattern (e.g., "/712b0345-d04c-4d25-fd46-08dd47c1cd7b")
+  const isUuidRoute = /^\/[0-9a-fA-F-]{36}$/.test(to.path); 
+
   if (isAuthenticated && (to.path === '/login' || to.path === '/register')) {
-    next('/spellmanager');
+    next('/spellmanager'); // Redirect logged-in users away from login/register
   } 
-  // Restrict access to the admin route
   else if (to.path === '/admin' && !isAdmin) {
-    next('/'); // Redirect non-admin users to home or another page
+    next('/'); // Restrict access to the admin route
+  } 
+  else if (!isAuthenticated && !isUuidRoute && to.path !== '/login') {
+    next('/login'); // Redirect logged-out users unless they're accessing a UUID route
   } 
   else {
     next(); // Proceed normally

@@ -15,7 +15,7 @@
                   v-model="selectedHomeWorld" required></v-select>
 
                 <!-- Name Input -->
-                <v-text-field label="Character Name" v-model="name" required @keydown.enter="search"></v-text-field>
+                <v-text-field label="Character's Full Name" v-model="name" required @keydown.enter="search"></v-text-field>
               </v-card-text>
 
               <v-card-actions class="justify-space-between">
