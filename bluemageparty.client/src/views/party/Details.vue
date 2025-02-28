@@ -1,8 +1,8 @@
 <template>
     <div class="party-details">
         <!-- Search and add character to party -->
-        <v-autocomplete v-model="selectedCharacter" :items="filteredCharacters" label="Search Character" item-value="id"
-            item-title="fullName" return-object :loading="searchLoading" @update:search="(value) => {
+        <v-autocomplete v-if="!message" v-model="selectedCharacter" :items="filteredCharacters" label="Search Character"
+            item-value="id" item-title="fullName" return-object :loading="searchLoading" @update:search="(value) => {
                 searchQuery = value;
                 characters = []; // Reset before searching
             }" @blur="clearSearch" no-data-text="No characters found" @update:model-value="addCharacterToParty">
@@ -24,8 +24,13 @@
 
         <!-- Display Party Details -->
         <div v-if="!loading">
-            <SpellComparison :party="party" :showRemoveIcon="true" :currentUserId="currentUserId"
+            <div v-if="!message">
+                <SpellComparison :party="party" :showRemoveIcon="true" :currentUserId="currentUserId"
                 @update-party-members="updatePartyMembers" @update-everyone-needs="recalculateEveryoneNeeds" />
+            </div>
+            <v-alert v-else type="warning" dismissible border="start">
+                {{ message }}
+            </v-alert>
         </div>
 
         <!-- Loading state -->
@@ -68,6 +73,7 @@ export default defineComponent({
         const characters = ref([]);
         const authStore = useAuthStore();
         const currentUserId = authStore.getUserId(); // Get the current user's ID
+        const message = ref("");
 
         // Fetch party details from the API
         const getPartyDetails = async () => {
@@ -82,6 +88,7 @@ export default defineComponent({
                     console.log("Error fetching party data.");
                 }
             } catch (error) {
+                message.value = 'Sorry, but this party does not exists.'
                 console.error("Error fetching party data:", error);
             }
             loading.value = false;
@@ -185,7 +192,7 @@ export default defineComponent({
                     character: { ...character, missingSpells: missingSpells },
                     isHost: false
                 };
-                
+
                 party.value.partyMembers.push(newPartyMember);
 
                 // Recalculate everyone's needs after adding a member
@@ -227,6 +234,7 @@ export default defineComponent({
             updatePartyMembers,
             recalculateEveryoneNeeds,
             currentUserId,
+            message
         };
     },
 });
