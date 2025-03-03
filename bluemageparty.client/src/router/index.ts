@@ -19,14 +19,17 @@ const routes = [
   {
     path: '/',
     component: Home,
+    meta: { allowUnauthenticated: true }, // Home is accessible to unauthenticated users
   },
   {
     path: '/login',
     component: Login,
+    meta: { allowUnauthenticated: true }, // Login is accessible to unauthenticated users
   },
   {
     path: '/register',
     component: Register,
+    meta: { allowUnauthenticated: true }, // Register is accessible to unauthenticated users
   },
   {
     path: '/spellmanager',
@@ -35,43 +38,48 @@ const routes = [
   {
     path: '/verify',
     component: Verify,
+    meta: { allowUnauthenticated: true }, // Verify is accessible to unauthenticated users
   },
   {
     path: '/ResendActivationEmail',
     component: ResendActivationEmail,
+    meta: { allowUnauthenticated: true }, // ResendActivationEmail is accessible to unauthenticated users
   },
   {
     path: '/ResetPasswordRequest',
-    component: ResetPasswordRequest
+    component: ResetPasswordRequest,
+    meta: { allowUnauthenticated: true }, // ResetPasswordRequest is accessible to unauthenticated users
   },
   {
     path: '/ResetPassword',
-    component: ResetPassword
+    component: ResetPassword,
+    meta: { allowUnauthenticated: true }, // ResetPassword is accessible to unauthenticated users
   },
   {
     path: '/character/Search',
-    component: CharacterSearch
+    component: CharacterSearch,
   },
   {
     path: '/character/Verify',
-    component: VerifyCharacter
+    component: VerifyCharacter,
   },
   {
     path: '/character/:loadstoneCharacterId',
-    component: CharacterDetails
+    component: CharacterDetails,
   },
   {
     path: '/partymanager',
-    component: PartyManager
+    component: PartyManager,
   },
   {
-    path: '/:partyId',
-    component: PartyDetails
+    path: '/party/:partyId',
+    component: PartyDetails,
+    meta: { allowUnauthenticated: true }
   },
   {
     path: '/admin',
-    component: Admin
-  }
+    component: Admin,
+  },
 ];
 
 const router = createRouter({
@@ -84,19 +92,22 @@ router.beforeEach((to, from, next) => {
   const isAuthenticated = authStore.isAuthenticated;
   const isAdmin = authStore.getIsAdmin();
 
+  console.log('isAuthenticated:', isAuthenticated, 'to.path:', to.path);
+
   // Allow access if the route matches a UUID pattern (e.g., "/712b0345-d04c-4d25-fd46-08dd47c1cd7b")
-  const isUuidRoute = /^\/[0-9a-fA-F-]{36}$/.test(to.path); 
+  const isUuidRoute = /^\/[0-9a-fA-F-]{36}$/.test(to.path);
 
   if (isAuthenticated && (to.path === '/login' || to.path === '/register')) {
+    console.log('Redirecting authenticated user to /spellmanager');
     next('/spellmanager'); // Redirect logged-in users away from login/register
-  } 
-  else if (to.path === '/admin' && !isAdmin) {
+  } else if (to.path === '/admin' && !isAdmin) {
+    console.log('Redirecting non-admin user to /');
     next('/'); // Restrict access to the admin route
-  } 
-  else if (!isAuthenticated && !isUuidRoute && to.path !== '/login') {
-    next('/login'); // Redirect logged-out users unless they're accessing a UUID route
-  } 
-  else {
+  } else if (!isAuthenticated && !isUuidRoute && !to.meta.allowUnauthenticated) {
+    console.log('Redirecting unauthenticated user to /login');
+    next('/login'); // Redirect unauthenticated users unless the route is allowed
+  } else {
+    console.log('Allowing navigation to:', to.path);
     next(); // Proceed normally
   }
 });

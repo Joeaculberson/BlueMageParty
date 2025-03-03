@@ -3,6 +3,10 @@
     <v-container>
       <v-row justify="center">
         <v-col>
+          <!-- Error Message Alert -->
+          <v-alert v-if="message" type="error" dismissible>
+            {{ message }}
+          </v-alert>
           <v-card title="Register">
             <v-form @submit.prevent="register" v-model="isValid">
               <v-card-text>
@@ -22,11 +26,6 @@
                 <v-btn :disabled="!isValid" @click="register" color="primary">Register</v-btn>
                 <v-btn @click="goToResendActivationEmail" color="primary">Resend Activation Code</v-btn>
               </v-card-actions>
-
-              <!-- Error Message Alert -->
-              <v-alert v-if="message" type="error" dismissible>
-                {{ message }}
-              </v-alert>
             </v-form>
           </v-card>
         </v-col>

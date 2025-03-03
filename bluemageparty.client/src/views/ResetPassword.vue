@@ -3,27 +3,21 @@
         <v-container>
             <v-row justify="center">
                 <v-col>
+
+                    <!-- Alert for Success/Error Messages -->
+                    <v-alert v-if="message" :type="alertType" dismissible>
+                        {{ message }}
+                    </v-alert>
                     <v-card title="Reset Password">
                         <v-form v-model="isValid">
                             <v-card-text>
                                 <!-- Password Input -->
-                                <v-text-field 
-                                    v-model="password" 
-                                    label="Password" 
-                                    type="password" 
-                                    :rules="[passwordRule]" 
-                                    required 
-                                />
+                                <v-text-field v-model="password" label="Password" type="password"
+                                    :rules="[passwordRule]" required />
 
                                 <!-- Confirm Password Input -->
-                                <v-text-field 
-                                    v-model="confirmPassword" 
-                                    label="Confirm Password" 
-                                    type="password" 
-                                    :rules="[confirmPasswordValidation]" 
-                                    required 
-                                    @keydown.enter="resetPassword" 
-                                />
+                                <v-text-field v-model="confirmPassword" label="Confirm Password" type="password"
+                                    :rules="[confirmPasswordValidation]" required @keydown.enter="resetPassword" />
 
                                 <!-- Reset Password Button -->
                                 <v-card-actions>
@@ -31,11 +25,6 @@
                                         Reset Password
                                     </v-btn>
                                 </v-card-actions>
-
-                                <!-- Alert for Success/Error Messages -->
-                                <v-alert v-if="message" :type="alertType" dismissible>
-                                    {{ message }}
-                                </v-alert>
                             </v-card-text>
                         </v-form>
                     </v-card>
