@@ -3,8 +3,15 @@
         <v-container>
             <v-row justify="center">
                 <v-col>
+                    <v-alert v-if="message" :type="alertType" dismissible>
+                        {{ message }}
+                    </v-alert>
                     <v-card title="Verify Your Account">
+                        <!-- Success Message Alert -->
+                        
                         <v-form v-model="isValid">
+                            
+
                             <v-card-text>
                                 <!-- Verification Code Field -->
                                 <v-text-field v-model="code" label="Verification Code" required maxlength="6" counter
@@ -19,12 +26,6 @@
                                     Resend Activation Email
                                 </v-btn>
                             </v-card-actions>
-
-                            <!-- Success Message Alert -->
-                            <v-alert v-if="message" :type="alertType" dismissible>
-                                {{ message }}
-                            </v-alert>
-
                         </v-form>
                     </v-card>
                 </v-col>

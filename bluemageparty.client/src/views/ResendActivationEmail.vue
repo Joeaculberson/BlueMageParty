@@ -3,6 +3,11 @@
         <v-container>
             <v-row justify="center">
                 <v-col>
+
+                    <!-- Alert for Success/Error Messages -->
+                    <v-alert v-if="message" :type="alertType" dismissible>
+                        {{ message }}
+                    </v-alert>
                     <v-card title="Resend Activation Email">
                         <v-form v-model="isValid">
                             <v-card-text>
@@ -15,11 +20,6 @@
                                         Resend Activation Email
                                     </v-btn>
                                 </v-card-actions>
-
-                                <!-- Alert for Success/Error Messages -->
-                                <v-alert v-if="message" :type="alertType" dismissible>
-                                    {{ message }}
-                                </v-alert>
                             </v-card-text>
                         </v-form>
                     </v-card>

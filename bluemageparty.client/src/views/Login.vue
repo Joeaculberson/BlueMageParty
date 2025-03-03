@@ -3,6 +3,10 @@
       <v-container>
           <v-row justify="center">
               <v-col>
+                <!-- Success Message Alert -->
+                <v-alert v-if="message" :type="alertType" dismissible>
+                    {{ message }}
+                </v-alert>
                   <v-card title="Login">
                       <v-form v-model="isValid">
                           <v-card-text>
@@ -15,11 +19,6 @@
                               <v-btn :disabled="!isValid" @click="login" color="primary">Login</v-btn>
                               <v-btn @click="goToResetPassword" color="primary" text>Forgot Password?</v-btn>
                           </v-card-actions>
-
-                          <!-- Success Message Alert -->
-                          <v-alert v-if="message" :type="alertType" dismissible>
-                              {{ message }}
-                          </v-alert>
                       </v-form>
                   </v-card>
               </v-col>
