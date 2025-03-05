@@ -1,7 +1,7 @@
 <template>
     <div class="party-details">
         <!-- Search and add character to party -->
-        <v-autocomplete v-if="!message" v-model="selectedCharacter" :items="filteredCharacters" label="Search Character"
+        <v-autocomplete v-if="!message && isAuthenticated" v-model="selectedCharacter" :items="filteredCharacters" label="Search Character"
             item-value="id" item-title="fullName" return-object :loading="searchLoading" @update:search="(value) => {
                 searchQuery = value;
                 characters = []; // Reset before searching
@@ -54,6 +54,7 @@ import {
     GET_MISSING_SPELLS_URL,
     ADD_PARTY_MEMBER_URL
 } from '@/constants/api';
+import { isAccessor } from "typescript";
 
 export default defineComponent({
     name: "PartyDetails",
@@ -74,6 +75,7 @@ export default defineComponent({
         const authStore = useAuthStore();
         const currentUserId = authStore.getUserId(); // Get the current user's ID
         const message = ref("");
+        const isAuthenticated = authStore.isAuthenticated;
 
         // Fetch party details from the API
         const getPartyDetails = async () => {
@@ -101,12 +103,6 @@ export default defineComponent({
             }
 
             const allSpells = party.value.spells;
-            //console.log("All Spells:", allSpells);
-
-            // Log missingSpells for each party member
-            /* party.value.partyMembers.forEach(member => {
-                console.log(`Member ${member.character.firstName} missing spells:`, member.character.missingSpells);
-            });*/
 
             // Create a Set of spell IDs that each member is missing
             const memberOwnedSpells = party.value.partyMembers
@@ -118,16 +114,11 @@ export default defineComponent({
                     return new Set(member.character.missingSpells.map(spell => spell.id));
                 });
 
-            //console.log("Member Owned Spells (as Sets):", memberOwnedSpells);
-
             // Filter spells that are missing for all members
             party.value.everyoneNeeds = allSpells.filter(spell => {
                 const isMissingForEveryone = memberOwnedSpells.every(ownedSpells => ownedSpells.has(spell.id));
-                //console.log(`Spell ${spell.id} (${spell.name}): Is missing for everyone?`, isMissingForEveryone);
                 return isMissingForEveryone;
             });
-
-            //console.log("Everyone Needs:", party.value.everyoneNeeds);
         };
 
         // Search characters based on the query
@@ -234,7 +225,8 @@ export default defineComponent({
             updatePartyMembers,
             recalculateEveryoneNeeds,
             currentUserId,
-            message
+            message,
+            isAuthenticated
         };
     },
 });

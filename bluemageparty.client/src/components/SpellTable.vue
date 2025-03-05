@@ -32,7 +32,11 @@
         <td>{{ spell.patch }}</td>
         <!-- Only show the checkbox if the current user owns the character -->
         <td v-if="showOwnedColumn">
-          <v-checkbox v-model="spell.owned" @change="handleCheckboxChange(spell)" color="primary" />
+          <v-checkbox
+            :input-value="isSpellOwned(spell.id)"
+            @change="(value) => handleCheckboxChange(spell, value)"
+            color="primary"
+          />
         </td>
       </tr>
     </tbody>
@@ -40,43 +44,47 @@
 </template>
 
 <script lang="ts">
-import { computed } from "vue";
 import axios from "axios";
 import { UPDATE_SPELL_OWNED_URL } from "@/constants/api";
-import { useAuthStore } from "@/stores/authStore";
 
 export default {
   props: {
     spells: Array,
     characterId: String, // Passed from parent
-    showOwnedColumn: Boolean
+    showOwnedColumn: Boolean,
+    missingSpells: Array, // Pass the character's missingSpells array
   },
   emits: ["spell-updated"], // Define the custom event
   setup(props, { emit }) {
-    const authStore = useAuthStore();
+    // Determine if a spell is owned by the character
+    const isSpellOwned = (spellId: string) => {
+      return !props.missingSpells?.some((spell) => spell.id === spellId);
+    };
 
     // Handle checkbox state change
-    const handleCheckboxChange = async (spell: any) => {
-      //if (!props.characterId || !isCharacterOwner.value) return; // Ensure the user is the owner
+    const handleCheckboxChange = async (spell: any, isChecked: boolean) => {
+      console.log("handleCheckBoxChange triggered");
       try {
         await axios.post(UPDATE_SPELL_OWNED_URL, {
           spellId: spell.id,
           characterId: props.characterId,
-          isChecked: spell.owned,
+          owned: isChecked,
         });
 
-        emit("spell-updated", { spellId: spell.id, owned: spell.owned, characterId: props.characterId });
+        emit("spell-updated", {
+          spellId: spell.id,
+          owned: isChecked,
+          characterId: props.characterId,
+        });
       } catch (error) {
         console.error("Error updating spell ownership:", error);
-        spell.owned = !spell.owned; // Revert the change on failure
       }
     };
 
-    return { handleCheckboxChange };
+    return { isSpellOwned, handleCheckboxChange };
   },
 };
 </script>
-
 <style scoped>
 .spell-sprite {
   border-radius: 0.3rem;

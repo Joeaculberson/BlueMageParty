@@ -13,9 +13,7 @@ namespace BlueMageParty.Server.Models
         [EmailAddress]
         [MaxLength(255)]
         public string Email { get; set; }
-
-        [Required]
-        public string Password { get; set; }
+        public string? Password { get; set; }
         public string? VerificationToken { get; set; }
         public string? VerificationCode { get; set; }  // For code-based verification
         public DateTime? VerificationExpires { get; set; }

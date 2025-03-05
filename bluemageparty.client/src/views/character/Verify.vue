@@ -117,7 +117,7 @@ export default defineComponent({
                 character.value = selectedCharacter;
                 fetchVerificationCode();
             } else {
-                router.push("/spellmanager");
+                router.push("/character/search");
             }
         });
 

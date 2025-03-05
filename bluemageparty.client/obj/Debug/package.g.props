@@ -14,13 +14,21 @@
     <PackageJsonDependenciesMdiFont Condition="$(PackageJsonDependenciesMdiFont) == ''">^7.4.47</PackageJsonDependenciesMdiFont>
     <PackageJsonDependenciesAxios Condition="$(PackageJsonDependenciesAxios) == ''">^1.7.9</PackageJsonDependenciesAxios>
     <PackageJsonDependenciesCoreJs Condition="$(PackageJsonDependenciesCoreJs) == ''">^3.37.1</PackageJsonDependenciesCoreJs>
+    <PackageJsonDependenciesJsonwebtoken Condition="$(PackageJsonDependenciesJsonwebtoken) == ''">^9.0.2</PackageJsonDependenciesJsonwebtoken>
     <PackageJsonDependenciesMaterialDesignIconsIconfont Condition="$(PackageJsonDependenciesMaterialDesignIconsIconfont) == ''">^6.7.0</PackageJsonDependenciesMaterialDesignIconsIconfont>
+    <PackageJsonDependenciesPassport Condition="$(PackageJsonDependenciesPassport) == ''">^0.7.0</PackageJsonDependenciesPassport>
+    <PackageJsonDependenciesPassportDiscord Condition="$(PackageJsonDependenciesPassportDiscord) == ''">^0.1.4</PackageJsonDependenciesPassportDiscord>
+    <PackageJsonDependenciesPassportJwt Condition="$(PackageJsonDependenciesPassportJwt) == ''">^4.0.1</PackageJsonDependenciesPassportJwt>
     <PackageJsonDependenciesRobotoFontface Condition="$(PackageJsonDependenciesRobotoFontface) == ''">*</PackageJsonDependenciesRobotoFontface>
     <PackageJsonDependenciesVue Condition="$(PackageJsonDependenciesVue) == ''">^3.4.31</PackageJsonDependenciesVue>
     <PackageJsonDevdependenciesEslintJs Condition="$(PackageJsonDevdependenciesEslintJs) == ''">^9.14.0</PackageJsonDevdependenciesEslintJs>
     <PackageJsonDevdependenciesTsconfigNode22 Condition="$(PackageJsonDevdependenciesTsconfigNode22) == ''">^22.0.0</PackageJsonDevdependenciesTsconfigNode22>
     <PackageJsonDevdependenciesTypesAxios Condition="$(PackageJsonDevdependenciesTypesAxios) == ''">^0.9.36</PackageJsonDevdependenciesTypesAxios>
+    <PackageJsonDevdependenciesTypesJsonwebtoken Condition="$(PackageJsonDevdependenciesTypesJsonwebtoken) == ''">^9.0.9</PackageJsonDevdependenciesTypesJsonwebtoken>
     <PackageJsonDevdependenciesTypesNode Condition="$(PackageJsonDevdependenciesTypesNode) == ''">^22.9.0</PackageJsonDevdependenciesTypesNode>
+    <PackageJsonDevdependenciesTypesPassport Condition="$(PackageJsonDevdependenciesTypesPassport) == ''">^1.0.17</PackageJsonDevdependenciesTypesPassport>
+    <PackageJsonDevdependenciesTypesPassportDiscord Condition="$(PackageJsonDevdependenciesTypesPassportDiscord) == ''">^0.1.14</PackageJsonDevdependenciesTypesPassportDiscord>
+    <PackageJsonDevdependenciesTypesPassportJwt Condition="$(PackageJsonDevdependenciesTypesPassportJwt) == ''">^4.0.1</PackageJsonDevdependenciesTypesPassportJwt>
     <PackageJsonDevdependenciesVitejsPluginVue Condition="$(PackageJsonDevdependenciesVitejsPluginVue) == ''">^5.1.4</PackageJsonDevdependenciesVitejsPluginVue>
     <PackageJsonDevdependenciesVueEslintConfigTypescript Condition="$(PackageJsonDevdependenciesVueEslintConfigTypescript) == ''">^14.1.3</PackageJsonDevdependenciesVueEslintConfigTypescript>
     <PackageJsonDevdependenciesVueTsconfig Condition="$(PackageJsonDevdependenciesVueTsconfig) == ''">^0.5.1</PackageJsonDevdependenciesVueTsconfig>

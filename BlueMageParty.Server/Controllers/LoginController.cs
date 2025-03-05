@@ -46,8 +46,13 @@
                     return Unauthorized($"Your account is locked. Please try again later.");
                 }
 
-                // Verify the password
-                if (PasswordHasher.VerifyPassword(request.Password, user.Password))
+                //This condition means the user signed up using discord.
+                if(user != null && user.Password == null)
+                {
+                    return Unauthorized("Please sign in using Discord.");
+                }
+
+                if (user.Password != null && PasswordHasher.VerifyPassword(request.Password, user.Password))
                 {
                     if (user.IsVerified)
                     {

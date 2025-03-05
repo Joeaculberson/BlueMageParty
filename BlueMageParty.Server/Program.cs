@@ -1,5 +1,7 @@
+using AspNet.Security.OAuth.Discord;
 using BlueMageParty.Server.Data;
 using BlueMageParty.Server.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -44,6 +46,22 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(builder.Configuration["LoginSettings:JWTSecurityKey"]))
         };
     });
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = DiscordAuthenticationDefaults.AuthenticationScheme;
+})
+.AddCookie()
+.AddDiscord(options =>
+{
+    options.ClientId = builder.Configuration["Discord:ClientId"];
+    options.ClientSecret = builder.Configuration["Discord:ClientSecret"];
+    options.CallbackPath = new PathString("/api/auth/callback");
+    options.SaveTokens = true;
+});
+
 
 var app = builder.Build();
 app.UseCors("AllowSpecificOrigins");
