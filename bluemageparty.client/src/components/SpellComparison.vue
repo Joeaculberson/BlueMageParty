@@ -40,10 +40,10 @@
                 mdi-bullhorn-variant-outline
               </v-icon>
             </span>
-            <v-icon @click.stop="goToCharacterPage(member.character.loadstoneCharacterId)" small>
+            <v-icon v-if="isAuthenticated" @click.stop="goToCharacterPage(member.character.loadstoneCharacterId)" small>
               mdi-account-outline
             </v-icon>
-            <v-icon v-if="showRemoveIcon && !member.isHost" @click.stop="removeMemberFromParty(member.id)" color="red"
+            <v-icon v-if="isAuthenticated && showRemoveIcon && !member.isHost" @click.stop="removeMemberFromParty(member.id)" color="red"
               small>
               mdi-trash-can
             </v-icon>
@@ -56,7 +56,7 @@
           <v-container v-else>
             <SpellTable :spells="filteredSpells(memberSpells(member.character.missingSpells))"
               :character-id="member.character.id" :show-owned-column="ownsCharacter(member.character.userId)"
-              @spell-updated="handleSpellUpdate" />
+              :missing-spells="member.character.missingSpells" @spell-updated="handleSpellUpdate" />
           </v-container>
         </v-expansion-panel-text>
       </v-expansion-panel>
@@ -92,6 +92,7 @@ export default defineComponent({
     const characterStore = useCharacterStore();
     const authStore = useAuthStore();
     const currentUserId = authStore.getUserId(); // Get the current user's ID
+    const isAuthenticated = authStore.isAuthenticated;
 
     // State for filters
     const filters = ref({
@@ -115,11 +116,11 @@ export default defineComponent({
     watch(
       () => characterStore.getVerifiedCharacters(),
       (newVerifiedCharacters) => {
-        if(newVerifiedCharacters.length == previousVerifiedCharacters.value.length)
+        if (newVerifiedCharacters.length == previousVerifiedCharacters.value.length)
           return;
 
         console.log('New verified characters:', newVerifiedCharacters);
-        console.log('Previous verified characters:', previousVerifiedCharacters.value); 
+        console.log('Previous verified characters:', previousVerifiedCharacters.value);
 
         // Only proceed if the array got smaller
         if (newVerifiedCharacters.length < previousVerifiedCharacters.value.length) {
@@ -165,14 +166,11 @@ export default defineComponent({
     };
 
     const memberSpells = (missingSpells) => {
-      if (!missingSpells || !Array.isArray(missingSpells)) {
-        return [];
-      }
-      if (!props.party?.spells) {
-        return [];
-      }
-      return props.party.spells.filter(spell =>
-        missingSpells.some(missing => missing.id === spell.id)
+      if (!missingSpells || !Array.isArray(missingSpells)) return [];
+      if (!props.party?.spells) return [];
+
+      return props.party.spells.filter((spell) =>
+        missingSpells.some((missing) => missing.id === spell.id)
       );
     };
 
@@ -235,7 +233,8 @@ export default defineComponent({
       removeMemberFromParty,
       currentUserId,
       ownsCharacter,
-      goToCharacterPage
+      goToCharacterPage,
+      isAuthenticated
     };
   }
 });

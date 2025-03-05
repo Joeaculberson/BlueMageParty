@@ -110,7 +110,7 @@ export default defineComponent({
           if (response.data) {
             parties.value.push(response.data);
             partyName.value = ""; // Reset input after creation
-            router.push('/' + response.data.id)
+            router.push('/party/' + response.data.id)
           }
       } catch (error) {
         console.error("Error creating party:", error);
@@ -119,7 +119,7 @@ export default defineComponent({
 
     const editParty = async (partyId: string) => {
       try {
-        router.push("/" + partyId)
+        router.push("/party/" + partyId)
       } catch (error) {
         console.error("Error editing party:", error);
       }

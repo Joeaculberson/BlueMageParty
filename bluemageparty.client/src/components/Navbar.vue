@@ -9,31 +9,20 @@
       <v-menu v-if="verifiedCharacters.length > 0" offset-y>
         <template v-slot:activator="{ props }">
           <v-btn text v-bind="props">
-            <img
-              :src="verifiedCharacters[0].avatar"
-              alt="avatar"
-              class="character-avatar"
-            />
+            <img :src="verifiedCharacters[0].avatar" alt="avatar" class="character-avatar" />
             {{ verifiedCharacters[0].firstName }} {{ verifiedCharacters[0].lastName }}
             <v-icon right>mdi-chevron-down</v-icon>
           </v-btn>
         </template>
         <v-list>
           <div v-if="verifiedCharacters.length > 0">
-            <v-list-item
-              v-for="character in verifiedCharacters"
-              :key="character.id"
-              @click="setAsActiveCharacter(character)"
-            >
+            <v-list-item v-for="character in verifiedCharacters" :key="character.id"
+              @click="setAsActiveCharacter(character)">
               <v-list-item-title>
                 <v-row align="center" justify="space-between">
                   <v-col cols="auto">
                     <v-row align="center">
-                      <img
-                        :src="character.avatar"
-                        alt="avatar"
-                        class="character-avatar"
-                      />
+                      <img :src="character.avatar" alt="avatar" class="character-avatar" />
                       {{ character.firstName }} {{ character.lastName }}
                     </v-row>
                   </v-col>
@@ -43,11 +32,7 @@
                     </v-icon>
                   </v-col>
                   <v-col cols="auto">
-                    <v-icon
-                      @click.stop="removeCharacter(character)"
-                      color="red"
-                      small
-                    >
+                    <v-icon @click.stop="removeCharacter(character)" color="red" small>
                       mdi-trash-can
                     </v-icon>
                   </v-col>
@@ -79,6 +64,9 @@
     <v-btn v-if="!isAuthenticated && !isOnLoginPage" @click="goToLogin" text>
       Login
     </v-btn>
+    <div class="login-page">
+      <LoginWithDiscord v-if="!isAuthenticated" />
+    </div>
   </v-app-bar>
 </template>
 
@@ -87,9 +75,13 @@ import { ref, computed, defineComponent, onMounted, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "@/stores/authStore";
 import { useCharacterStore } from "@/stores/characterStore";
+import LoginWithDiscord from '@/components/LoginWithDiscord.vue';
 
 export default defineComponent({
   name: "Navbar",
+  components: {
+    LoginWithDiscord
+  },
   setup(props, { emit }) {
     const router = useRouter();
     const route = useRoute();
@@ -204,5 +196,14 @@ export default defineComponent({
 .v-icon {
   cursor: pointer;
   margin-left: 8px;
+}
+
+.login-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f5f5f5;
 }
 </style>
