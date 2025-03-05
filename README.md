@@ -1,6 +1,6 @@
 # 🧙‍♂️ Blue Mage Party
 
-**Blue Mage Party** is a tool designed to help Final Fantasy XIV players manage their Blue Mage spells and party setups. Whether you're organizing a solo run, a light party, or a full party, this application makes it easy to track which spells each party member has and identify the spells everyone still needs.
+**Blue Mage Party** is a tool designed to help Final Fantasy XIV Blue Mages play together easier. Whether you're playing solo, in a light party, or a full party, this application makes it easy to track which spells each party member has and identify the spells everyone still needs.
 
 ---
 
