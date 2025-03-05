@@ -64,9 +64,7 @@
     <v-btn v-if="!isAuthenticated && !isOnLoginPage" @click="goToLogin" text>
       Login
     </v-btn>
-    <div class="login-page">
-      <LoginWithDiscord v-if="!isAuthenticated" />
-    </div>
+    <LoginWithDiscord v-if="!isAuthenticated" class="login-page" />
   </v-app-bar>
 </template>
 
@@ -199,11 +197,6 @@ export default defineComponent({
 }
 
 .login-page {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  background-color: #f5f5f5;
+  margin-right: 20px;
 }
 </style>
