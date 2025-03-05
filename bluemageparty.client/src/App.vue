@@ -34,6 +34,7 @@
     <!-- Main Content -->
     <v-main class="fill-height">
       <router-view />
+      <BottomBar />
     </v-main>
   </v-app>
 </template>
@@ -45,7 +46,7 @@ import { useAuthStore } from './stores/authStore';
 
 export default {
   components: {
-    Navbar,
+    Navbar
   },
   setup() {
     const drawer = ref(false);
