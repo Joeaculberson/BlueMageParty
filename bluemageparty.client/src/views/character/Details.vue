@@ -58,7 +58,16 @@
                             <v-btn v-if="!loading" color="primary" @click="refreshCharacterData">
                                 <v-icon small>mdi-refresh</v-icon> Refresh Character Data
                             </v-btn>
-                            <v-progress-circular v-else indeterminate color="primary"></v-progress-circular>
+                            <v-card-text>
+                                <v-row class="d-flex justify-center align-center">
+                                    <v-col cols="12" class="text-center">
+                                        <img src="@/assets/seifer-panic.gif" width="128" alt="Loading" />
+                                    </v-col>
+                                    <v-col cols="12" class="text-center">
+                                        Loading...
+                                    </v-col>
+                                </v-row>
+                            </v-card-text>
                             <v-spacer></v-spacer>
                         </v-card-actions>
                     </div>
@@ -71,7 +80,16 @@
                         <SpellComparison v-if="!loading" :party="party" :showRemoveIcon="false"
                             :currentUserId="currentUserId" @update-party-members="updatePartyMembers"
                             @update-everyone-needs="recalculateEveryoneNeeds" />
-                        <v-progress-circular v-else indeterminate color="primary"></v-progress-circular>
+                        <v-card-text v-else>
+                            <v-row class="d-flex justify-center align-center">
+                                <v-col cols="12" class="text-center">
+                                    <img src="@/assets/seifer-panic.gif" width="128" alt="Loading" />
+                                </v-col>
+                                <v-col cols="12" class="text-center">
+                                    Loading...
+                                </v-col>
+                            </v-row>
+                        </v-card-text>
                     </v-card-text>
                 </v-card>
             </v-col>
@@ -80,7 +98,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, watch, ref, reactive, onMounted } from "vue";
+import { defineComponent, watch, ref, reactive } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import axios from "axios";
 import { GET_CHARACTER_BY_LOADSTONE_ID_URL, REFRESH_CHARACTER_DATA_FROM_LOADSTONE_URL, GET_MISSING_SPELLS_URL, GET_MOCK_PARTY_FROM_CHARACTER_IDS_URL } from "@/constants/api";

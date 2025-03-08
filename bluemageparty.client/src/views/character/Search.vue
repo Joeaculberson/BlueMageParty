@@ -15,7 +15,8 @@
                   v-model="selectedHomeWorld" required></v-select>
 
                 <!-- Name Input -->
-                <v-text-field label="Character's Full Name" v-model="name" required @keydown.enter="search"></v-text-field>
+                <v-text-field label="Character's Full Name" v-model="name" required
+                  @keydown.enter="search"></v-text-field>
               </v-card-text>
 
               <v-card-actions class="justify-space-between">
@@ -41,7 +42,14 @@
               <span>Character Search Results</span>
             </template>
             <v-card-text>
-              <v-progress-circular indeterminate color="primary"></v-progress-circular>
+              <v-row class="d-flex justify-center align-center">
+                <v-col cols="12" class="text-center">
+                  <img src="@/assets/seifer-panic.gif" width="128" alt="Loading" />
+                </v-col>
+                <v-col cols="12" class="text-center">
+                  Searching...
+                </v-col>
+              </v-row>
             </v-card-text>
           </v-card>
         </v-col>

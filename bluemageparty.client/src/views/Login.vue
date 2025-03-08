@@ -85,7 +85,6 @@
               localStorage.removeItem('redirectUrl'); // Clear the stored URL
               router.push(redirectUrl); // Redirect to the original page
             } else {
-                console.log("redirectUrl was null " + redirectUrl)
               router.push('/character/search'); // Fallback to the default route
             }
           } else {

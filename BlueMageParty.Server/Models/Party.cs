@@ -22,6 +22,7 @@ namespace BlueMageParty.Server.Models
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public Guid UserId { get; set; }
         public List<SpellDto> Spells { get; set; }
         public List<SpellDto> EveryoneNeeds { get; set; }
         public List<PartyMemberDto> PartyMembers { get; set; }

@@ -22,13 +22,18 @@
       </v-row>
 
       <v-card-text v-if="isLoading">
-        <v-progress-circular indeterminate color="primary"></v-progress-circular>
+        <v-row class="d-flex justify-center align-center">
+          <v-col cols="12" class="text-center">
+            <img src="@/assets/seifer-panic.gif" width="128" alt="Loading" />
+          </v-col>
+          <v-col cols="12" class="text-center">
+            Loading...
+          </v-col>
+        </v-row>
       </v-card-text>
       <v-container v-else>
-        <SpellTable :spells="filteredSpells" 
-        :character-id="characterStore.getVerifiedCharacters()[0]?.id" 
-        :show-owned-column="characterStore.getVerifiedCharacters().length > 0"
-          @spell-updated="handleSpellUpdate" />
+        <SpellTable :spells="filteredSpells" :character-id="characterStore.getVerifiedCharacters()[0]?.id"
+          :show-owned-column="characterStore.getVerifiedCharacters().length > 0" @spell-updated="handleSpellUpdate" />
       </v-container>
     </div>
   </v-container>

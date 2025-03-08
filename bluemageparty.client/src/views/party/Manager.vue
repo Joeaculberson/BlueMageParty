@@ -9,15 +9,9 @@
         <v-card>
           <v-card-title class="text-h5">Create a Party</v-card-title>
           <v-card-text>
-            <v-text-field
-              v-model="partyName"
-              label="Enter party name"
-              :disabled="characterStore.getVerifiedCharacters().length == 0"
-              maxlength="255"
-              counter
-              outlined
-              dense
-            ></v-text-field>
+            <v-text-field v-model="partyName" label="Enter party name"
+              :disabled="characterStore.getVerifiedCharacters().length == 0" maxlength="255" counter outlined
+              dense></v-text-field>
           </v-card-text>
           <v-card-actions>
             <v-btn @click="createParty" :disabled="!partyName" color="blue" class="w-full">
@@ -29,21 +23,27 @@
 
       <!-- Loading Spinner -->
       <v-col cols="12" v-if="loading">
-        <v-progress-circular indeterminate color="primary"></v-progress-circular>
+        <v-card-text class="d-flex justify-center align-center" style="height: 100%;">
+          Loading...
+          <img src="@/assets/seifer-panic.gif" alt="Loading" />
+        </v-card-text>
       </v-col>
 
       <!-- No Parties Found Message -->
-      <v-col cols="12" v-else-if="parties.length === 0" class="text-center grey--text">
+      <v-col cols="12" v-else-if="hostedParties.length === 0 && guestOfParties.length === 0"
+        class="text-center grey--text">
         No parties found.
       </v-col>
 
       <!-- Party List -->
       <v-col cols="12" v-else>
+        Owned Parties
         <v-list>
-          <v-list-item v-for="party in parties" :key="party.id">
+          <v-list-item v-for="party in hostedParties" :key="party.id">
             <template v-slot:prepend>
               <v-list-item-title class="text-h6">{{ party.name }}</v-list-item-title>
-              <v-list-item-subtitle>Created On: {{ formatDate(party.createdOn) }} | Members: {{ party.partyMembers.length }}</v-list-item-subtitle>
+              <v-list-item-subtitle>Created On: {{ formatDate(party.createdOn) }} | Members: {{
+                party.partyMembers.length }}</v-list-item-subtitle>
             </template>
             <template v-slot:append>
               <v-icon @click="editParty(party.id)" color="warning" small>
@@ -51,6 +51,21 @@
               </v-icon>
               <v-icon @click="deleteParty(party.id)" color="red" small>
                 mdi-trash-can
+              </v-icon>
+            </template>
+          </v-list-item>
+        </v-list>
+        <v-list v-if="guestOfParties.length > 0">
+          Guest Parties
+          <v-list-item v-for="party in guestOfParties" :key="party.id">
+            <template v-slot:prepend>
+              <v-list-item-title class="text-h6">{{ party.name }}</v-list-item-title>
+              <v-list-item-subtitle>Created On: {{ formatDate(party.createdOn) }} | Members: {{
+                party.partyMembers.length }}</v-list-item-subtitle>
+            </template>
+            <template v-slot:append>
+              <v-icon @click="editParty(party.id)" color="warning" small>
+                mdi-pencil
               </v-icon>
             </template>
           </v-list-item>
@@ -76,7 +91,8 @@ export default defineComponent({
   name: "PartyManager",
   setup() {
     const router = useRouter();
-    const parties = ref<any[]>([]);
+    const hostedParties = ref<any[]>([]);
+    const guestOfParties = ref<any[]>([]);
     const loading = ref(true);
     const partyName = ref("");
     const authStore = useAuthStore();
@@ -89,7 +105,9 @@ export default defineComponent({
         const response = await axios.get(GET_PARTIES_BY_USER_ID_URL, {
           params: { authToken: authStore.getAuthToken() }
         });
-        parties.value = response.data;
+
+        hostedParties.value = response.data.hostedParties;
+        guestOfParties.value = response.data.guestOfParties;
       } catch (error) {
         console.error("Error fetching parties:", error);
       } finally {
@@ -99,19 +117,19 @@ export default defineComponent({
 
     const createParty = async () => {
       if (!partyName.value) return;
-      
-        try {
-          const response = await axios.post(CREATE_PARTY_URL, {
-            authToken: authStore.getAuthToken(),
-            characterId: characterStore.getVerifiedCharacters()[0].id,
-            partyName: partyName.value
-          });
 
-          if (response.data) {
-            parties.value.push(response.data);
-            partyName.value = ""; // Reset input after creation
-            router.push('/party/' + response.data.id)
-          }
+      try {
+        const response = await axios.post(CREATE_PARTY_URL, {
+          authToken: authStore.getAuthToken(),
+          characterId: characterStore.getVerifiedCharacters()[0].id,
+          partyName: partyName.value
+        });
+
+        if (response.data) {
+          hostedParties.value.push(response.data);
+          partyName.value = ""; // Reset input after creation
+          router.push('/party/' + response.data.id)
+        }
       } catch (error) {
         console.error("Error creating party:", error);
       }
@@ -128,7 +146,7 @@ export default defineComponent({
     const deleteParty = async (partyId: string) => {
       try {
         await axios.delete(DELETE_PARTY_URL, { params: { partyId } });
-        parties.value = parties.value.filter((p) => p.id !== partyId);
+        hostedParties.value = hostedParties.value.filter((p) => p.id !== partyId);
       } catch (error) {
         console.error("Error deleting party:", error);
       }
@@ -143,7 +161,8 @@ export default defineComponent({
     });
 
     return {
-      parties,
+      hostedParties,
+      guestOfParties,
       loading,
       partyName,
       createParty,

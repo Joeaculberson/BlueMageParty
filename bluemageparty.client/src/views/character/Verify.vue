@@ -53,7 +53,14 @@
                         </v-card-actions>
 
                         <v-card-text v-if="isLoading">
-                            <v-progress-circular indeterminate color="primary"></v-progress-circular>
+                            <v-row class="d-flex justify-center align-center">
+                                <v-col cols="12" class="text-center">
+                                    <img src="@/assets/seifer-panic.gif" width="128" alt="Loading" />
+                                </v-col>
+                                <v-col cols="12" class="text-center">
+                                    Loading...
+                                </v-col>
+                            </v-row>
                         </v-card-text>
                         <v-alert v-if="message" :type="messageType" class="mt-4" dismissible>
                             {{ message }}
@@ -143,7 +150,7 @@ export default defineComponent({
                     const payload = {
                         LoadstoneVerificationCode: verificationCode.value,
                         AuthToken: authStore.getAuthToken(),
-                        Character: { 
+                        Character: {
                             FirstName: character.value.name.split(' ')[0],
                             LastName: character.value.name.split(' ')[1],
                             World: character.value.server,
@@ -169,7 +176,7 @@ export default defineComponent({
                             TownName: character.value.townName,
                             Tribe: character.value.tribe
                         }
-                    }; 
+                    };
                     //console.log('payload ' + JSON.stringify(payload))
                     const response = await axios.post(VERIFY_CHARACTER_URL, payload);
                     if (!response.data.verified) {

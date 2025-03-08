@@ -12,8 +12,11 @@
     <PackageJsonScriptsTypeCheck Condition="$(PackageJsonScriptsTypeCheck) == ''">vue-tsc --build --force</PackageJsonScriptsTypeCheck>
     <PackageJsonScriptsLint Condition="$(PackageJsonScriptsLint) == ''">eslint . --fix</PackageJsonScriptsLint>
     <PackageJsonDependenciesMdiFont Condition="$(PackageJsonDependenciesMdiFont) == ''">^7.4.47</PackageJsonDependenciesMdiFont>
+    <PackageJsonDependenciesTypesGsap Condition="$(PackageJsonDependenciesTypesGsap) == ''">^1.20.2</PackageJsonDependenciesTypesGsap>
+    <PackageJsonDependenciesAnimejs Condition="$(PackageJsonDependenciesAnimejs) == ''">^3.2.2</PackageJsonDependenciesAnimejs>
     <PackageJsonDependenciesAxios Condition="$(PackageJsonDependenciesAxios) == ''">^1.7.9</PackageJsonDependenciesAxios>
     <PackageJsonDependenciesCoreJs Condition="$(PackageJsonDependenciesCoreJs) == ''">^3.37.1</PackageJsonDependenciesCoreJs>
+    <PackageJsonDependenciesGsap Condition="$(PackageJsonDependenciesGsap) == ''">^3.12.7</PackageJsonDependenciesGsap>
     <PackageJsonDependenciesJsonwebtoken Condition="$(PackageJsonDependenciesJsonwebtoken) == ''">^9.0.2</PackageJsonDependenciesJsonwebtoken>
     <PackageJsonDependenciesMaterialDesignIconsIconfont Condition="$(PackageJsonDependenciesMaterialDesignIconsIconfont) == ''">^6.7.0</PackageJsonDependenciesMaterialDesignIconsIconfont>
     <PackageJsonDependenciesPassport Condition="$(PackageJsonDependenciesPassport) == ''">^0.7.0</PackageJsonDependenciesPassport>

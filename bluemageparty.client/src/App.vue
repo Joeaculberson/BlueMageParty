@@ -34,7 +34,7 @@
     <!-- Main Content -->
     <v-main class="fill-height">
       <router-view />
-      <BottomBar />
+      <BottomBar class="bottom-bar" />
     </v-main>
   </v-app>
 </template>
@@ -76,3 +76,20 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 1000; /* Ensure this is higher than other elements */
+}
+
+.v-expansion-panels {
+  z-index: 1; /* Ensure this is lower than the BottomBar's z-index */
+}
+
+.panel-container {
+  margin-bottom: 60px; /* Adjust based on the height of your BottomBar */
+}
+</style>
