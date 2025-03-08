@@ -1,8 +1,9 @@
 <template>
     <div class="party-details">
         <!-- Search and add character to party -->
-        <v-autocomplete v-if="!message && isAuthenticated" v-model="selectedCharacter" :items="filteredCharacters" label="Search Character"
-            item-value="id" item-title="fullName" return-object :loading="searchLoading" @update:search="(value) => {
+        <v-autocomplete v-if="!message && isAuthenticated" v-model="selectedCharacter" :items="filteredCharacters"
+            label="Search Character" item-value="id" item-title="fullName" return-object :loading="searchLoading"
+            @update:search="(value) => {
                 searchQuery = value;
                 characters = []; // Reset before searching
             }" @blur="clearSearch" no-data-text="No characters found" @update:model-value="addCharacterToParty">
@@ -26,7 +27,7 @@
         <div v-if="!loading">
             <div v-if="!message">
                 <SpellComparison :party="party" :showRemoveIcon="true" :currentUserId="currentUserId"
-                @update-party-members="updatePartyMembers" @update-everyone-needs="recalculateEveryoneNeeds" />
+                    @update-party-members="updatePartyMembers" @update-everyone-needs="recalculateEveryoneNeeds" />
             </div>
             <v-alert v-else type="warning" dismissible border="start">
                 {{ message }}
@@ -36,7 +37,10 @@
         <!-- Loading state -->
         <div v-else class="text-gray-600">
             <v-card-text>
-                <v-progress-circular indeterminate color="primary"></v-progress-circular>
+                <v-card-text class="d-flex justify-center align-center" style="height: 100%;">
+                    Loading...
+                    <img src="@/assets/seifer-panic.gif" alt="Loading" />
+                </v-card-text>
             </v-card-text>
         </div>
     </div>
@@ -86,6 +90,7 @@ export default defineComponent({
                 });
                 if (response.data) {
                     party.value = response.data;
+                    console.log(JSON.stringify(party.value));
                 } else {
                     console.log("Error fetching party data.");
                 }

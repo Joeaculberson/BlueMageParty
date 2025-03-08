@@ -134,7 +134,8 @@ export default defineComponent({
     onMounted(() => {
       if (
         characterStore.getVerifiedCharacters().length === 0 ||
-        Object.keys(characterStore.getVerifiedCharacters())
+        Object.keys(characterStore.getVerifiedCharacters()
+        )
       ) {
         characterStore.syncVerifiedCharacters();
       }

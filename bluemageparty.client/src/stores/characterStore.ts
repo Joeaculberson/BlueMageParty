@@ -14,8 +14,11 @@ export const useCharacterStore = defineStore("character", {
   }),
   actions: {
     async fetchVerifiedCharactersFromDB() {
+      const authToken = localStorage.getItem("auth_token");
+      if(!authToken)
+        return;
+
       try {
-        const authToken = localStorage.getItem("auth_token");
         const response = await axios.get(GET_CHARACTERS_URL, {
           params: { authToken: authToken },
         });

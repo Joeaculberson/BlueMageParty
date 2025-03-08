@@ -20,7 +20,14 @@
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <v-card-text v-if="loading">
-            <v-progress-circular indeterminate color="primary"></v-progress-circular>
+            <v-row class="d-flex justify-center align-center">
+              <v-col cols="12" class="text-center">
+                <img src="@/assets/seifer-panic.gif" width="128" alt="Loading" />
+              </v-col>
+              <v-col cols="12" class="text-center">
+                Loading...
+              </v-col>
+            </v-row>
           </v-card-text>
           <v-container v-else>
             <SpellTable :spells="filteredSpells(memberSpells(party.everyoneNeeds))" />
@@ -43,15 +50,22 @@
             <v-icon v-if="isAuthenticated" @click.stop="goToCharacterPage(member.character.loadstoneCharacterId)" small>
               mdi-account-outline
             </v-icon>
-            <v-icon v-if="isAuthenticated && showRemoveIcon && !member.isHost" @click.stop="removeMemberFromParty(member.id)" color="red"
-              small>
+            <v-icon v-if="isAuthenticated && showRemoveIcon && !member.isHost && party.userId == currentUserId"
+              @click.stop="removeMemberFromParty(member.id)" color="red" small>
               mdi-trash-can
             </v-icon>
           </h2>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <v-card-text v-if="loading">
-            <v-progress-circular indeterminate color="primary"></v-progress-circular>
+            <v-row class="d-flex justify-center align-center">
+              <v-col cols="12" class="text-center">
+                <img src="@/assets/seifer-panic.gif" width="128" alt="Loading" />
+              </v-col>
+              <v-col cols="12" class="text-center">
+                Loading...
+              </v-col>
+            </v-row>
           </v-card-text>
           <v-container v-else>
             <SpellTable :spells="filteredSpells(memberSpells(member.character.missingSpells))"

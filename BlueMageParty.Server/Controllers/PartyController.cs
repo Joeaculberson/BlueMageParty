@@ -124,6 +124,7 @@ namespace BlueMageParty.Server.Controllers
                     Name = "Mock Party",
                     EveryoneNeeds = everyoneNeeds,
                     Spells = allSpells,
+                    UserId = Guid.Empty,
                     PartyMembers = characters.Select((character, index) => new
                     {
                         Id = Guid.Empty, // Empty GUID for mock party member
@@ -187,6 +188,7 @@ namespace BlueMageParty.Server.Controllers
                     {
                         x.Id,
                         x.Name,
+                        x.UserId,
                         PartyMembers = x.PartyMembers.Select(member => new
                         {
                             member.Id,
@@ -259,6 +261,7 @@ namespace BlueMageParty.Server.Controllers
                     Name = party.Name,
                     EveryoneNeeds = everyoneNeeds,
                     Spells = allSpells,
+                    UserId = party.UserId,
                     PartyMembers = party.PartyMembers.Select(member => new PartyMemberDto
                     {
                         Id = member.Id,
@@ -313,11 +316,36 @@ namespace BlueMageParty.Server.Controllers
             try
             {
                 Guid userId = TokenDecoder.DecodeUserIdFromJwtToken(authToken);
-                var parties = _context.Parties
-                    .Include(x => x.PartyMembers)
-                    .Where(x => x.UserId == userId).ToList();
-                return Ok(parties);
-            } catch(Exception ex)
+
+                // Get all characters owned by this user
+                var userCharacterIds = await _context.Characters
+                    .Where(c => c.UserId == userId)
+                    .Select(c => c.Id)
+                    .ToListAsync();
+
+                // Get parties owned by the user
+                var hostedParties = await _context.Parties
+                    .Include(p => p.PartyMembers)
+                    .Where(p => p.UserId == userId)
+                    .ToListAsync();
+
+                // Get party IDs owned by the user to exclude them from guest_of_parties
+                var userOwnedPartyIds = hostedParties.Select(p => p.Id).ToList();
+
+                // Get parties where any of the user's characters are members but exclude owned parties
+                var guestOfParties = await _context.Parties
+                    .Include(p => p.PartyMembers)
+                    .Where(p => !userOwnedPartyIds.Contains(p.Id) &&
+                                p.PartyMembers.Any(pm => userCharacterIds.Contains(pm.CharacterId)))
+                    .ToListAsync();
+
+                return Ok(new
+                {
+                    hostedParties,
+                    guestOfParties
+                });
+            }
+            catch (Exception ex)
             {
                 var error = new ErrorLog
                 {
@@ -331,6 +359,7 @@ namespace BlueMageParty.Server.Controllers
                 throw;
             }
         }
+
 
         [HttpPost("Create")]
         public async Task<IActionResult> CreateParty(CreatePartyRequest request)

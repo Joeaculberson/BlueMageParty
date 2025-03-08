@@ -99,6 +99,33 @@
             }
         }
 
+        [HttpGet("GetLoginResponse")]
+        public async Task<IActionResult> GetLoginResponse([FromQuery] string jwt)
+        {
+            try
+            {
+                Guid userId = TokenDecoder.DecodeUserIdFromJwtToken(jwt);
+                User user = await this._context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+                user.FailedLoginAttempts = 0;
+                user.LockoutEnd = null;
+                await _context.SaveChangesAsync();
+
+                return Ok(user);
+             
+            }
+            catch (Exception ex)
+            {
+                var error = new ErrorLog()
+                {
+                    Message = ex.Message,
+                    StackTrace = ex.StackTrace
+                };
+
+                this._context.ErrorLogs.Add(error);
+                await _context.SaveChangesAsync();
+                throw ex;
+            }
+        }
 
         private string GenerateJwtToken(string username, Guid userId)
         {
