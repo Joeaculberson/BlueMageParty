@@ -101,48 +101,48 @@
 import { defineComponent, watch, ref, reactive } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import axios from "axios";
-import { GET_CHARACTER_BY_LOADSTONE_ID_URL, REFRESH_CHARACTER_DATA_FROM_LOADSTONE_URL, GET_MISSING_SPELLS_URL, GET_MOCK_PARTY_FROM_CHARACTER_IDS_URL } from "@/constants/api";
+import { GET_CHARACTER_BY_LOADSTONE_ID_URL, REFRESH_CHARACTER_DATA_FROM_LOADSTONE_URL, GET_MOCK_PARTY_FROM_CHARACTER_IDS_URL } from "@/constants/api";
 import { useCharacterStore } from "@/stores/characterStore";
 import { useAuthStore } from "@/stores/authStore";
 import SpellComparison from "@/components/SpellComparison.vue";
 
-interface SpellDto {
-    id: string;
-    name: string;
-    description: string;
-    number: number;
-    sources: string[];
-    patch: string;
-    icon: string;
-    isSolo: boolean;
-    isLightParty: boolean;
-    isFullParty: boolean;
-}
-
-interface CharacterDto {
-    id: string;
-    userId: string;
+interface Character {
+    avatar: string;
     firstName: string;
     lastName: string;
-    loadstoneCharacterId: string;
-    avatar: string;
+    title: string;
     server: string;
-    spellsOwned: { spellId: string; owned: boolean }[];
-    missingSpells: { id: string }[];
+    id: string;
+    activeClassJobIcon: string;
+    activeClassJobLevel: number | null;
+    bio: string;
+    freeCompany: string;
+    gender: string;
+    grandCompanyName: string;
+    grandCompanyRank: string;
+    guardianDeityIcon: string;
+    guardianDeityName: string;
+    nameday: string;
+    portrait: string;
+    pvpTeam: string;
+    race: string;
+    raceClanGender: string;
+    townIcon: string;
+    townName: string;
+    tribe: string;
 }
 
-interface PartyMemberDto {
-    id: string;
-    isHost: boolean;
-    character: CharacterDto;
+interface Party {
+    partyMembers: any[];
+    everyoneNeeds: any[];
 }
 
-interface PartyDto {
+interface CharacterResponse {
     id: string;
-    name: string;
-    everyoneNeeds: SpellDto[];
-    spells: SpellDto[];
-    partyMembers: PartyMemberDto[];
+    firstName: string;
+    lastName: string;
+    server: string;
+    // Add other expected properties...
 }
 
 export default defineComponent({
@@ -155,7 +155,7 @@ export default defineComponent({
         const route = useRoute();
         const ownsCharacter = ref(false);
         const loading = ref(false);
-        const character = reactive({
+        const character = reactive<Character>({
             avatar: "",
             firstName: "",
             lastName: "",
@@ -180,34 +180,36 @@ export default defineComponent({
             townName: "",
             tribe: "",
         });
+
         const characterStore = useCharacterStore();
         const authStore = useAuthStore();
         const currentUserId = authStore.getUserId();
 
         // Define the party object with the character and the verified character
-        const party = ref({
+        const party = ref<Party>({
             partyMembers: [],
             everyoneNeeds: [],
         });
 
         ownsCharacter.value = characterStore
             .getVerifiedCharacters()
-            .some(character => character.loadstoneCharacterId === route.params.loadstoneCharacterId);
+            .some((character) => character.loadstoneCharacterId === route.params.loadstoneCharacterId);
 
         const getCharacterDetails = async () => {
             try {
-                const response = await axios.get(GET_CHARACTER_BY_LOADSTONE_ID_URL, {
+                const response = await axios.get<CharacterResponse>(GET_CHARACTER_BY_LOADSTONE_ID_URL, {
                     params: { loadstoneCharacterId: route.params.loadstoneCharacterId },
                 });
 
                 if (response.data) {
                     Object.assign(character, response.data); // Updates character data
+                    if (characterStore.getVerifiedCharacters().length === 0) return;
 
-                    if (characterStore.getVerifiedCharacters().length == 0)
-                        return;
+                    // Ensure response.data.id is recognized as a string
+                    const characterId = response.data.id;
+                    const verifiedCharacterId = characterStore.getVerifiedCharacters()[0].id;
 
-                    await getMockParty([response.data.id, characterStore.getVerifiedCharacters()[0].id])
-
+                    await getMockParty([characterId, verifiedCharacterId]);
                     recalculateEveryoneNeeds();
                 } else {
                     console.log("Error fetching character data.");
@@ -227,12 +229,12 @@ export default defineComponent({
                 const response = await axios.get(GET_MOCK_PARTY_FROM_CHARACTER_IDS_URL, {
                     params: { characterIds },
                     paramsSerializer: (params) => {
-                        return characterIds.map(id => `characterIds=${id}`).join("&");
-                    }
+                        return characterIds.map((id) => `characterIds=${id}`).join("&");
+                    },
                 });
 
                 if (response.data) {
-                    return response.data; // Return the mock party data
+                    return response.data as Party; // Return the mock party data
                 } else {
                     console.error("No data returned from the server.");
                     return null;
@@ -245,7 +247,6 @@ export default defineComponent({
 
         const getMockParty = async (characterIds: string[]) => {
             const result = await fetchMockPartyFromCharacterIds(characterIds);
-
             if (result) {
                 party.value = result; // Update the reactive mockParty object
             } else {
@@ -289,7 +290,7 @@ export default defineComponent({
         };
 
         // Update party members when an event is emitted
-        const updatePartyMembers = (updatedPartyMembers) => {
+        const updatePartyMembers = (updatedPartyMembers: any[]) => {
             party.value.partyMembers = updatedPartyMembers;
             recalculateEveryoneNeeds();
         };

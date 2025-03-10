@@ -42,19 +42,25 @@
 </template>
 
 <script lang="ts">
-import { ref } from 'vue';
+import { ref, computed, defineComponent } from 'vue'; // Added defineComponent and computed
+import { useRouter } from 'vue-router'; // Added useRouter
 import Navbar from './components/Navbar.vue';
+import BottomBar from './components/BottomBar.vue'; // Ensure this import is correct
 import { useAuthStore } from './stores/authStore';
 
-export default {
+export default defineComponent({ // Wrapped in defineComponent for TypeScript support
+  name: 'App',
   components: {
-    Navbar
+    Navbar,
+    BottomBar, // Ensure BottomBar is registered
   },
   setup() {
-    const drawer = ref(false);
-    const router = useRouter();
+    const drawer = ref(false); // Made drawer reactive with ref
+    const router = useRouter(); // Added router for navigation
     const authStore = useAuthStore();
-    const isAdmin = authStore.getIsAdmin();
+
+    // Use computed to reactively check if the user is an admin
+    const isAdmin = computed(() => authStore.getIsAdmin());
 
     const goToSpellManager = () => {
       router.push('/spellmanager');
@@ -73,10 +79,10 @@ export default {
       isAdmin,
       goToSpellManager,
       goToPartyManager,
-      goToAdmin
+      goToAdmin,
     };
   },
-};
+});
 </script>
 
 <style scoped>

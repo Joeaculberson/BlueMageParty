@@ -1,7 +1,5 @@
 import { defineStore } from "pinia";
 import { useCharacterStore } from "./characterStore";
-import axios from "axios";
-import { GET_USER_URL } from "@/constants/api";
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({

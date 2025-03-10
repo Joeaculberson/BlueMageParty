@@ -93,12 +93,31 @@ import {
   DELETE_PARTY_URL
 } from '@/constants/api';
 
+interface Party {
+  id: string;
+  name: string;
+  createdOn: string;
+  partyMembers: any[]; // Adjust the type as needed
+}
+
+interface GetPartiesResponse {
+  hostedParties: Party[];
+  guestOfParties: Party[];
+}
+
+interface CreatePartyResponse {
+  id: string;
+  name: string;
+  createdOn: string;
+  partyMembers: any[]; // Adjust the type as needed
+}
+
 export default defineComponent({
   name: "PartyManager",
   setup() {
     const router = useRouter();
-    const hostedParties = ref<any[]>([]);
-    const guestOfParties = ref<any[]>([]);
+    const hostedParties = ref<Party[]>([]);
+    const guestOfParties = ref<Party[]>([]);
     const loading = ref(true);
     const partyName = ref("");
     const authStore = useAuthStore();
@@ -108,7 +127,7 @@ export default defineComponent({
     const getUsersParties = async () => {
       loading.value = true;
       try {
-        const response = await axios.get(GET_PARTIES_BY_USER_ID_URL, {
+        const response = await axios.get<GetPartiesResponse>(GET_PARTIES_BY_USER_ID_URL, {
           params: { authToken: authStore.getAuthToken() }
         });
 
@@ -125,7 +144,7 @@ export default defineComponent({
       if (!partyName.value) return;
 
       try {
-        const response = await axios.post(CREATE_PARTY_URL, {
+        const response = await axios.post<CreatePartyResponse>(CREATE_PARTY_URL, {
           authToken: authStore.getAuthToken(),
           characterId: characterStore.getVerifiedCharacters()[0].id,
           partyName: partyName.value
@@ -134,7 +153,7 @@ export default defineComponent({
         if (response.data) {
           hostedParties.value.push(response.data);
           partyName.value = ""; // Reset input after creation
-          router.push('/party/' + response.data.id)
+          router.push('/party/' + response.data.id);
         }
       } catch (error) {
         console.error("Error creating party:", error);
@@ -143,7 +162,7 @@ export default defineComponent({
 
     const editParty = async (partyId: string) => {
       try {
-        router.push("/party/" + partyId)
+        router.push("/party/" + partyId);
       } catch (error) {
         console.error("Error editing party:", error);
       }

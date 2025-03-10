@@ -3,7 +3,6 @@
         <v-container>
             <v-row justify="center">
                 <v-col>
-
                     <!-- Alert for Success/Error Messages -->
                     <v-alert v-if="message" :type="alertType" dismissible>
                         {{ message }}
@@ -36,6 +35,10 @@ import axios from 'axios';
 import { RESEND_ACTIVATION_EMAIL_URL } from '@/constants/api';
 import { useRouter } from 'vue-router';
 
+interface ResendActivationEmailResponse {
+    message: string;
+}
+
 export default {
     name: 'ResendActivationEmail',
     setup() {
@@ -60,18 +63,20 @@ export default {
             isVerifying.value = true;
 
             try {
-                const response = await axios.post(RESEND_ACTIVATION_EMAIL_URL, { email: email.value });
+                const response = await axios.post<ResendActivationEmailResponse>(RESEND_ACTIVATION_EMAIL_URL, { email: email.value });
 
                 // Store email in Pinia (authStore)
                 authStore.setEmail(email.value);
 
                 alertType.value = 'success';
-                message.value = response.data.message;
+                message.value = response.data.message; // No more error
                 console.log("Resend activation response: success");
                 router.push('/verify?emailsent=true'); // Redirect to verification page
             } catch (error) {
+                const errorData = error.response?.data as { message?: string }; // Type assertion
                 alertType.value = 'error';
-                message.value = error.response?.data || 'There was a problem resending the activation email.';
+                message.value = errorData?.message || 'There was a problem resending the activation email.';
+
                 console.error('Resend activation failed:', error);
             } finally {
                 isVerifying.value = false;
