@@ -41,14 +41,11 @@
 
 <script lang="ts">
 import SpellTable from "@/components/SpellTable.vue";
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/authStore';
-import { watch } from 'vue';
 import { useCharacterStore } from '@/stores/characterStore';
-import {
-  GET_SPELLS_URL
-} from '@/constants/api';
+import { GET_SPELLS_URL } from '@/constants/api';
 
 interface Spell {
   id: string;
@@ -69,22 +66,32 @@ interface Spell {
   isFullParty: boolean;
 }
 
+interface Filters {
+  isSolo: boolean;
+  isLightParty: boolean;
+  isFullParty: boolean;
+  hideOwned: boolean;
+}
+
 export default {
   name: 'SpellManager',
+  components: {
+    SpellTable,
+  },
   setup() {
     const characterStore = useCharacterStore();
+    const authStore = useAuthStore();
     const alertType = ref<'success' | 'error' | 'info'>('info');
     const adminMessage = ref('');
     const isAdmin = ref(false);
     const spells = ref<Spell[]>([]); // Store spells here
     const isLoading = ref(false);
-    const authStore = useAuthStore();
     const currentUserId = authStore.getUserId();
-    const filters = ref({
+    const filters = ref<Filters>({
       isSolo: true, // Start checked
       isLightParty: true, // Start checked
       isFullParty: true, // Start checked
-      hideOwned: true // Start checked
+      hideOwned: true, // Start checked
     });
 
     const filteredSpells = computed(() => {
@@ -105,8 +112,10 @@ export default {
 
     // Handle spell ownership updates
     const handleSpellUpdate = (data: { spellId: string; owned: boolean }) => {
-      // console.log("Spell ownership updated:", data);
-      // Update the spells array if needed
+      const spell = spells.value.find((s) => s.id === data.spellId);
+      if (spell) {
+        spell.owned = data.owned;
+      }
     };
 
     // Fetch the list of spells
@@ -120,11 +129,11 @@ export default {
               : undefined;
 
           // Fetch spells based on the active character
-          const response = await axios.get(GET_SPELLS_URL, {
+          const response = await axios.get<Spell[]>(GET_SPELLS_URL, {
             params: { characterId },
           });
 
-          spells.value = response.data.map((spell: any) => ({
+          spells.value = response.data.map((spell) => ({
             ...spell,
             checked: false, // Initialize checkbox state as false
           }));
@@ -154,7 +163,7 @@ export default {
 
     // Apply filters to the spells
     const applyFilters = () => {
-      spells.value = spells.value.map(spell => ({ ...spell })); // Forces reactivity update
+      spells.value = [...spells.value]; // Forces reactivity update
     };
 
     onMounted(() => {
@@ -173,7 +182,7 @@ export default {
       filters,
       filteredSpells,
       applyFilters,
-      currentUserId
+      currentUserId,
     };
   },
 };

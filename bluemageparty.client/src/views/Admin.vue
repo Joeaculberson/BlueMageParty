@@ -1,11 +1,11 @@
 <template>
     <v-container>
         <v-alert v-if="adminMessage" :type="alertType" dismissible>
-        {{ adminMessage }}
+            {{ adminMessage }}
         </v-alert>
 
         <v-btn @click="fetchAndSaveSpells" color="primary">
-        Fetch and Save New Spells
+            Fetch and Save New Spells
         </v-btn>
     </v-container>
 </template>
@@ -15,16 +15,34 @@ import { ref } from 'vue';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/authStore';
 import {
-  SAVE_SPELLS_BULK_URL,
-  GET_TARO_BOKOKINGWAY_MISSING_SPELLS_URL,
+    SAVE_SPELLS_BULK_URL,
+    GET_TARO_BOKOKINGWAY_MISSING_SPELLS_URL,
 } from '@/constants/api';
+
+interface Spell {
+    order: number;
+    name: string;
+    description: string;
+    tooltip: string;
+    rank: string;
+    patch: string;
+    icon: string;
+    type: { name: string };
+    aspect: { name: string };
+    sources: { text: string }[];
+}
+
+// Define the expected structure of the bulk save response
+interface BulkResponse {
+    message: string;
+}
 
 export default {
     setup() {
         const authStore = useAuthStore();
         const drawer = ref(false);
         const router = useRouter();
-        
+
         const alertType = ref<'success' | 'error' | 'info'>('info');
         const adminMessage = ref('')
 
@@ -32,11 +50,9 @@ export default {
         const fetchAndSaveSpells = async (): Promise<void> => {
             try {
                 // Fetch the spell data from the external API
-                const response = await axios.get(
-                    GET_TARO_BOKOKINGWAY_MISSING_SPELLS_URL
-                );
+                const response = await axios.get<Spell[]>(GET_TARO_BOKOKINGWAY_MISSING_SPELLS_URL);
 
-                const spellsToSave = response.data.map((spell: any) => ({
+                const spellsToSave = response.data.map((spell) => ({
                     number: spell.order,
                     name: spell.name,
                     description: spell.description,
@@ -47,28 +63,17 @@ export default {
                     icon: spell.icon,
                     typeName: spell.type.name,
                     aspectName: spell.aspect.name,
-                    sources: spell.sources.map((source: any) => {
-                        // Split the source text by '/' and trim the parts
-                        const parts = source.text.split('/').map((part: string) =>
-                            part.trim()
-                        );
-                        let enemy = '';
-                        let location = '';
-
-                        // If there is only one part, assign it to location
-                        if (parts.length === 1) {
-                            location = parts[0];
-                        } else {
-                            enemy = parts[0];
-                            location = parts[1];
-                        }
-
-                        return { enemy, location };
+                    sources: spell.sources.map((source) => {
+                        const parts = source.text.split('/').map((part) => part.trim());
+                        return {
+                            enemy: parts.length > 1 ? parts[0] : '',
+                            location: parts.length > 1 ? parts[1] : parts[0],
+                        };
                     }),
                 }));
 
                 // Send the spells data in bulk to the server
-                const bulkResponse = await axios.post(SAVE_SPELLS_BULK_URL, spellsToSave, {
+                const bulkResponse = await axios.post<BulkResponse>(SAVE_SPELLS_BULK_URL, spellsToSave, {
                     headers: {
                         'Content-Type': 'application/json',
                     },

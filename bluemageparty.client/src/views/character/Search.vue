@@ -105,9 +105,9 @@ export default {
 
     const selectedDataCenter = ref<string | null>("All Data Centers");
     const selectedHomeWorld = ref<string | null>("All Worlds");
-    const dataCenters = ref([]);
-    const homeWorlds = ref([]);
-    const filteredHomeWorlds = ref([]);
+    const dataCenters = ref<any[]>([]); // Explicitly typed as an array
+    const homeWorlds = ref<any[]>([]); // Explicitly typed as an array
+    const filteredHomeWorlds = ref<any[]>([]); // Explicitly typed as an array
 
     const search = async () => {
       if (!isLoading.value) {
@@ -147,13 +147,13 @@ export default {
           isLoading.value = false;
         }
       }
-
     };
 
     const getHomeWorlds = async () => {
       try {
         const response = await axios.get(GET_HOME_WORLDS_URL);
-        homeWorlds.value = response.data;
+        // Ensure response.data is an array
+        homeWorlds.value = Array.isArray(response.data) ? response.data : Object.values(response.data);
       } catch (error) {
         console.error("Error fetching home worlds:", error);
       }
@@ -162,7 +162,8 @@ export default {
     const getDataCenters = async () => {
       try {
         const response = await axios.get(GET_DATA_CENTERS_URL);
-        dataCenters.value = response.data;
+        // Ensure response.data is an array
+        dataCenters.value = Array.isArray(response.data) ? response.data : Object.values(response.data);
       } catch (error) {
         console.error("Error fetching data centers:", error);
       }
@@ -245,7 +246,6 @@ export default {
   font-weight: bold;
   font-size: 0.9rem;
 }
-
 
 .character-server {
   font-size: 0.8rem;

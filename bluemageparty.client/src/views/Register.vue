@@ -78,11 +78,7 @@ export default defineComponent({
         console.log("Registration successful:", response.data);
         router.push('/verify?emailsent=true');
       } catch (error) {
-        if (axios.isAxiosError(error)) {
-          message.value = error.response?.data?.message || "Registration failed";
-        } else {
-          message.value = "Unexpected error occurred";
-        }
+        message.value = error.response?.data?.message || "Registration failed";
       } finally {
         isVerifying.value = false;
       }
