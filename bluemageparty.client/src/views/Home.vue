@@ -18,7 +18,7 @@
 
                 <!-- Centered Image -->
                 <div class="image-container">
-                    <img width="100px" src="@/assets/blue-mage.webp" alt="Blue Mage" />
+                    <img width="450px" src="@/assets/seifer-blue-mage.png" alt="Blue Mage" />
                 </div>
             </v-col>
         </v-row>
@@ -143,7 +143,6 @@ export default {
 }
 
 .image-container {
-    margin: 20px 0; /* Add space above and below the image */
     display: flex;
     justify-content: center; /* Center the image horizontally */
     align-items: center; /* Center the image vertically */
