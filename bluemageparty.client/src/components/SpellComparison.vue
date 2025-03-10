@@ -16,6 +16,9 @@
     <v-expansion-panels v-model="panel" multiple>
       <v-expansion-panel>
         <v-expansion-panel-title>
+          <v-avatar size="80">
+            <img width="80px" src="@/assets/malboro-minion.jpg" alt="avatar" />
+          </v-avatar>
           <h2>Everyone Needs</h2>
         </v-expansion-panel-title>
         <v-expansion-panel-text>

@@ -33,7 +33,9 @@
 
     <!-- Main Content -->
     <v-main class="fill-height">
-      <router-view />
+      <div class="main-content">
+        <router-view />
+      </div>
       <BottomBar class="bottom-bar" />
     </v-main>
   </v-app>
@@ -78,6 +80,10 @@ export default {
 </script>
 
 <style scoped>
+.main-content {
+  padding-bottom: 20px; /* Adjust this value based on the height of your bottom bar */
+}
+
 .bottom-bar {
   position: fixed;
   bottom: 0;
