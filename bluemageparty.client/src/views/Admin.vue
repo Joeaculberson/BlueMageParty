@@ -24,7 +24,8 @@ export default {
         const authStore = useAuthStore();
         const drawer = ref(false);
         const router = useRouter();
-        const alertType = ref('');
+        
+        const alertType = ref<'success' | 'error' | 'info'>('info');
         const adminMessage = ref('')
 
         // Fetch and save spells in bulk from external API

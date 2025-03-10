@@ -33,7 +33,12 @@
             </v-row>
           </v-card-text>
           <v-container v-else>
-            <SpellTable :spells="filteredSpells(memberSpells(party.everyoneNeeds))" />
+            <SpellTable
+              :spells="filteredSpells(memberSpells(party.everyoneNeeds))"
+              :character-id="'everyone'"
+              :show-owned-column="false"
+              :missing-spells="[]"
+            />
           </v-container>
         </v-expansion-panel-text>
       </v-expansion-panel>
@@ -71,9 +76,13 @@
             </v-row>
           </v-card-text>
           <v-container v-else>
-            <SpellTable :spells="filteredSpells(memberSpells(member.character.missingSpells))"
-              :character-id="member.character.id" :show-owned-column="ownsCharacter(member.character.userId)"
-              :missing-spells="member.character.missingSpells" @spell-updated="handleSpellUpdate" />
+            <SpellTable
+              :spells="filteredSpells(memberSpells(member.character.missingSpells))"
+              :character-id="member.character.id"
+              :show-owned-column="ownsCharacter(member.character.userId)"
+              :missing-spells="member.character.missingSpells"
+              @spell-updated="handleSpellUpdate"
+            />
           </v-container>
         </v-expansion-panel-text>
       </v-expansion-panel>

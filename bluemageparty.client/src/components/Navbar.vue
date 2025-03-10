@@ -8,7 +8,7 @@
     <template v-if="isAuthenticated">
       <v-menu v-if="verifiedCharacters.length > 0" offset-y>
         <template v-slot:activator="{ props }">
-          <v-btn text v-bind="props">
+          <v-btn v-bind="props">
             <img :src="verifiedCharacters[0].avatar" alt="avatar" class="character-avatar" />
             {{ verifiedCharacters[0].firstName }} {{ verifiedCharacters[0].lastName }}
             <v-icon right>mdi-chevron-down</v-icon>
@@ -40,7 +40,7 @@
               </v-list-item-title>
             </v-list-item>
           </div>
-          <v-list-item @click="goToCharacterSearch" text>
+          <v-list-item @click="goToCharacterSearch">
             <v-list-item-title>
               <v-row align="center" justify="space-between">
                 <span>Add Character</span>
@@ -50,18 +50,18 @@
           </v-list-item>
         </v-list>
       </v-menu>
-      <v-btn v-else @click="goToCharacterSearch" text>
+      <v-btn v-else @click="goToCharacterSearch">
         Select Character
       </v-btn>
     </template>
 
-    <v-btn v-if="isAuthenticated" @click="logout" text>
+    <v-btn v-if="isAuthenticated" @click="logout">
       Logout
     </v-btn>
-    <v-btn v-if="!isAuthenticated && isOnLoginPage" @click="goToRegisterPage" text>
+    <v-btn v-if="!isAuthenticated && isOnLoginPage" @click="goToRegisterPage">
       Register
     </v-btn>
-    <v-btn v-if="!isAuthenticated && !isOnLoginPage" @click="goToLogin" text>
+    <v-btn v-if="!isAuthenticated && !isOnLoginPage" @click="goToLogin">
       Login
     </v-btn>
     <LoginWithDiscord v-if="!isAuthenticated" class="login-page" />

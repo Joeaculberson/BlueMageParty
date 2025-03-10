@@ -66,7 +66,7 @@ export const useCharacterStore = defineStore("character", {
       }
       localStorage.setItem("verified_characters", JSON.stringify(this.verifiedCharacters));
     },
-    addVerifiedCharacter(character: Character) {
+    addVerifiedCharacter(character) {
       this.verifiedCharacters.unshift(character);
       this.setVerifiedCharacters();
     },
@@ -103,7 +103,7 @@ export const useCharacterStore = defineStore("character", {
     getVerifiedCharacters() {
       return this.verifiedCharacters.filter((char) => char !== null);
     },
-    setSelectedCharacter(character: Character) {
+    setSelectedCharacter(character) {
       this.selectedCharacter = character;
       localStorage.setItem("selected_character", JSON.stringify(character));
     },

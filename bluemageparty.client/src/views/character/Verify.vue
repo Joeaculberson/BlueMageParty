@@ -114,7 +114,7 @@ export default defineComponent({
             tribe: ""
         });
 
-        const messageType = ref('info');
+        const messageType = ref<'success' | 'error' | 'info'>('info');
         const message = ref('');
         const isLoading = ref(false);
 

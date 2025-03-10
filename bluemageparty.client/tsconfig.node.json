@@ -14,6 +14,9 @@
 
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "types": ["node"]
+    "types": ["node"],
+    "noEmitOnError": false,
+    "skipLibCheck": true,
+    "strict": false
   }
 }

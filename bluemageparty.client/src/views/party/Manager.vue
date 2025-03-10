@@ -23,9 +23,15 @@
 
       <!-- Loading Spinner -->
       <v-col cols="12" v-if="loading">
-        <v-card-text class="d-flex justify-center align-center" style="height: 100%;">
-          Loading...
-          <img src="@/assets/seifer-panic.gif" alt="Loading" />
+        <v-card-text>
+          <v-row class="d-flex justify-center align-center">
+            <v-col cols="12" class="text-center">
+              <img src="@/assets/seifer-panic.gif" width="128" alt="Loading" />
+            </v-col>
+            <v-col cols="12" class="text-center">
+              Loading...
+            </v-col>
+          </v-row>
         </v-card-text>
       </v-col>
 
@@ -37,7 +43,7 @@
 
       <!-- Party List -->
       <v-col cols="12" v-else>
-        Owned Parties
+        Hosted Parties
         <v-list>
           <v-list-item v-for="party in hostedParties" :key="party.id">
             <template v-slot:prepend>
