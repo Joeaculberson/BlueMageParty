@@ -18,7 +18,7 @@
   
                 <v-card-actions class="justify-space-between">
                   <v-btn :disabled="!isValid" @click="login" color="primary">Login</v-btn>
-                  <v-btn @click="goToResetPassword" color="primary" text>Forgot Password?</v-btn>
+                  <v-btn @click="goToResetPassword" color="primary">Forgot Password?</v-btn>
                 </v-card-actions>
               </v-form>
             </v-card>

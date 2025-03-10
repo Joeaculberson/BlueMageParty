@@ -45,14 +45,43 @@
 
 <script lang="ts">
 import axios from "axios";
+import { defineComponent } from "vue";
+import type { PropType } from "vue";
 import { UPDATE_SPELL_OWNED_URL } from "@/constants/api";
 
-export default {
+// Define the Spell interface
+interface Spell {
+  id: string;
+  number: number;
+  icon: string;
+  name: string;
+  sources: { enemy: string; location: string }[];
+  patch: string;
+}
+
+// Define the MissingSpell interface (used in missingSpells prop)
+interface MissingSpell {
+  id: string;
+}
+
+export default defineComponent({
   props: {
-    spells: Array,
-    characterId: String, // Passed from parent
-    showOwnedColumn: Boolean,
-    missingSpells: Array, // Pass the character's missingSpells array
+    spells: {
+      type: Array as PropType<Spell[]>,
+      required: true,
+    },
+    characterId: {
+      type: String,
+      required: true,
+    },
+    showOwnedColumn: {
+      type: Boolean,
+      default: false,
+    },
+    missingSpells: {
+      type: Array as PropType<MissingSpell[]>,
+      default: () => [],
+    },
   },
   emits: ["spell-updated"], // Define the custom event
   setup(props, { emit }) {
@@ -62,7 +91,7 @@ export default {
     };
 
     // Handle checkbox state change
-    const handleCheckboxChange = async (spell: any, isChecked: boolean) => {
+    const handleCheckboxChange = async (spell: Spell, isChecked: boolean) => {
       console.log("handleCheckBoxChange triggered");
       try {
         await axios.post(UPDATE_SPELL_OWNED_URL, {
@@ -83,8 +112,9 @@ export default {
 
     return { isSpellOwned, handleCheckboxChange };
   },
-};
+});
 </script>
+
 <style scoped>
 .spell-sprite {
   border-radius: 0.3rem;
