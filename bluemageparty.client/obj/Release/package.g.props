@@ -14,7 +14,7 @@
     <PackageJsonDependenciesMdiFont Condition="$(PackageJsonDependenciesMdiFont) == ''">^7.4.47</PackageJsonDependenciesMdiFont>
     <PackageJsonDependenciesTypesGsap Condition="$(PackageJsonDependenciesTypesGsap) == ''">^1.20.2</PackageJsonDependenciesTypesGsap>
     <PackageJsonDependenciesAnimejs Condition="$(PackageJsonDependenciesAnimejs) == ''">^3.2.2</PackageJsonDependenciesAnimejs>
-    <PackageJsonDependenciesAxios Condition="$(PackageJsonDependenciesAxios) == ''">^1.7.9</PackageJsonDependenciesAxios>
+    <PackageJsonDependenciesAxios Condition="$(PackageJsonDependenciesAxios) == ''">^1.8.2</PackageJsonDependenciesAxios>
     <PackageJsonDependenciesCoreJs Condition="$(PackageJsonDependenciesCoreJs) == ''">^3.37.1</PackageJsonDependenciesCoreJs>
     <PackageJsonDependenciesGsap Condition="$(PackageJsonDependenciesGsap) == ''">^3.12.7</PackageJsonDependenciesGsap>
     <PackageJsonDependenciesJsonwebtoken Condition="$(PackageJsonDependenciesJsonwebtoken) == ''">^9.0.2</PackageJsonDependenciesJsonwebtoken>
