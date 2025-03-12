@@ -43,7 +43,7 @@ jobs:
       - name: Deploy to server
         env:
           ConnectionStrings__BlueMagePartyContext: ${{ secrets.PROD_CONNECTION_STRING }}
-          LoginSettings__JWTSecurityKey: ${{ secrets.PROD_JWT_KEY }}
+          LoginSettings__JWTSecurityKey: ${{ secrets.JWT_SECURITY_KEY }}
           EmailSettings__SMTPEmailPassword: ${{ secrets.SMTP_EMAIL_PASSWORD }}
           EmailSettings__SendGridApiKey: ${{ secrets.SEND_GRID_API_KEY }}
           Discord__ClientSecret: ${{ secrets.DISCORD_CLIENT_SECRET }}
