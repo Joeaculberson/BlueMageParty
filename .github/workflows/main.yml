@@ -47,7 +47,16 @@ jobs:
           EmailSettings__SMTPEmailPassword: ${{ secrets.SMTP_EMAIL_PASSWORD }}
           EmailSettings__SendGridApiKey: ${{ secrets.SEND_GRID_API_KEY }}
           Discord__ClientSecret: ${{ secrets.DISCORD_CLIENT_SECRET }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
+          # Set up SSH
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          # Add the server's host key to known_hosts
+          ssh-keyscan -H 64.227.6.150 >> ~/.ssh/known_hosts
+
           # Copy the .NET backend to the server
           scp -r BlueMageParty.Server/publish/* jculberson@64.227.6.150:/var/www/BlueMageParty/server
 
@@ -55,11 +64,11 @@ jobs:
           scp -r bluemageparty.client/dist/* jculberson@64.227.6.150:/var/www/BlueMageParty/client
 
           # Set environment variables and start the .NET app
-          ssh jculberson@64.227.6.150 "
+          ssh -o StrictHostKeyChecking=no jculberson@64.227.6.150 "
             export ConnectionStrings__BlueMagePartyContext=$ConnectionStrings__BlueMagePartyContext &&
             export LoginSettings__JWTSecurityKey=$LoginSettings__JWTSecurityKey &&
             export EmailSettings__SMTPEmailPassword=$EmailSettings__SMTPEmailPassword &&
             export EmailSettings__SendGridApiKey=$EmailSettings__SendGridApiKey &&
             export Discord__ClientSecret=$Discord__ClientSecret &&
-            dotnet /var/www/BlueMageParty/server/BlueMageParty.Server.dll
+            nohup dotnet /var/www/BlueMageParty/server/BlueMageParty.Server.dll > /dev/null 2>&1 &
           "
