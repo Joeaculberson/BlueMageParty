@@ -1,0 +1,65 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main  # Trigger on pushes to the main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Step 2: Set up .NET
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '8.0.x'
+
+      # Step 3: Build and publish the .NET backend
+      - name: Publish .NET app
+        run: |
+          cd BlueMageParty.Server  # Navigate to your .NET project folder
+          dotnet publish -c Release -o ./publish
+
+      # Step 4: Set up Node.js for the Vue.js frontend
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'  # Use the Node.js version required by your Vue.js project
+
+      # Step 5: Install dependencies and build the Vue.js frontend
+      - name: Build Vue.js app
+        run: |
+          cd bluemageparty.client  # Navigate to your Vue.js project folder
+          npm install
+          npm run build
+
+      # Step 6: Deploy to the server
+      - name: Deploy to server
+        env:
+          ConnectionStrings__BlueMagePartyContext: ${{ secrets.PROD_CONNECTION_STRING }}
+          LoginSettings__JWTSecurityKey: ${{ secrets.PROD_JWT_KEY }}
+          EmailSettings__SMTPEmailPassword: ${{ secrets.SMTP_EMAIL_PASSWORD }}
+          EmailSettings__SendGridApiKey: ${{ secrets.SEND_GRID_API_KEY }}
+          Discord__ClientSecret: ${{ secrets.DISCORD_CLIENT_SECRET }}
+        run: |
+          # Copy the .NET backend to the server
+          scp -r BlueMageParty.Server/publish/* jculberson@64.227.6.150:/var/www/BlueMageParty/server
+
+          # Copy the Vue.js frontend to the server
+          scp -r bluemageparty.client/dist/* jculberson@64.227.6.150:/var/www/BlueMageParty/client
+
+          # Set environment variables and start the .NET app
+          ssh jculberson@64.227.6.150 "
+            export ConnectionStrings__BlueMagePartyContext=$ConnectionStrings__BlueMagePartyContext &&
+            export LoginSettings__JWTSecurityKey=$LoginSettings__JWTSecurityKey &&
+            export EmailSettings__SMTPEmailPassword=$EmailSettings__SMTPEmailPassword &&
+            export EmailSettings__SendGridApiKey=$EmailSettings__SendGridApiKey &&
+            export Discord__ClientSecret=$Discord__ClientSecret &&
+            dotnet /var/www/BlueMageParty/server/BlueMageParty.Server.dll
+          "
