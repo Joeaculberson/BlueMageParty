@@ -57,6 +57,9 @@ jobs:
           # Add the server's host key to known_hosts
           ssh-keyscan -H 64.227.6.150 >> ~/.ssh/known_hosts
 
+          # Delete old files in the client directory
+          ssh -o StrictHostKeyChecking=no jculberson@64.227.6.150 "rm -rf /var/www/BlueMageParty/client/*"
+
           # Copy the .NET backend to the server
           scp -r BlueMageParty.Server/publish/* jculberson@64.227.6.150:/var/www/BlueMageParty/server
 
