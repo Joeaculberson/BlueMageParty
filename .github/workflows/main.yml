@@ -34,8 +34,6 @@ jobs:
 
       # Step 5: Install dependencies and build the Vue.js frontend
       - name: Build Vue.js app
-        env:
-          VITE_API_BASE_URL:http://64.227.6.150:3000
         run: |
           cd bluemageparty.client  # Navigate to your Vue.js project folder
           npm install
