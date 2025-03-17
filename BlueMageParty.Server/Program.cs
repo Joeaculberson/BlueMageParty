@@ -57,7 +57,7 @@ builder.Services.AddAuthentication(options =>
 .AddCookie()
 .AddDiscord(options =>
 {
-    options.ClientId = builder.Configuration["DiscordClientKey"];
+    options.ClientId = builder.Configuration["Discord:ClientId"];
     options.ClientSecret = builder.Configuration["Discord:ClientSecret"];
     options.CallbackPath = new PathString("/api/auth/callback");
     options.SaveTokens = true;
