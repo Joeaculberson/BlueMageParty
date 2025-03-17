@@ -65,6 +65,21 @@ builder.Services.AddAuthentication(options =>
 
 
 var app = builder.Build();
+// Apply migrations at startup
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<BlueMagePartyContext>();
+        context.Database.Migrate(); // Apply any pending migrations
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error applying migrations: {ex.Message}");
+    }
+}
+
 app.UseCors("AllowSpecificOrigins");
 
 app.UseSwagger();
