@@ -1,6 +1,7 @@
 .vs/
 BlueMageParty.Server/bin/
 BlueMageParty.Server/obj/
+BlueMageParty.Server/publish/
 bluemageparty.client/node_modules/
 node_modules/
 /BlueMageParty.Server/appsettings.Production.json
