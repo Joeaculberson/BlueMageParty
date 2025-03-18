@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Collections;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,6 +31,12 @@ builder.Services.AddControllers();
 string sql = builder.Configuration["ConnectionStrings:BlueMagePartyContext"];
 var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
 logger.LogInformation("Connection String: {ConnectionString}", sql);
+
+foreach (var env in Environment.GetEnvironmentVariables().Cast<DictionaryEntry>())
+{
+    Console.WriteLine($"{env.Key} = {env.Value}");
+}
+
 // Add EF Core with SQL Server
 builder.Services.AddDbContext<BlueMagePartyContext>(options =>
     options.UseSqlServer(sql));
