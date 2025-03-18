@@ -31,11 +31,12 @@ jobs:
         env:
          ConnectionStrings__BlueMagePartyContext: ${{ secrets.PROD_CONNECTION_STRING }}
         run: |
-         cd BlueMageParty.Server  # Navigate to your .NET project folder
-         echo "Compiling and running connection test..."
-         dotnet new console -n TestConnection -o TestConnection
-         cd TestConnection
-         dotnet run
+          echo "Compiling and running connection test..."
+          dotnet new console -n TestConnection -o TestConnection
+          cp TestConnection.cs TestConnection/Program.cs
+          cd TestConnection
+          dotnet add package Microsoft.Data.SqlClient
+          dotnet run
 
       # Step 4: Set up Node.js for the Vue.js frontend
       - name: Set up Node.js
@@ -79,10 +80,10 @@ jobs:
 
           # Set environment variables and start the .NET app
           ssh -o StrictHostKeyChecking=no jculberson@64.227.6.150 "
-            export ConnectionStrings__BlueMagePartyContext=$ConnectionStrings__BlueMagePartyContext &&
-            export LoginSettings__JWTSecurityKey=$LoginSettings__JWTSecurityKey &&
-            export EmailSettings__SMTPEmailPassword=$EmailSettings__SMTPEmailPassword &&
-            export EmailSettings__SendGridApiKey=$EmailSettings__SendGridApiKey &&
-            export Discord__ClientSecret=$Discord__ClientSecret &&
+            export ConnectionStrings__BlueMagePartyContext='$ConnectionStrings__BlueMagePartyContext' &&
+            export LoginSettings__JWTSecurityKey='$LoginSettings__JWTSecurityKey' &&
+            export EmailSettings__SMTPEmailPassword='$EmailSettings__SMTPEmailPassword' &&
+            export EmailSettings__SendGridApiKey='$EmailSettings__SendGridApiKey' &&
+            export Discord__ClientSecret='$Discord__ClientSecret' &&
             nohup dotnet /var/www/BlueMageParty/server/BlueMageParty.Server.dll > /dev/null 2>&1 &
           "
