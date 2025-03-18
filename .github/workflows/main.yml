@@ -34,7 +34,6 @@ jobs:
          cd BlueMageParty.Server  # Navigate to your .NET project folder
          echo "Compiling and running connection test..."
          dotnet new console -n TestConnection -o TestConnection
-         cp TestConnection.cs TestConnection/Program.cs
          cd TestConnection
          dotnet run
 
