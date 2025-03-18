@@ -1,6 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 
-namespace BlueMageParty.Server
+namespace BlueMageParty.Server.TestConnection
 {
     class Program
     {
