@@ -28,6 +28,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
 string sql = builder.Configuration["ConnectionStrings:BlueMagePartyContext"];
+var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
+logger.LogInformation("Connection String: {ConnectionString}", sql);
 // Add EF Core with SQL Server
 builder.Services.AddDbContext<BlueMagePartyContext>(options =>
     options.UseSqlServer(sql));
