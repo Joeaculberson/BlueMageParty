@@ -27,10 +27,10 @@ builder.Services.AddSwaggerGen();
 // Add services to the container.
 builder.Services.AddControllers();
 
-string sql = builder.Configuration.GetConnectionString("BlueMagePartyContext");
+string sql = builder.Configuration["ConnectionStrings:BlueMageContext"];
 // Add EF Core with SQL Server
 builder.Services.AddDbContext<BlueMagePartyContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("BlueMagePartyContext")));
+    options.UseSqlServer(sql));
 
 // Add JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
