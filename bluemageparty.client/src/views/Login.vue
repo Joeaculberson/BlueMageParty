@@ -8,16 +8,33 @@
             {{ message }}
           </v-alert>
           <v-card title="Login">
-            <v-form v-model="isValid">
+            <v-form v-model="isValid" @submit.prevent="login"> <!-- Add @submit.prevent to the form -->
               <v-card-text>
                 <!-- Email Input Field -->
-                <v-text-field label="Email" v-model="email" type="email" :rules="[emailRule]" required />
+                <v-text-field
+                  label="Email"
+                  v-model="email"
+                  type="email"
+                  :rules="[emailRule]"
+                  required
+                  @keyup.enter="login"
+                />
                 <!-- Password Input Field -->
-                <v-text-field label="Password" v-model="password" type="password" :rules="[passwordRule]" required />
+                <v-text-field
+                  label="Password"
+                  v-model="password"
+                  type="password"
+                  :rules="[passwordRule]"
+                  required
+                  @keyup.enter="login"
+                />
                 <!-- Login Button -->
-                <v-card-actions>
-                  <v-btn @click="login" color="primary" :disabled="!isValid">
+                <v-card-actions class="justify-space-between">
+                  <v-btn type="submit" color="primary" :disabled="!isValid"> <!-- Change to type="submit" -->
                     Login
+                  </v-btn>
+                  <v-btn @click="forgotPassword" color="primary">
+                    Forgot Password?
                   </v-btn>
                 </v-card-actions>
               </v-card-text>
@@ -65,6 +82,10 @@ export default {
       }
     });
 
+    const forgotPassword = async () => {
+      router.push('/resetpasswordrequest');
+    };
+
     const login = async () => {
       if (!isValid.value) return;
 
@@ -102,6 +123,7 @@ export default {
       login,
       emailRule,
       passwordRule,
+      forgotPassword,
     };
   },
 };

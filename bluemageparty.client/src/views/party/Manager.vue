@@ -9,9 +9,16 @@
         <v-card>
           <v-card-title class="text-h5">Create a Party</v-card-title>
           <v-card-text>
-            <v-text-field v-model="partyName" label="Enter party name"
-              :disabled="characterStore.getVerifiedCharacters().length == 0" maxlength="255" counter outlined
-              dense></v-text-field>
+            <v-text-field
+              v-model="partyName"
+              label="Enter party name"
+              :disabled="characterStore.getVerifiedCharacters().length == 0"
+              maxlength="255"
+              counter
+              outlined
+              dense
+              @keyup.enter="createParty"
+            ></v-text-field>
           </v-card-text>
           <v-card-actions>
             <v-btn @click="createParty" :disabled="!partyName" color="blue" class="w-full">
@@ -36,8 +43,7 @@
       </v-col>
 
       <!-- No Parties Found Message -->
-      <v-col cols="12" v-else-if="hostedParties.length === 0 && guestOfParties.length === 0"
-        class="text-center grey--text">
+      <v-col cols="12" v-else-if="hostedParties.length === 0 && guestOfParties.length === 0" class="text-center grey--text">
         No parties found.
       </v-col>
 

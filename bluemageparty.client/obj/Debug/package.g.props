@@ -18,6 +18,7 @@
     <PackageJsonDependenciesCoreJs Condition="$(PackageJsonDependenciesCoreJs) == ''">^3.37.1</PackageJsonDependenciesCoreJs>
     <PackageJsonDependenciesGsap Condition="$(PackageJsonDependenciesGsap) == ''">^3.12.7</PackageJsonDependenciesGsap>
     <PackageJsonDependenciesJsonwebtoken Condition="$(PackageJsonDependenciesJsonwebtoken) == ''">^9.0.2</PackageJsonDependenciesJsonwebtoken>
+    <PackageJsonDependenciesLodashDebounce Condition="$(PackageJsonDependenciesLodashDebounce) == ''">^4.0.8</PackageJsonDependenciesLodashDebounce>
     <PackageJsonDependenciesMaterialDesignIconsIconfont Condition="$(PackageJsonDependenciesMaterialDesignIconsIconfont) == ''">^6.7.0</PackageJsonDependenciesMaterialDesignIconsIconfont>
     <PackageJsonDependenciesPassport Condition="$(PackageJsonDependenciesPassport) == ''">^0.7.0</PackageJsonDependenciesPassport>
     <PackageJsonDependenciesPassportDiscord Condition="$(PackageJsonDependenciesPassportDiscord) == ''">^0.1.4</PackageJsonDependenciesPassportDiscord>
