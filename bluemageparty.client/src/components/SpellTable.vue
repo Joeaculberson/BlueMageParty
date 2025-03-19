@@ -16,7 +16,7 @@
       <tr v-for="spell in spells" :key="spell.id">
         <td>No. {{ spell.number }}</td>
         <td>
-          <v-img :src="spell.icon" class="spell-sprite" max-width="42" max-height="42" />
+          <v-img :src="spell.icon" class="spell-sprite" width="42px" />
         </td>
         <td>{{ spell.name }}</td>
         <td>
