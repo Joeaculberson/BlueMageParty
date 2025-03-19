@@ -8,7 +8,6 @@
         <th class="text-left">Enemy</th>
         <th class="text-left">Location</th>
         <th class="text-left">Patch</th>
-        <!-- Only show the "Owned" column if the current user owns the character -->
         <th class="text-left" v-if="showOwnedColumn">Owned</th>
       </tr>
     </thead>
@@ -30,43 +29,70 @@
           </div>
         </td>
         <td>{{ spell.patch }}</td>
-        <!-- Only show the checkbox if the current user owns the character -->
         <td v-if="showOwnedColumn">
-          <v-checkbox v-model="spell.owned" :value="isSpellOwned(spell.id)"
-            @change="() => debouncedHandleCheckboxChange(spell)" color="primary" />
+          <v-checkbox
+            v-model="spell.owned"
+            @change="() => debouncedHandleCheckboxChange(spell)"
+            color="primary"
+          />
         </td>
       </tr>
     </tbody>
   </v-table>
 </template>
 
-
 <script lang="ts">
 import axios from "axios";
 import { UPDATE_SPELL_OWNED_URL } from "@/constants/api";
 import debounce from "lodash.debounce";
+import { defineComponent, PropType } from "vue";
 
-export default {
+interface Source {
+  enemy: string;
+  location: string;
+}
+
+interface Spell {
+  id: string;
+  number: number;
+  icon: string;
+  name: string;
+  sources: Source[];
+  patch: string;
+  owned: boolean;
+}
+
+export default defineComponent({
   props: {
-    spells: Array,
-    characterId: String, // Passed from parent
-    showOwnedColumn: Boolean,
-    missingSpells: Array, // Pass the character's missingSpells array
+    spells: {
+      type: Array as PropType<Spell[]>,
+      required: true,
+    },
+    characterId: {
+      type: String,
+      required: true,
+    },
+    showOwnedColumn: {
+      type: Boolean,
+      required: true,
+    },
+    missingSpells: {
+      type: Array as PropType<Spell[]>,
+      required: true,
+    },
   },
-  emits: ["spell-updated"], // Define the custom event
+  emits: ["spell-updated"],
   setup(props, { emit }) {
-    // Determine if a spell is owned by the character
     const isSpellOwned = (spellId: string) => {
       return !props.missingSpells?.some((spell) => spell.id === spellId);
     };
 
-    // Handle checkbox state change
-    const handleCheckboxChange = async (spell: any) => {
+    const handleCheckboxChange = async (spell: Spell) => {
       try {
         await axios.post(UPDATE_SPELL_OWNED_URL, {
           spellId: spell.id,
           characterId: props.characterId,
-          isChecked: spell.owned, // Directly use the spell's 'owned' property
+          isChecked: spell.owned,
         });
 
         emit("spell-updated", {
@@ -76,15 +102,15 @@ export default {
         });
       } catch (error) {
         console.error("Error updating spell ownership:", error);
+        spell.owned = !spell.owned; // Revert the checkbox state
       }
     };
 
-    // Debounce the handleCheckboxChange function
     const debouncedHandleCheckboxChange = debounce(handleCheckboxChange, 500);
 
     return { isSpellOwned, debouncedHandleCheckboxChange };
   },
-};
+});
 </script>
 
 <style scoped>

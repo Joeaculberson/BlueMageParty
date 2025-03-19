@@ -150,129 +150,136 @@ function __VLS_template() {
     const __VLS_43 = __VLS_resolvedLocalAndGlobalComponents.VTextField;
     /** @type { [typeof __VLS_components.VTextField, typeof __VLS_components.vTextField, typeof __VLS_components.VTextField, typeof __VLS_components.vTextField, ] } */
     // @ts-ignore
-    const __VLS_44 = __VLS_asFunctionalComponent(__VLS_43, new __VLS_43({ modelValue: ((__VLS_ctx.partyName)), label: ("Enter party name"), disabled: ((__VLS_ctx.characterStore.getVerifiedCharacters().length == 0)), maxlength: ("255"), counter: (true), outlined: (true), dense: (true), }));
-    const __VLS_45 = __VLS_44({ modelValue: ((__VLS_ctx.partyName)), label: ("Enter party name"), disabled: ((__VLS_ctx.characterStore.getVerifiedCharacters().length == 0)), maxlength: ("255"), counter: (true), outlined: (true), dense: (true), }, ...__VLS_functionalComponentArgsRest(__VLS_44));
+    const __VLS_44 = __VLS_asFunctionalComponent(__VLS_43, new __VLS_43({ ...{ 'onKeyup': {} }, modelValue: ((__VLS_ctx.partyName)), label: ("Enter party name"), disabled: ((__VLS_ctx.characterStore.getVerifiedCharacters().length == 0)), maxlength: ("255"), counter: (true), outlined: (true), dense: (true), }));
+    const __VLS_45 = __VLS_44({ ...{ 'onKeyup': {} }, modelValue: ((__VLS_ctx.partyName)), label: ("Enter party name"), disabled: ((__VLS_ctx.characterStore.getVerifiedCharacters().length == 0)), maxlength: ("255"), counter: (true), outlined: (true), dense: (true), }, ...__VLS_functionalComponentArgsRest(__VLS_44));
+    let __VLS_49;
+    const __VLS_50 = {
+        onKeyup: (__VLS_ctx.createParty)
+    };
+    let __VLS_46;
+    let __VLS_47;
+    var __VLS_48;
     __VLS_nonNullable(__VLS_42.slots).default;
     var __VLS_42;
-    const __VLS_49 = __VLS_resolvedLocalAndGlobalComponents.VCardActions;
+    const __VLS_51 = __VLS_resolvedLocalAndGlobalComponents.VCardActions;
     /** @type { [typeof __VLS_components.VCardActions, typeof __VLS_components.vCardActions, typeof __VLS_components.VCardActions, typeof __VLS_components.vCardActions, ] } */
     // @ts-ignore
-    const __VLS_50 = __VLS_asFunctionalComponent(__VLS_49, new __VLS_49({}));
-    const __VLS_51 = __VLS_50({}, ...__VLS_functionalComponentArgsRest(__VLS_50));
-    const __VLS_55 = __VLS_resolvedLocalAndGlobalComponents.VBtn;
+    const __VLS_52 = __VLS_asFunctionalComponent(__VLS_51, new __VLS_51({}));
+    const __VLS_53 = __VLS_52({}, ...__VLS_functionalComponentArgsRest(__VLS_52));
+    const __VLS_57 = __VLS_resolvedLocalAndGlobalComponents.VBtn;
     /** @type { [typeof __VLS_components.VBtn, typeof __VLS_components.vBtn, typeof __VLS_components.VBtn, typeof __VLS_components.vBtn, ] } */
     // @ts-ignore
-    const __VLS_56 = __VLS_asFunctionalComponent(__VLS_55, new __VLS_55({ ...{ 'onClick': {} }, disabled: ((!__VLS_ctx.partyName)), color: ("blue"), ...{ class: ("w-full") }, }));
-    const __VLS_57 = __VLS_56({ ...{ 'onClick': {} }, disabled: ((!__VLS_ctx.partyName)), color: ("blue"), ...{ class: ("w-full") }, }, ...__VLS_functionalComponentArgsRest(__VLS_56));
-    let __VLS_61;
-    const __VLS_62 = {
+    const __VLS_58 = __VLS_asFunctionalComponent(__VLS_57, new __VLS_57({ ...{ 'onClick': {} }, disabled: ((!__VLS_ctx.partyName)), color: ("blue"), ...{ class: ("w-full") }, }));
+    const __VLS_59 = __VLS_58({ ...{ 'onClick': {} }, disabled: ((!__VLS_ctx.partyName)), color: ("blue"), ...{ class: ("w-full") }, }, ...__VLS_functionalComponentArgsRest(__VLS_58));
+    let __VLS_63;
+    const __VLS_64 = {
         onClick: (__VLS_ctx.createParty)
     };
-    let __VLS_58;
-    let __VLS_59;
-    __VLS_nonNullable(__VLS_60.slots).default;
-    var __VLS_60;
-    __VLS_nonNullable(__VLS_54.slots).default;
-    var __VLS_54;
+    let __VLS_60;
+    let __VLS_61;
+    __VLS_nonNullable(__VLS_62.slots).default;
+    var __VLS_62;
+    __VLS_nonNullable(__VLS_56.slots).default;
+    var __VLS_56;
     __VLS_nonNullable(__VLS_30.slots).default;
     var __VLS_30;
     __VLS_nonNullable(__VLS_18.slots).default;
     var __VLS_18;
     if (__VLS_ctx.loading) {
-        const __VLS_63 = __VLS_resolvedLocalAndGlobalComponents.VCol;
+        const __VLS_65 = __VLS_resolvedLocalAndGlobalComponents.VCol;
         /** @type { [typeof __VLS_components.VCol, typeof __VLS_components.vCol, typeof __VLS_components.VCol, typeof __VLS_components.vCol, ] } */
         // @ts-ignore
-        const __VLS_64 = __VLS_asFunctionalComponent(__VLS_63, new __VLS_63({ cols: ("12"), }));
-        const __VLS_65 = __VLS_64({ cols: ("12"), }, ...__VLS_functionalComponentArgsRest(__VLS_64));
-        const __VLS_69 = __VLS_resolvedLocalAndGlobalComponents.VCardText;
+        const __VLS_66 = __VLS_asFunctionalComponent(__VLS_65, new __VLS_65({ cols: ("12"), }));
+        const __VLS_67 = __VLS_66({ cols: ("12"), }, ...__VLS_functionalComponentArgsRest(__VLS_66));
+        const __VLS_71 = __VLS_resolvedLocalAndGlobalComponents.VCardText;
         /** @type { [typeof __VLS_components.VCardText, typeof __VLS_components.vCardText, typeof __VLS_components.VCardText, typeof __VLS_components.vCardText, ] } */
         // @ts-ignore
-        const __VLS_70 = __VLS_asFunctionalComponent(__VLS_69, new __VLS_69({}));
-        const __VLS_71 = __VLS_70({}, ...__VLS_functionalComponentArgsRest(__VLS_70));
-        const __VLS_75 = __VLS_resolvedLocalAndGlobalComponents.VRow;
+        const __VLS_72 = __VLS_asFunctionalComponent(__VLS_71, new __VLS_71({}));
+        const __VLS_73 = __VLS_72({}, ...__VLS_functionalComponentArgsRest(__VLS_72));
+        const __VLS_77 = __VLS_resolvedLocalAndGlobalComponents.VRow;
         /** @type { [typeof __VLS_components.VRow, typeof __VLS_components.vRow, typeof __VLS_components.VRow, typeof __VLS_components.vRow, ] } */
         // @ts-ignore
-        const __VLS_76 = __VLS_asFunctionalComponent(__VLS_75, new __VLS_75({ ...{ class: ("d-flex justify-center align-center") }, }));
-        const __VLS_77 = __VLS_76({ ...{ class: ("d-flex justify-center align-center") }, }, ...__VLS_functionalComponentArgsRest(__VLS_76));
-        const __VLS_81 = __VLS_resolvedLocalAndGlobalComponents.VCol;
+        const __VLS_78 = __VLS_asFunctionalComponent(__VLS_77, new __VLS_77({ ...{ class: ("d-flex justify-center align-center") }, }));
+        const __VLS_79 = __VLS_78({ ...{ class: ("d-flex justify-center align-center") }, }, ...__VLS_functionalComponentArgsRest(__VLS_78));
+        const __VLS_83 = __VLS_resolvedLocalAndGlobalComponents.VCol;
         /** @type { [typeof __VLS_components.VCol, typeof __VLS_components.vCol, typeof __VLS_components.VCol, typeof __VLS_components.vCol, ] } */
         // @ts-ignore
-        const __VLS_82 = __VLS_asFunctionalComponent(__VLS_81, new __VLS_81({ cols: ("12"), ...{ class: ("text-center") }, }));
-        const __VLS_83 = __VLS_82({ cols: ("12"), ...{ class: ("text-center") }, }, ...__VLS_functionalComponentArgsRest(__VLS_82));
+        const __VLS_84 = __VLS_asFunctionalComponent(__VLS_83, new __VLS_83({ cols: ("12"), ...{ class: ("text-center") }, }));
+        const __VLS_85 = __VLS_84({ cols: ("12"), ...{ class: ("text-center") }, }, ...__VLS_functionalComponentArgsRest(__VLS_84));
         __VLS_elementAsFunction(__VLS_intrinsicElements.img)({ src: ("@/assets/seifer-panic.gif"), width: ("128"), alt: ("Loading"), });
-        __VLS_nonNullable(__VLS_86.slots).default;
-        var __VLS_86;
-        const __VLS_87 = __VLS_resolvedLocalAndGlobalComponents.VCol;
+        __VLS_nonNullable(__VLS_88.slots).default;
+        var __VLS_88;
+        const __VLS_89 = __VLS_resolvedLocalAndGlobalComponents.VCol;
         /** @type { [typeof __VLS_components.VCol, typeof __VLS_components.vCol, typeof __VLS_components.VCol, typeof __VLS_components.vCol, ] } */
         // @ts-ignore
-        const __VLS_88 = __VLS_asFunctionalComponent(__VLS_87, new __VLS_87({ cols: ("12"), ...{ class: ("text-center") }, }));
-        const __VLS_89 = __VLS_88({ cols: ("12"), ...{ class: ("text-center") }, }, ...__VLS_functionalComponentArgsRest(__VLS_88));
-        __VLS_nonNullable(__VLS_92.slots).default;
-        var __VLS_92;
-        __VLS_nonNullable(__VLS_80.slots).default;
-        var __VLS_80;
-        __VLS_nonNullable(__VLS_74.slots).default;
-        var __VLS_74;
-        __VLS_nonNullable(__VLS_68.slots).default;
-        var __VLS_68;
+        const __VLS_90 = __VLS_asFunctionalComponent(__VLS_89, new __VLS_89({ cols: ("12"), ...{ class: ("text-center") }, }));
+        const __VLS_91 = __VLS_90({ cols: ("12"), ...{ class: ("text-center") }, }, ...__VLS_functionalComponentArgsRest(__VLS_90));
+        __VLS_nonNullable(__VLS_94.slots).default;
+        var __VLS_94;
+        __VLS_nonNullable(__VLS_82.slots).default;
+        var __VLS_82;
+        __VLS_nonNullable(__VLS_76.slots).default;
+        var __VLS_76;
+        __VLS_nonNullable(__VLS_70.slots).default;
+        var __VLS_70;
     }
     else if (__VLS_ctx.hostedParties.length === 0 && __VLS_ctx.guestOfParties.length === 0) {
-        const __VLS_93 = __VLS_resolvedLocalAndGlobalComponents.VCol;
+        const __VLS_95 = __VLS_resolvedLocalAndGlobalComponents.VCol;
         /** @type { [typeof __VLS_components.VCol, typeof __VLS_components.vCol, typeof __VLS_components.VCol, typeof __VLS_components.vCol, ] } */
         // @ts-ignore
-        const __VLS_94 = __VLS_asFunctionalComponent(__VLS_93, new __VLS_93({ cols: ("12"), ...{ class: ("text-center grey--text") }, }));
-        const __VLS_95 = __VLS_94({ cols: ("12"), ...{ class: ("text-center grey--text") }, }, ...__VLS_functionalComponentArgsRest(__VLS_94));
-        __VLS_nonNullable(__VLS_98.slots).default;
-        var __VLS_98;
+        const __VLS_96 = __VLS_asFunctionalComponent(__VLS_95, new __VLS_95({ cols: ("12"), ...{ class: ("text-center grey--text") }, }));
+        const __VLS_97 = __VLS_96({ cols: ("12"), ...{ class: ("text-center grey--text") }, }, ...__VLS_functionalComponentArgsRest(__VLS_96));
+        __VLS_nonNullable(__VLS_100.slots).default;
+        var __VLS_100;
     }
     else {
-        const __VLS_99 = __VLS_resolvedLocalAndGlobalComponents.VCol;
+        const __VLS_101 = __VLS_resolvedLocalAndGlobalComponents.VCol;
         /** @type { [typeof __VLS_components.VCol, typeof __VLS_components.vCol, typeof __VLS_components.VCol, typeof __VLS_components.vCol, ] } */
         // @ts-ignore
-        const __VLS_100 = __VLS_asFunctionalComponent(__VLS_99, new __VLS_99({ cols: ("12"), }));
-        const __VLS_101 = __VLS_100({ cols: ("12"), }, ...__VLS_functionalComponentArgsRest(__VLS_100));
-        const __VLS_105 = __VLS_resolvedLocalAndGlobalComponents.VList;
+        const __VLS_102 = __VLS_asFunctionalComponent(__VLS_101, new __VLS_101({ cols: ("12"), }));
+        const __VLS_103 = __VLS_102({ cols: ("12"), }, ...__VLS_functionalComponentArgsRest(__VLS_102));
+        const __VLS_107 = __VLS_resolvedLocalAndGlobalComponents.VList;
         /** @type { [typeof __VLS_components.VList, typeof __VLS_components.vList, typeof __VLS_components.VList, typeof __VLS_components.vList, ] } */
         // @ts-ignore
-        const __VLS_106 = __VLS_asFunctionalComponent(__VLS_105, new __VLS_105({}));
-        const __VLS_107 = __VLS_106({}, ...__VLS_functionalComponentArgsRest(__VLS_106));
+        const __VLS_108 = __VLS_asFunctionalComponent(__VLS_107, new __VLS_107({}));
+        const __VLS_109 = __VLS_108({}, ...__VLS_functionalComponentArgsRest(__VLS_108));
         for (const [party] of __VLS_getVForSourceType((__VLS_ctx.hostedParties))) {
-            const __VLS_111 = __VLS_resolvedLocalAndGlobalComponents.VListItem;
+            const __VLS_113 = __VLS_resolvedLocalAndGlobalComponents.VListItem;
             /** @type { [typeof __VLS_components.VListItem, typeof __VLS_components.vListItem, typeof __VLS_components.VListItem, typeof __VLS_components.vListItem, ] } */
             // @ts-ignore
-            const __VLS_112 = __VLS_asFunctionalComponent(__VLS_111, new __VLS_111({ key: ((party.id)), }));
-            const __VLS_113 = __VLS_112({ key: ((party.id)), }, ...__VLS_functionalComponentArgsRest(__VLS_112));
+            const __VLS_114 = __VLS_asFunctionalComponent(__VLS_113, new __VLS_113({ key: ((party.id)), }));
+            const __VLS_115 = __VLS_114({ key: ((party.id)), }, ...__VLS_functionalComponentArgsRest(__VLS_114));
             __VLS_elementAsFunction(__VLS_intrinsicElements.template, __VLS_intrinsicElements.template)({});
             {
-                const { prepend: __VLS_thisSlot } = __VLS_nonNullable(__VLS_116.slots);
-                const __VLS_117 = __VLS_resolvedLocalAndGlobalComponents.VListItemTitle;
+                const { prepend: __VLS_thisSlot } = __VLS_nonNullable(__VLS_118.slots);
+                const __VLS_119 = __VLS_resolvedLocalAndGlobalComponents.VListItemTitle;
                 /** @type { [typeof __VLS_components.VListItemTitle, typeof __VLS_components.vListItemTitle, typeof __VLS_components.VListItemTitle, typeof __VLS_components.vListItemTitle, ] } */
                 // @ts-ignore
-                const __VLS_118 = __VLS_asFunctionalComponent(__VLS_117, new __VLS_117({ ...{ class: ("text-h6") }, }));
-                const __VLS_119 = __VLS_118({ ...{ class: ("text-h6") }, }, ...__VLS_functionalComponentArgsRest(__VLS_118));
+                const __VLS_120 = __VLS_asFunctionalComponent(__VLS_119, new __VLS_119({ ...{ class: ("text-h6") }, }));
+                const __VLS_121 = __VLS_120({ ...{ class: ("text-h6") }, }, ...__VLS_functionalComponentArgsRest(__VLS_120));
                 (party.name);
-                __VLS_nonNullable(__VLS_122.slots).default;
-                var __VLS_122;
-                const __VLS_123 = __VLS_resolvedLocalAndGlobalComponents.VListItemSubtitle;
+                __VLS_nonNullable(__VLS_124.slots).default;
+                var __VLS_124;
+                const __VLS_125 = __VLS_resolvedLocalAndGlobalComponents.VListItemSubtitle;
                 /** @type { [typeof __VLS_components.VListItemSubtitle, typeof __VLS_components.vListItemSubtitle, typeof __VLS_components.VListItemSubtitle, typeof __VLS_components.vListItemSubtitle, ] } */
                 // @ts-ignore
-                const __VLS_124 = __VLS_asFunctionalComponent(__VLS_123, new __VLS_123({}));
-                const __VLS_125 = __VLS_124({}, ...__VLS_functionalComponentArgsRest(__VLS_124));
+                const __VLS_126 = __VLS_asFunctionalComponent(__VLS_125, new __VLS_125({}));
+                const __VLS_127 = __VLS_126({}, ...__VLS_functionalComponentArgsRest(__VLS_126));
                 (__VLS_ctx.formatDate(party.createdOn));
                 (party.partyMembers.length);
-                __VLS_nonNullable(__VLS_128.slots).default;
-                var __VLS_128;
+                __VLS_nonNullable(__VLS_130.slots).default;
+                var __VLS_130;
             }
             __VLS_elementAsFunction(__VLS_intrinsicElements.template, __VLS_intrinsicElements.template)({});
             {
-                const { append: __VLS_thisSlot } = __VLS_nonNullable(__VLS_116.slots);
-                const __VLS_129 = __VLS_resolvedLocalAndGlobalComponents.VIcon;
+                const { append: __VLS_thisSlot } = __VLS_nonNullable(__VLS_118.slots);
+                const __VLS_131 = __VLS_resolvedLocalAndGlobalComponents.VIcon;
                 /** @type { [typeof __VLS_components.VIcon, typeof __VLS_components.vIcon, typeof __VLS_components.VIcon, typeof __VLS_components.vIcon, ] } */
                 // @ts-ignore
-                const __VLS_130 = __VLS_asFunctionalComponent(__VLS_129, new __VLS_129({ ...{ 'onClick': {} }, color: ("warning"), small: (true), }));
-                const __VLS_131 = __VLS_130({ ...{ 'onClick': {} }, color: ("warning"), small: (true), }, ...__VLS_functionalComponentArgsRest(__VLS_130));
-                let __VLS_135;
-                const __VLS_136 = {
+                const __VLS_132 = __VLS_asFunctionalComponent(__VLS_131, new __VLS_131({ ...{ 'onClick': {} }, color: ("warning"), small: (true), }));
+                const __VLS_133 = __VLS_132({ ...{ 'onClick': {} }, color: ("warning"), small: (true), }, ...__VLS_functionalComponentArgsRest(__VLS_132));
+                let __VLS_137;
+                const __VLS_138 = {
                     onClick: (...[$event]) => {
                         if (!(!((__VLS_ctx.loading))))
                             return;
@@ -281,17 +288,17 @@ function __VLS_template() {
                         __VLS_ctx.editParty(party.id);
                     }
                 };
-                let __VLS_132;
-                let __VLS_133;
-                __VLS_nonNullable(__VLS_134.slots).default;
-                var __VLS_134;
-                const __VLS_137 = __VLS_resolvedLocalAndGlobalComponents.VIcon;
+                let __VLS_134;
+                let __VLS_135;
+                __VLS_nonNullable(__VLS_136.slots).default;
+                var __VLS_136;
+                const __VLS_139 = __VLS_resolvedLocalAndGlobalComponents.VIcon;
                 /** @type { [typeof __VLS_components.VIcon, typeof __VLS_components.vIcon, typeof __VLS_components.VIcon, typeof __VLS_components.vIcon, ] } */
                 // @ts-ignore
-                const __VLS_138 = __VLS_asFunctionalComponent(__VLS_137, new __VLS_137({ ...{ 'onClick': {} }, color: ("red"), small: (true), }));
-                const __VLS_139 = __VLS_138({ ...{ 'onClick': {} }, color: ("red"), small: (true), }, ...__VLS_functionalComponentArgsRest(__VLS_138));
-                let __VLS_143;
-                const __VLS_144 = {
+                const __VLS_140 = __VLS_asFunctionalComponent(__VLS_139, new __VLS_139({ ...{ 'onClick': {} }, color: ("red"), small: (true), }));
+                const __VLS_141 = __VLS_140({ ...{ 'onClick': {} }, color: ("red"), small: (true), }, ...__VLS_functionalComponentArgsRest(__VLS_140));
+                let __VLS_145;
+                const __VLS_146 = {
                     onClick: (...[$event]) => {
                         if (!(!((__VLS_ctx.loading))))
                             return;
@@ -300,58 +307,58 @@ function __VLS_template() {
                         __VLS_ctx.deleteParty(party.id);
                     }
                 };
-                let __VLS_140;
-                let __VLS_141;
-                __VLS_nonNullable(__VLS_142.slots).default;
-                var __VLS_142;
+                let __VLS_142;
+                let __VLS_143;
+                __VLS_nonNullable(__VLS_144.slots).default;
+                var __VLS_144;
             }
-            var __VLS_116;
+            var __VLS_118;
         }
-        __VLS_nonNullable(__VLS_110.slots).default;
-        var __VLS_110;
+        __VLS_nonNullable(__VLS_112.slots).default;
+        var __VLS_112;
         if (__VLS_ctx.guestOfParties.length > 0) {
-            const __VLS_145 = __VLS_resolvedLocalAndGlobalComponents.VList;
+            const __VLS_147 = __VLS_resolvedLocalAndGlobalComponents.VList;
             /** @type { [typeof __VLS_components.VList, typeof __VLS_components.vList, typeof __VLS_components.VList, typeof __VLS_components.vList, ] } */
             // @ts-ignore
-            const __VLS_146 = __VLS_asFunctionalComponent(__VLS_145, new __VLS_145({}));
-            const __VLS_147 = __VLS_146({}, ...__VLS_functionalComponentArgsRest(__VLS_146));
+            const __VLS_148 = __VLS_asFunctionalComponent(__VLS_147, new __VLS_147({}));
+            const __VLS_149 = __VLS_148({}, ...__VLS_functionalComponentArgsRest(__VLS_148));
             for (const [party] of __VLS_getVForSourceType((__VLS_ctx.guestOfParties))) {
-                const __VLS_151 = __VLS_resolvedLocalAndGlobalComponents.VListItem;
+                const __VLS_153 = __VLS_resolvedLocalAndGlobalComponents.VListItem;
                 /** @type { [typeof __VLS_components.VListItem, typeof __VLS_components.vListItem, typeof __VLS_components.VListItem, typeof __VLS_components.vListItem, ] } */
                 // @ts-ignore
-                const __VLS_152 = __VLS_asFunctionalComponent(__VLS_151, new __VLS_151({ key: ((party.id)), }));
-                const __VLS_153 = __VLS_152({ key: ((party.id)), }, ...__VLS_functionalComponentArgsRest(__VLS_152));
+                const __VLS_154 = __VLS_asFunctionalComponent(__VLS_153, new __VLS_153({ key: ((party.id)), }));
+                const __VLS_155 = __VLS_154({ key: ((party.id)), }, ...__VLS_functionalComponentArgsRest(__VLS_154));
                 __VLS_elementAsFunction(__VLS_intrinsicElements.template, __VLS_intrinsicElements.template)({});
                 {
-                    const { prepend: __VLS_thisSlot } = __VLS_nonNullable(__VLS_156.slots);
-                    const __VLS_157 = __VLS_resolvedLocalAndGlobalComponents.VListItemTitle;
+                    const { prepend: __VLS_thisSlot } = __VLS_nonNullable(__VLS_158.slots);
+                    const __VLS_159 = __VLS_resolvedLocalAndGlobalComponents.VListItemTitle;
                     /** @type { [typeof __VLS_components.VListItemTitle, typeof __VLS_components.vListItemTitle, typeof __VLS_components.VListItemTitle, typeof __VLS_components.vListItemTitle, ] } */
                     // @ts-ignore
-                    const __VLS_158 = __VLS_asFunctionalComponent(__VLS_157, new __VLS_157({ ...{ class: ("text-h6") }, }));
-                    const __VLS_159 = __VLS_158({ ...{ class: ("text-h6") }, }, ...__VLS_functionalComponentArgsRest(__VLS_158));
+                    const __VLS_160 = __VLS_asFunctionalComponent(__VLS_159, new __VLS_159({ ...{ class: ("text-h6") }, }));
+                    const __VLS_161 = __VLS_160({ ...{ class: ("text-h6") }, }, ...__VLS_functionalComponentArgsRest(__VLS_160));
                     (party.name);
-                    __VLS_nonNullable(__VLS_162.slots).default;
-                    var __VLS_162;
-                    const __VLS_163 = __VLS_resolvedLocalAndGlobalComponents.VListItemSubtitle;
+                    __VLS_nonNullable(__VLS_164.slots).default;
+                    var __VLS_164;
+                    const __VLS_165 = __VLS_resolvedLocalAndGlobalComponents.VListItemSubtitle;
                     /** @type { [typeof __VLS_components.VListItemSubtitle, typeof __VLS_components.vListItemSubtitle, typeof __VLS_components.VListItemSubtitle, typeof __VLS_components.vListItemSubtitle, ] } */
                     // @ts-ignore
-                    const __VLS_164 = __VLS_asFunctionalComponent(__VLS_163, new __VLS_163({}));
-                    const __VLS_165 = __VLS_164({}, ...__VLS_functionalComponentArgsRest(__VLS_164));
+                    const __VLS_166 = __VLS_asFunctionalComponent(__VLS_165, new __VLS_165({}));
+                    const __VLS_167 = __VLS_166({}, ...__VLS_functionalComponentArgsRest(__VLS_166));
                     (__VLS_ctx.formatDate(party.createdOn));
                     (party.partyMembers.length);
-                    __VLS_nonNullable(__VLS_168.slots).default;
-                    var __VLS_168;
+                    __VLS_nonNullable(__VLS_170.slots).default;
+                    var __VLS_170;
                 }
                 __VLS_elementAsFunction(__VLS_intrinsicElements.template, __VLS_intrinsicElements.template)({});
                 {
-                    const { append: __VLS_thisSlot } = __VLS_nonNullable(__VLS_156.slots);
-                    const __VLS_169 = __VLS_resolvedLocalAndGlobalComponents.VIcon;
+                    const { append: __VLS_thisSlot } = __VLS_nonNullable(__VLS_158.slots);
+                    const __VLS_171 = __VLS_resolvedLocalAndGlobalComponents.VIcon;
                     /** @type { [typeof __VLS_components.VIcon, typeof __VLS_components.vIcon, typeof __VLS_components.VIcon, typeof __VLS_components.vIcon, ] } */
                     // @ts-ignore
-                    const __VLS_170 = __VLS_asFunctionalComponent(__VLS_169, new __VLS_169({ ...{ 'onClick': {} }, color: ("warning"), small: (true), }));
-                    const __VLS_171 = __VLS_170({ ...{ 'onClick': {} }, color: ("warning"), small: (true), }, ...__VLS_functionalComponentArgsRest(__VLS_170));
-                    let __VLS_175;
-                    const __VLS_176 = {
+                    const __VLS_172 = __VLS_asFunctionalComponent(__VLS_171, new __VLS_171({ ...{ 'onClick': {} }, color: ("warning"), small: (true), }));
+                    const __VLS_173 = __VLS_172({ ...{ 'onClick': {} }, color: ("warning"), small: (true), }, ...__VLS_functionalComponentArgsRest(__VLS_172));
+                    let __VLS_177;
+                    const __VLS_178 = {
                         onClick: (...[$event]) => {
                             if (!(!((__VLS_ctx.loading))))
                                 return;
@@ -362,18 +369,18 @@ function __VLS_template() {
                             __VLS_ctx.editParty(party.id);
                         }
                     };
-                    let __VLS_172;
-                    let __VLS_173;
-                    __VLS_nonNullable(__VLS_174.slots).default;
-                    var __VLS_174;
+                    let __VLS_174;
+                    let __VLS_175;
+                    __VLS_nonNullable(__VLS_176.slots).default;
+                    var __VLS_176;
                 }
-                var __VLS_156;
+                var __VLS_158;
             }
-            __VLS_nonNullable(__VLS_150.slots).default;
-            var __VLS_150;
+            __VLS_nonNullable(__VLS_152.slots).default;
+            var __VLS_152;
         }
-        __VLS_nonNullable(__VLS_104.slots).default;
-        var __VLS_104;
+        __VLS_nonNullable(__VLS_106.slots).default;
+        var __VLS_106;
     }
     __VLS_nonNullable(__VLS_12.slots).default;
     var __VLS_12;

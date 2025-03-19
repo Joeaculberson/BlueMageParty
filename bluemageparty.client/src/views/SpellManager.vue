@@ -33,7 +33,7 @@
       </v-card-text>
       <v-container v-else>
         <SpellTable :spells="filteredSpells" :character-id="characterStore.getVerifiedCharacters()[0]?.id"
-          :show-owned-column="characterStore.getVerifiedCharacters().length > 0" @spell-updated="handleSpellUpdate" />
+          :show-owned-column="characterStore.getVerifiedCharacters().length > 0" @spell-updated="handleSpellUpdate" :missing-spells=[] />
       </v-container>
     </div>
   </v-container>
@@ -120,11 +120,11 @@ export default {
               : undefined;
 
           // Fetch spells based on the active character
-          const response = await axios.get(GET_SPELLS_URL, {
+          const response = await axios.get<Spell[]>(GET_SPELLS_URL, {
             params: { characterId },
           });
 
-          spells.value = response.data.map((spell: any) => ({
+          spells.value = response.data.map((spell) => ({
             ...spell,
             checked: false, // Initialize checkbox state as false
           }));
@@ -173,7 +173,7 @@ export default {
       filters,
       filteredSpells,
       applyFilters,
-      currentUserId
+      currentUserId,
     };
   },
 };

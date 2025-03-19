@@ -2,6 +2,7 @@ import { ref } from 'vue';
 import axios from 'axios';
 import { RESET_PASSWORD_URL } from '@/constants/api';
 import { passwordRule, confirmPasswordRule } from '@/utils/validationRules';
+import { useRoute, useRouter } from 'vue-router'; // Import useRoute
 export default (await import('vue')).defineComponent({
     name: 'ResetPassword',
     setup() {
@@ -11,14 +12,25 @@ export default (await import('vue')).defineComponent({
         const alertType = ref('info');
         const isValid = ref(false);
         const isResetting = ref(false);
+        const route = useRoute();
+        const router = useRouter();
+        const token = ref('');
+        onMounted(() => {
+            if (route.query.token) {
+                token.value = route.query.token;
+            }
+            else {
+                router.push('/login');
+            }
+        });
         const resetPassword = async () => {
             if (!isValid.value || isResetting.value)
                 return;
             isResetting.value = true;
             try {
                 const response = await axios.post(RESET_PASSWORD_URL, {
-                    newPassword: newPassword.value,
-                    confirmPassword: confirmPassword.value,
+                    Password: newPassword.value,
+                    Token: token.value
                 });
                 alertType.value = 'success';
                 message.value = 'Password reset successfully.';
