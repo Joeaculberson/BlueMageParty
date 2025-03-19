@@ -35,6 +35,7 @@ import axios from 'axios';
 import { useRouter, useRoute } from 'vue-router'; // Import useRoute
 import { useAuthStore } from '@/stores/authStore';
 import { emailRule, passwordRule } from '@/utils/validationRules';
+import { LOGIN_URL } from '@/constants/api';
 
 interface LoginResponse {
   auth_token: string;
@@ -68,7 +69,7 @@ export default {
       if (!isValid.value) return;
 
       try {
-        const response = await axios.post<LoginResponse>('/api/login', {
+        const response = await axios.post<LoginResponse>(LOGIN_URL, {
           email: email.value,
           password: password.value,
         });
