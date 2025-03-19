@@ -4,7 +4,7 @@
       <v-row justify="center">
         <v-col>
           <!-- Alert for Success/Error Messages -->
-          <v-alert v-if="message" :type="alertType" dismissible>
+          <v-alert v-if="message || isVerified" :type="alertType" dismissible>
             {{ message }}
           </v-alert>
           <v-card title="Login">
@@ -30,9 +30,9 @@
 </template>
 
 <script lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router'; // Import useRoute
 import { useAuthStore } from '@/stores/authStore';
 import { emailRule, passwordRule } from '@/utils/validationRules';
 
@@ -51,8 +51,18 @@ export default {
     const message = ref('');
     const alertType = ref<'success' | 'error' | 'info' | 'warning'>('info');
     const isValid = ref(false);
+    const isVerified = ref(false); // Add a ref for verified status
     const router = useRouter();
+    const route = useRoute(); // Use useRoute to access query parameters
     const authStore = useAuthStore();
+
+    // Check if the URL contains verified=true
+    onMounted(() => {
+      if (route.query.verified === 'true') {
+        message.value = 'Your account has been verified!';
+        alertType.value = 'success';
+      }
+    });
 
     const login = async () => {
       if (!isValid.value) return;
@@ -87,6 +97,7 @@ export default {
       message,
       alertType,
       isValid,
+      isVerified, // Return isVerified
       login,
       emailRule,
       passwordRule,
