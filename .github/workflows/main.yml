@@ -73,7 +73,3 @@ jobs:
             export EmailSettings__SMTPEmailPassword='$EmailSettings__SMTPEmailPassword' &&
             export EmailSettings__SendGridApiKey='$EmailSettings__SendGridApiKey' &&
             export Discord__ClientSecret='$Discord__ClientSecret' &&
-
-          ssh -o StrictHostKeyChecking=no jculberson@64.227.6.150 "sudo systemctl daemon-reload && sudo systemctl restart BlueMageServer.service"
-            nohup dotnet /var/www/BlueMageParty/server/BlueMageParty.Server.dll > /dev/null 2>&1 &
-          "
