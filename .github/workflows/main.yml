@@ -73,3 +73,6 @@ jobs:
             export EmailSettings__SMTPEmailPassword='$EmailSettings__SMTPEmailPassword' &&
             export EmailSettings__SendGridApiKey='$EmailSettings__SendGridApiKey' &&
             export Discord__ClientSecret='$Discord__ClientSecret' &&
+            sudo systemctl daemon-reload &&
+            sudo systemctl restart BlueMageServer.service
+          "
