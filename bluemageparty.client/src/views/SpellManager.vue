@@ -123,7 +123,7 @@ export default {
           const response = await axios.get<Spell[]>(GET_SPELLS_URL, {
             params: { characterId },
           });
-
+          console.log(response);
           spells.value = response.data.map((spell) => ({
             ...spell,
             checked: false, // Initialize checkbox state as false

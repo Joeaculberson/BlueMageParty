@@ -59,6 +59,7 @@ interface LoginResponse {
   is_admin: boolean;
   id: string;
   message?: string;
+  email: string;
 }
 
 export default {
@@ -97,6 +98,7 @@ export default {
 
         if (response.data.auth_token) {
           authStore.login(response.data.auth_token);
+          authStore.setEmail(response.data.email);
           authStore.setIsAdmin(response.data.is_admin);
           authStore.setUserId(response.data.id);
           console.log('setUserId', response.data.id);
