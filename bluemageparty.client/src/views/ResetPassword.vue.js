@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import axios from 'axios';
+import apiClient from '@/apiClient';
 import { RESET_PASSWORD_URL } from '@/constants/api';
 import { passwordRule, confirmPasswordRule } from '@/utils/validationRules';
 import { useRoute, useRouter } from 'vue-router'; // Import useRoute
@@ -28,7 +28,7 @@ export default (await import('vue')).defineComponent({
                 return;
             isResetting.value = true;
             try {
-                const response = await axios.post(RESET_PASSWORD_URL, {
+                const response = await apiClient.post(RESET_PASSWORD_URL, {
                     Password: newPassword.value,
                     Token: token.value
                 });

@@ -8,8 +8,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6682B4F6-81E0-4DCB-9274-704E625D721D}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
-		InsertUsers.sql = InsertUsers.sql
 		README.md = README.md
+		InsertData.sql = InsertData.sql
 		UpdateSpellPartySize.sql = UpdateSpellPartySize.sql
 	EndProjectSection
 EndProject

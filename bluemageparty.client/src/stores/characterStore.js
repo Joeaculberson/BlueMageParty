@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import axios from "axios";
+import apiClient from '@/apiClient';
 import { GET_CHARACTERS_URL, SET_DEFAULT_CHARACTER_URL, REMOVE_CHARACTER_URL, } from "@/constants/api";
 export const useCharacterStore = defineStore("character", {
     state: () => ({
@@ -13,7 +13,7 @@ export const useCharacterStore = defineStore("character", {
             if (!authToken)
                 return;
             try {
-                const response = await axios.get(GET_CHARACTERS_URL, {
+                const response = await apiClient.get(GET_CHARACTERS_URL, {
                     params: { authToken: authToken },
                 });
                 const characters = response.data.filter((char) => char !== null);
@@ -26,7 +26,7 @@ export const useCharacterStore = defineStore("character", {
         },
         async setAsDefault(character) {
             try {
-                const response = await axios.post(SET_DEFAULT_CHARACTER_URL, {
+                const response = await apiClient.post(SET_DEFAULT_CHARACTER_URL, {
                     characterId: character.id,
                 });
                 return response;
@@ -38,7 +38,7 @@ export const useCharacterStore = defineStore("character", {
         async removeCharacterFromDB(character) {
             try {
                 // Use the character ID in the URL path
-                const response = await axios.delete(`${REMOVE_CHARACTER_URL}/${character.id}`);
+                const response = await apiClient.delete(`${REMOVE_CHARACTER_URL}/${character.id}`);
                 console.log("Character removed from database");
             }
             catch (error) {

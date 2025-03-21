@@ -16,7 +16,7 @@
   import { handleDiscordCallback } from '@/services/authService';
   import { useAuthStore } from '@/stores/authStore';
   import { useRouter } from 'vue-router';
-  import axios from 'axios';
+  import apiClient from '@/apiClient';
   import { GET_LOGIN_RESPONSE } from '@/constants/api';
   
   interface DiscordCallbackResponse {
@@ -37,7 +37,7 @@
   
       const getUser = async (token: string): Promise<UserResponse | null> => {
         try {
-          const response = await axios.get<UserResponse>(GET_LOGIN_RESPONSE, {
+          const response = await apiClient.get<UserResponse>(GET_LOGIN_RESPONSE, {
             params: { jwt: token },
           });
           if (response.data) {

@@ -1,5 +1,5 @@
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
+import apiClient from '@/apiClient';
 import { useRouter, useRoute } from 'vue-router'; // Import useRoute
 import { useAuthStore } from '@/stores/authStore';
 import { emailRule, passwordRule } from '@/utils/validationRules';
@@ -30,7 +30,7 @@ export default (await import('vue')).defineComponent({
             if (!isValid.value)
                 return;
             try {
-                const response = await axios.post(LOGIN_URL, {
+                const response = await apiClient.post(LOGIN_URL, {
                     email: email.value,
                     password: password.value,
                 });

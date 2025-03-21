@@ -48,7 +48,7 @@
 
 <script lang="ts">
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
+import apiClient from '@/apiClient';
 import { useRouter, useRoute } from 'vue-router'; // Import useRoute
 import { useAuthStore } from '@/stores/authStore';
 import { emailRule, passwordRule } from '@/utils/validationRules';
@@ -91,7 +91,7 @@ export default {
       if (!isValid.value) return;
 
       try {
-        const response = await axios.post<LoginResponse>(LOGIN_URL, {
+        const response = await apiClient.post<LoginResponse>(LOGIN_URL, {
           email: email.value,
           password: password.value,
         });
@@ -101,7 +101,6 @@ export default {
           authStore.setEmail(response.data.email);
           authStore.setIsAdmin(response.data.is_admin);
           authStore.setUserId(response.data.id);
-          console.log('setUserId', response.data.id);
 
           alertType.value = 'success';
           message.value = 'Login successful.';

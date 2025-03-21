@@ -49,17 +49,13 @@ Run the following command in the Package Manager Console:
 
 ### **Step 3: Insert Mock Data**
 1. Navigate to the root directory of the project.
-2. Run the provided `InsertUser.sql` script against your database.
-3. All generated users will have the default password: `test123`.
-4. Login with Pavetheway101@gmail.com and test123
+2. Run the provided `InsertData.sql` script against your database.
+3. All generated users will have the default password: `Test123!`.
+4. Login with Pavetheway101@gmail.com and Test123!
 
 ---
 
-## Advanced Installation 
-
-### Only follow these steps if you're wanting to add to the login system. Otherwise, stick to the simple installation.
-
-### **Step 1: Generate a JWT Security Key**
+### **Step 4: Generate a JWT Security Key**
 To secure the application, you need to generate your own JWT Security Key.
 
 1. Run the following command to generate a key:
@@ -78,9 +74,29 @@ To secure the application, you need to generate your own JWT Security Key.
    BlueMageParty/BlueMageParty.Server/
    ```
 
+### **Step 5: Set up .env.local in the Vue project**
+1. Use openssl to create an api key.
+   ```bash
+   Use openssl rand -base64 32
+   ```
+
+2. Create a .env.local in the same directory as .env.development file with a api key.
+   ```bash
+    VITE_API_KEY=your_api_key_here
+   ```
+
+3. Add the same new generate api key to your user-secrets:
+   ```bash
+   dotnet user-secrets set "VITE_API_KEY" "YOUR_API_KEY"
+   ```
+
 ---
 
-### **Step 2: Configure Email or Authentication Keys**
+## Advanced Installation 
+
+### Only follow these steps if you're wanting to add to the login system. Otherwise, stick to the simple installation.
+
+### **Step 1: Configure Email or Authentication Keys (Optional)**
 To authenticate new users, you’ll need SMTP info/keys and Discord Keys.
 
 #### **Option 1: Email Authentication**
@@ -103,7 +119,7 @@ To authenticate new users, you’ll need SMTP info/keys and Discord Keys.
 
 ---
 
-### **Step 3: Configure Discord Client Key and Secret**
+### **Step 2: Configure Discord Client Key and Secret (Optional)**
 To authenticate new users via Discord, you'll need a Discord Secret Key and Discord Client Key.
 
 1. **Add Discord Secret to User Secrets:**

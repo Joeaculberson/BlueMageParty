@@ -1,4 +1,4 @@
-import axios from "axios";
+import apiClient from '@/apiClient';
 import { UPDATE_SPELL_OWNED_URL } from "@/constants/api";
 import debounce from "lodash.debounce";
 import { defineComponent } from "vue";
@@ -30,7 +30,7 @@ export default defineComponent({
         // Handle checkbox state change
         const handleCheckboxChange = async (spell) => {
             try {
-                await axios.post(UPDATE_SPELL_OWNED_URL, {
+                await apiClient.post(UPDATE_SPELL_OWNED_URL, {
                     spellId: spell.id,
                     characterId: props.characterId,
                     isChecked: spell.owned, // Directly use the spell's 'owned' property

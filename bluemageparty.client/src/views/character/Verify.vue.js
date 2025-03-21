@@ -2,7 +2,7 @@ import { defineComponent, ref, onMounted } from "vue";
 import { useAuthStore } from "@/stores/authStore";
 import { useCharacterStore } from "@/stores/characterStore";
 import { useRouter } from "vue-router";
-import axios from "axios";
+import apiClient from '@/apiClient';
 import { GET_VERIFICATION_CODE_URL, VERIFY_CHARACTER_URL } from "@/constants/api";
 export default defineComponent({
     name: "VerifyCharacter",
@@ -52,7 +52,7 @@ export default defineComponent({
         });
         const fetchVerificationCode = async () => {
             try {
-                const response = await axios.get(GET_VERIFICATION_CODE_URL, {
+                const response = await apiClient.get(GET_VERIFICATION_CODE_URL, {
                     params: { token: authStore.getAuthToken() },
                 });
                 verificationCode.value = response.data.verificationCode; // No more error
@@ -98,7 +98,7 @@ export default defineComponent({
                             Tribe: character.value.tribe,
                         },
                     };
-                    const response = await axios.post(VERIFY_CHARACTER_URL, payload);
+                    const response = await apiClient.post(VERIFY_CHARACTER_URL, payload);
                     if (!response.data.verified) {
                         message.value = "Character verification failed. Please confirm that the verification code is in the character's bio.";
                         messageType.value = 'error';

@@ -1,5 +1,5 @@
 import { ref, computed, onMounted } from 'vue';
-import axios from 'axios';
+import apiClient from '@/apiClient';
 import { useAuthStore } from '@/stores/authStore';
 import { watch } from 'vue';
 import { useCharacterStore } from '@/stores/characterStore';
@@ -50,7 +50,7 @@ export default (await import('vue')).defineComponent({
                         ? characterStore.getVerifiedCharacters()[0].id
                         : undefined;
                     // Fetch spells based on the active character
-                    const response = await axios.get(GET_SPELLS_URL, {
+                    const response = await apiClient.get(GET_SPELLS_URL, {
                         params: { characterId },
                     });
                     spells.value = response.data.map((spell) => ({

@@ -86,7 +86,7 @@
 
 <script lang="ts">
 import { ref, onMounted } from "vue";
-import axios from "axios";
+import apiClient from '@/apiClient';
 import { useRouter } from "vue-router";
 import { useCharacterStore } from "@/stores/characterStore";
 import { GET_HOME_WORLDS_URL, GET_DATA_CENTERS_URL, SEARCH_CHARACTER_URL } from "@/constants/api";
@@ -113,7 +113,7 @@ export default {
       if (!isLoading.value) {
         isLoading.value = true;
         try {
-          const response = await axios.post(SEARCH_CHARACTER_URL, {
+          const response = await apiClient.post(SEARCH_CHARACTER_URL, {
             name: name.value,
             world: selectedHomeWorld.value,
           });
@@ -151,7 +151,7 @@ export default {
 
     const getHomeWorlds = async () => {
       try {
-        const response = await axios.get(GET_HOME_WORLDS_URL);
+        const response = await apiClient.get(GET_HOME_WORLDS_URL);
         // Ensure response.data is an array
         homeWorlds.value = Array.isArray(response.data) ? response.data : Object.values(response.data);
       } catch (error) {
@@ -161,7 +161,7 @@ export default {
 
     const getDataCenters = async () => {
       try {
-        const response = await axios.get(GET_DATA_CENTERS_URL);
+        const response = await apiClient.get(GET_DATA_CENTERS_URL);
         // Ensure response.data is an array
         dataCenters.value = Array.isArray(response.data) ? response.data : Object.values(response.data);
       } catch (error) {

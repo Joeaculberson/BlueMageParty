@@ -86,7 +86,7 @@
 import { defineComponent, ref, watch } from 'vue';
 import { useCharacterStore } from '@/stores/characterStore';
 import { useRouter } from "vue-router";
-import axios from "axios";
+import apiClient from '@/apiClient';
 import { REMOVE_PARTY_MEMBER_URL } from '@/constants/api';
 import { useAuthStore } from '@/stores/authStore';
 
@@ -231,7 +231,7 @@ export default defineComponent({
       if (!memberId) return;
 
       try {
-        const response = await axios.delete(REMOVE_PARTY_MEMBER_URL, {
+        const response = await apiClient.delete(REMOVE_PARTY_MEMBER_URL, {
           params: { Id: memberId }
         });
 

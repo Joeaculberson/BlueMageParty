@@ -42,7 +42,7 @@
 <script lang="ts">
 import SpellTable from "@/components/SpellTable.vue";
 import { ref, computed, onMounted } from 'vue';
-import axios from 'axios';
+import apiClient from '@/apiClient';
 import { useAuthStore } from '@/stores/authStore';
 import { watch } from 'vue';
 import { useCharacterStore } from '@/stores/characterStore';
@@ -120,7 +120,7 @@ export default {
               : undefined;
 
           // Fetch spells based on the active character
-          const response = await axios.get<Spell[]>(GET_SPELLS_URL, {
+          const response = await apiClient.get<Spell[]>(GET_SPELLS_URL, {
             params: { characterId },
           });
           console.log(response);

@@ -33,7 +33,7 @@
 
 <script lang="ts">
 import { ref } from 'vue';
-import axios from 'axios';
+import apiClient from '@/apiClient';
 import { RESET_PASSWORD_URL } from '@/constants/api';
 import { passwordRule, confirmPasswordRule } from '@/utils/validationRules';
 import { useRoute, useRouter } from 'vue-router'; // Import useRoute
@@ -69,7 +69,7 @@ export default {
       isResetting.value = true;
 
       try {
-        const response = await axios.post<ResetPasswordResponse>(RESET_PASSWORD_URL, {
+        const response = await apiClient.post<ResetPasswordResponse>(RESET_PASSWORD_URL, {
           Password: newPassword.value,
           Token: token.value
         });

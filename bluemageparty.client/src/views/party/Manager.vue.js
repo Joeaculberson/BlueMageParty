@@ -1,5 +1,5 @@
 import { defineComponent, ref, onMounted } from "vue";
-import axios from "axios";
+import apiClient from '@/apiClient';
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/authStore";
 import { useCharacterStore } from "@/stores/characterStore";
@@ -18,7 +18,7 @@ export default defineComponent({
         const getUsersParties = async () => {
             loading.value = true;
             try {
-                const response = await axios.get(GET_PARTIES_BY_USER_ID_URL, {
+                const response = await apiClient.get(GET_PARTIES_BY_USER_ID_URL, {
                     params: { authToken: authStore.getAuthToken() }
                 });
                 hostedParties.value = response.data.hostedParties;
@@ -35,7 +35,7 @@ export default defineComponent({
             if (!partyName.value)
                 return;
             try {
-                const response = await axios.post(CREATE_PARTY_URL, {
+                const response = await apiClient.post(CREATE_PARTY_URL, {
                     authToken: authStore.getAuthToken(),
                     characterId: characterStore.getVerifiedCharacters()[0].id,
                     partyName: partyName.value
@@ -60,7 +60,7 @@ export default defineComponent({
         };
         const deleteParty = async (partyId) => {
             try {
-                await axios.delete(DELETE_PARTY_URL, { params: { partyId } });
+                await apiClient.delete(DELETE_PARTY_URL, { params: { partyId } });
                 hostedParties.value = hostedParties.value.filter((p) => p.id !== partyId);
             }
             catch (error) {

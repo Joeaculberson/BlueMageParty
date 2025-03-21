@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import axios from 'axios';
+import apiClient from '@/apiClient';
 import { RESET_PASSWORD_REQUEST_URL } from '@/constants/api';
 import { useAuthStore } from '@/stores/authStore';
 import { emailRule } from '@/utils/validationRules';
@@ -19,7 +19,7 @@ export default (await import('vue')).defineComponent({
                 return; // Prevent double clicks
             isVerifying.value = true;
             try {
-                const response = await axios.post(RESET_PASSWORD_REQUEST_URL, { email: email.value });
+                const response = await apiClient.post(RESET_PASSWORD_REQUEST_URL, { email: email.value });
                 // Store email in Pinia
                 authStore.setEmail(email.value);
                 alertType.value = 'success';

@@ -1,4 +1,4 @@
-import axios from "axios";
+import apiClient from '@/apiClient';
 const VITE_API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const DISCORD_CLIENT_ID = import.meta.env.VITE_DISCORD_CLIENT_ID;
 const DISCORD_REDIRECT_URI = import.meta.env.VITE_DISCORD_REDIRECT_URI;
@@ -8,7 +8,7 @@ export const redirectToDiscord = () => {
 };
 export const handleDiscordCallback = async (code) => {
     try {
-        const response = await axios.post(VITE_API_BASE_URL + "/auth/discord/callback", { code });
+        const response = await apiClient.post(VITE_API_BASE_URL + "/auth/discord/callback", { code });
         return response.data; // Contains the JWT
     }
     catch (error) {

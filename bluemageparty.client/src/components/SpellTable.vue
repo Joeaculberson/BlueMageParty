@@ -42,7 +42,7 @@
 </template>
 
 <script lang="ts">
-import axios from "axios";
+import apiClient from '@/apiClient';
 import { UPDATE_SPELL_OWNED_URL } from "@/constants/api";
 import debounce from "lodash.debounce";
 import { defineComponent, PropType } from "vue";
@@ -89,7 +89,7 @@ export default defineComponent({
 
     const handleCheckboxChange = async (spell: Spell) => {
       try {
-        await axios.post(UPDATE_SPELL_OWNED_URL, {
+        await apiClient.post(UPDATE_SPELL_OWNED_URL, {
           spellId: spell.id,
           characterId: props.characterId,
           isChecked: spell.owned,
