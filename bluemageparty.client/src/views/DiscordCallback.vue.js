@@ -1,3 +1,4 @@
+/// <reference types="../../node_modules/.vue-global-types/vue_3.5_false.d.ts" />
 import { defineComponent, onMounted } from 'vue';
 import { handleDiscordCallback } from '@/services/authService';
 import { useAuthStore } from '@/stores/authStore';

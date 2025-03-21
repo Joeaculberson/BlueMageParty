@@ -1,3 +1,4 @@
+/// <reference types="../../node_modules/.vue-global-types/vue_3.5_false.d.ts" />
 import { ref, computed, onMounted } from 'vue';
 import apiClient from '@/apiClient';
 import { useAuthStore } from '@/stores/authStore';
@@ -38,9 +39,6 @@ export default (await import('vue')).defineComponent({
             // console.log("Spell ownership updated:", data);
             // Update the spells array if needed
         };
-        const missingSpells = computed(() => {
-            return [];
-        });
         // Fetch the list of spells
         const getSpells = async () => {
             if (!isLoading.value) {
@@ -53,6 +51,7 @@ export default (await import('vue')).defineComponent({
                     const response = await apiClient.get(GET_SPELLS_URL, {
                         params: { characterId },
                     });
+                    console.log(response);
                     spells.value = response.data.map((spell) => ({
                         ...spell,
                         checked: false, // Initialize checkbox state as false
@@ -95,7 +94,6 @@ export default (await import('vue')).defineComponent({
             filteredSpells,
             applyFilters,
             currentUserId,
-            missingSpells
         };
     },
 });
@@ -236,14 +234,11 @@ function __VLS_template() {
             const __VLS_99 = __VLS_resolvedLocalAndGlobalComponents.SpellTable;
             /** @type { [typeof __VLS_components.SpellTable, ] } */
             // @ts-ignore
-            const __VLS_100 = __VLS_asFunctionalComponent(__VLS_99, new __VLS_99({ ...{ 'onSpellUpdated': {} }, ...{ 'onMissingSpells': {} }, spells: ((__VLS_ctx.filteredSpells)), characterId: ((__VLS_ctx.characterStore.getVerifiedCharacters()[0]?.id)), showOwnedColumn: ((__VLS_ctx.characterStore.getVerifiedCharacters().length > 0)), }));
-            const __VLS_101 = __VLS_100({ ...{ 'onSpellUpdated': {} }, ...{ 'onMissingSpells': {} }, spells: ((__VLS_ctx.filteredSpells)), characterId: ((__VLS_ctx.characterStore.getVerifiedCharacters()[0]?.id)), showOwnedColumn: ((__VLS_ctx.characterStore.getVerifiedCharacters().length > 0)), }, ...__VLS_functionalComponentArgsRest(__VLS_100));
+            const __VLS_100 = __VLS_asFunctionalComponent(__VLS_99, new __VLS_99({ ...{ 'onSpellUpdated': {} }, spells: ((__VLS_ctx.filteredSpells)), characterId: ((__VLS_ctx.characterStore.getVerifiedCharacters()[0]?.id)), showOwnedColumn: ((__VLS_ctx.characterStore.getVerifiedCharacters().length > 0)), missingSpells: (([])), }));
+            const __VLS_101 = __VLS_100({ ...{ 'onSpellUpdated': {} }, spells: ((__VLS_ctx.filteredSpells)), characterId: ((__VLS_ctx.characterStore.getVerifiedCharacters()[0]?.id)), showOwnedColumn: ((__VLS_ctx.characterStore.getVerifiedCharacters().length > 0)), missingSpells: (([])), }, ...__VLS_functionalComponentArgsRest(__VLS_100));
             let __VLS_105;
             const __VLS_106 = {
                 onSpellUpdated: (__VLS_ctx.handleSpellUpdate)
-            };
-            const __VLS_107 = {
-                onMissingSpells: (__VLS_ctx.missingSpells)
             };
             let __VLS_102;
             let __VLS_103;

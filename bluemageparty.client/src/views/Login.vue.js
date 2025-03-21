@@ -1,3 +1,4 @@
+/// <reference types="../../node_modules/.vue-global-types/vue_3.5_false.d.ts" />
 import { ref, onMounted } from 'vue';
 import apiClient from '@/apiClient';
 import { useRouter, useRoute } from 'vue-router'; // Import useRoute
@@ -36,9 +37,9 @@ export default (await import('vue')).defineComponent({
                 });
                 if (response.data.auth_token) {
                     authStore.login(response.data.auth_token);
+                    authStore.setEmail(response.data.email);
                     authStore.setIsAdmin(response.data.is_admin);
                     authStore.setUserId(response.data.id);
-                    console.log('setUserId', response.data.id);
                     alertType.value = 'success';
                     message.value = 'Login successful.';
                     router.push('/'); // Redirect to home page

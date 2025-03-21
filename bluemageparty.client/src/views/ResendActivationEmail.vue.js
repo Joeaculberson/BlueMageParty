@@ -1,3 +1,4 @@
+/// <reference types="../../node_modules/.vue-global-types/vue_3.5_false.d.ts" />
 import { ref } from 'vue';
 import { useAuthStore } from '@/stores/authStore';
 import apiClient from '@/apiClient';

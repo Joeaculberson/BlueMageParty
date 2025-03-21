@@ -1,3 +1,4 @@
+/// <reference types="../../node_modules/.vue-global-types/vue_3.5_false.d.ts" />
 import { ref } from 'vue';
 import apiClient from '@/apiClient';
 import { RESET_PASSWORD_REQUEST_URL } from '@/constants/api';

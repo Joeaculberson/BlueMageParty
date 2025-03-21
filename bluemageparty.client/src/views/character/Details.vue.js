@@ -1,3 +1,4 @@
+/// <reference types="../../../node_modules/.vue-global-types/vue_3.5_false.d.ts" />
 import { defineComponent, watch, ref, reactive } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import apiClient from '@/apiClient';

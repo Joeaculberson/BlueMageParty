@@ -1,3 +1,4 @@
+/// <reference types="../../../node_modules/.vue-global-types/vue_3.5_false.d.ts" />
 import { ref, onMounted } from "vue";
 import apiClient from '@/apiClient';
 import { useRouter } from "vue-router";

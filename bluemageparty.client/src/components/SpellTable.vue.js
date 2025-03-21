@@ -1,3 +1,4 @@
+/// <reference types="../../node_modules/.vue-global-types/vue_3.5_false.d.ts" />
 import apiClient from '@/apiClient';
 import { UPDATE_SPELL_OWNED_URL } from "@/constants/api";
 import debounce from "lodash.debounce";
@@ -18,22 +19,20 @@ export default defineComponent({
         },
         missingSpells: {
             type: Array,
-            required: false,
+            required: true,
         },
     },
     emits: ["spell-updated"],
     setup(props, { emit }) {
-        // Determine if a spell is owned by the character
         const isSpellOwned = (spellId) => {
             return !props.missingSpells?.some((spell) => spell.id === spellId);
         };
-        // Handle checkbox state change
         const handleCheckboxChange = async (spell) => {
             try {
                 await apiClient.post(UPDATE_SPELL_OWNED_URL, {
                     spellId: spell.id,
                     characterId: props.characterId,
-                    isChecked: spell.owned, // Directly use the spell's 'owned' property
+                    isChecked: spell.owned,
                 });
                 emit("spell-updated", {
                     spellId: spell.id,
@@ -43,9 +42,9 @@ export default defineComponent({
             }
             catch (error) {
                 console.error("Error updating spell ownership:", error);
+                spell.owned = !spell.owned; // Revert the checkbox state
             }
         };
-        // Debounce the handleCheckboxChange function
         const debouncedHandleCheckboxChange = debounce(handleCheckboxChange, 500);
         return { isSpellOwned, debouncedHandleCheckboxChange };
     },
@@ -114,8 +113,8 @@ function __VLS_template() {
             const __VLS_13 = __VLS_resolvedLocalAndGlobalComponents.VCheckbox;
             /** @type { [typeof __VLS_components.VCheckbox, typeof __VLS_components.vCheckbox, ] } */
             // @ts-ignore
-            const __VLS_14 = __VLS_asFunctionalComponent(__VLS_13, new __VLS_13({ ...{ 'onChange': {} }, modelValue: ((spell.owned)), value: ((__VLS_ctx.isSpellOwned(spell.id))), color: ("primary"), }));
-            const __VLS_15 = __VLS_14({ ...{ 'onChange': {} }, modelValue: ((spell.owned)), value: ((__VLS_ctx.isSpellOwned(spell.id))), color: ("primary"), }, ...__VLS_functionalComponentArgsRest(__VLS_14));
+            const __VLS_14 = __VLS_asFunctionalComponent(__VLS_13, new __VLS_13({ ...{ 'onChange': {} }, modelValue: ((spell.owned)), color: ("primary"), }));
+            const __VLS_15 = __VLS_14({ ...{ 'onChange': {} }, modelValue: ((spell.owned)), color: ("primary"), }, ...__VLS_functionalComponentArgsRest(__VLS_14));
             let __VLS_19;
             const __VLS_20 = {
                 onChange: (() => __VLS_ctx.debouncedHandleCheckboxChange(spell))
