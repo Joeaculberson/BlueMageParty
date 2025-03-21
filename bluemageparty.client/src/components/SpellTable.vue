@@ -32,7 +32,7 @@
         <td v-if="showOwnedColumn">
           <v-checkbox
             v-model="spell.owned"
-            @change="() => debouncedHandleCheckboxChange(spell)"
+            @change="() => handleCheckboxChange(spell)"
             color="primary"
           />
         </td>
@@ -44,7 +44,6 @@
 <script lang="ts">
 import apiClient from '@/apiClient';
 import { UPDATE_SPELL_OWNED_URL } from "@/constants/api";
-import debounce from "lodash.debounce";
 import { defineComponent, PropType } from "vue";
 
 interface Source {
@@ -106,9 +105,7 @@ export default defineComponent({
       }
     };
 
-    const debouncedHandleCheckboxChange = debounce(handleCheckboxChange, 500);
-
-    return { isSpellOwned, debouncedHandleCheckboxChange };
+    return { isSpellOwned, handleCheckboxChange };
   },
 });
 </script>
