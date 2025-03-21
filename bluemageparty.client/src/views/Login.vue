@@ -91,7 +91,6 @@ export default {
       if (!isValid.value) return;
 
       try {
-        console.log('WHAT IS GOING ON?????????')
         const response = await apiClient.post<LoginResponse>(LOGIN_URL, {
           email: email.value,
           password: password.value,
