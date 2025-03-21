@@ -48,7 +48,7 @@ jobs:
           EmailSettings__SendGridApiKey: ${{ secrets.SEND_GRID_API_KEY }}
           Discord__ClientSecret: ${{ secrets.DISCORD_CLIENT_SECRET }}
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          ApiKey: ${{ secrets.ApiKey }}
+          ApiKey: ${{ secrets.VITE_API_KEY }}
         run: |
           # Set up SSH
           mkdir -p ~/.ssh
@@ -74,7 +74,7 @@ jobs:
             export EmailSettings__SMTPEmailPassword='$EmailSettings__SMTPEmailPassword' &&
             export EmailSettings__SendGridApiKey='$EmailSettings__SendGridApiKey' &&
             export Discord__ClientSecret='$Discord__ClientSecret' &&
-            export ApiKey='$ApiKey' &&
+            export VITE_API_KEY='$VITE_API_KEY' &&
             sudo systemctl daemon-reload &&
             sudo systemctl restart BlueMageServer.service
           "
