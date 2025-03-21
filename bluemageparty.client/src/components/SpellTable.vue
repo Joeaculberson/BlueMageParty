@@ -1,5 +1,5 @@
 <template>
-  <v-table>
+  <v-table class="styled-table">
     <thead>
       <tr>
         <th class="text-left">#</th>
@@ -114,12 +114,38 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Arial, sans-serif;
+}
+
+.styled-table thead th {
+  background-color: #222eab; /* Light blue */
+  color: white;
+  padding: 12px;
+  text-align: left;
+}
+
+.styled-table tbody tr:nth-of-type(odd) {
+  background-color: #f2f2f2; /* Light grey for odd rows */
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+  background-color: #e6f7ff; /* Very light blue for even rows */
+}
+
+.styled-table tbody tr:hover {
+  background-color: #b3e5fc; /* Slightly darker blue for hover */
+}
+
+.styled-table td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
 .spell-sprite {
   border-radius: 0.3rem;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-}
-
-tbody tr:nth-of-type(odd) {
-  background-color: rgba(0, 0, 0, 0.391);
 }
 </style>
