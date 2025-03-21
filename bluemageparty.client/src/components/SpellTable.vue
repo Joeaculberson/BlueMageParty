@@ -121,7 +121,7 @@ export default defineComponent({
 }
 
 .styled-table thead th {
-  background-color: #222eab; /* Light blue */
+  background-color: #2064c4; /* Light blue */
   color: white;
   padding: 12px;
   text-align: left;
