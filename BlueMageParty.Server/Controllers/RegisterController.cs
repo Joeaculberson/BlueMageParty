@@ -14,6 +14,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.WebUtilities;
 using Azure.Core;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BlueMageParty.Server.Controllers
 {

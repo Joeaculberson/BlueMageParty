@@ -3,6 +3,7 @@
     using BlueMageParty.Server.Data;
     using BlueMageParty.Server.Helpers;
     using BlueMageParty.Server.Models;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.IdentityModel.Tokens;
@@ -62,7 +63,7 @@
                         await _context.SaveChangesAsync();
 
                         var token = GenerateJwtToken(request.Email, user.Id);
-                        return Ok(new { auth_token = token, is_admin = user.IsAdmin, id = user.Id });
+                        return Ok(new { auth_token = token, is_admin = user.IsAdmin, id = user.Id, email = user.Email });
                     }
                     else
                     {

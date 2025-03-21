@@ -8,6 +8,7 @@ using BlueMageParty.Server.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using BlueMageParty.Server.Data;
+using Microsoft.AspNetCore.Authorization;
 
 [Route("api/auth")]
 [ApiController]
