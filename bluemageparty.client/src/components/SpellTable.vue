@@ -31,8 +31,8 @@
         <td>{{ spell.patch }}</td>
         <td v-if="showOwnedColumn">
           <v-checkbox
-            v-model="spell.owned"
-            @change="() => handleCheckboxChange(spell)"
+            :model-value="isSpellOwned(spell.id)"
+            @update:model-value="(value) => handleCheckboxChange(spell.id, value)"
             color="primary"
           />
         </td>
@@ -58,10 +58,10 @@ interface Spell {
   name: string;
   sources: Source[];
   patch: string;
-  owned: boolean;
 }
 
 export default defineComponent({
+  name: 'SpellTable',
   props: {
     spells: {
       type: Array as PropType<Spell[]>,
@@ -76,7 +76,7 @@ export default defineComponent({
       required: true,
     },
     missingSpells: {
-      type: Array as PropType<Spell[]>,
+      type: Array as PropType<{id: string}[]>,
       required: true,
     },
   },
@@ -86,22 +86,21 @@ export default defineComponent({
       return !props.missingSpells?.some((spell) => spell.id === spellId);
     };
 
-    const handleCheckboxChange = async (spell: Spell) => {
+    const handleCheckboxChange = async (spellId: string, isChecked: boolean) => {
       try {
         await apiClient.post(UPDATE_SPELL_OWNED_URL, {
-          spellId: spell.id,
+          spellId: spellId,
           characterId: props.characterId,
-          isChecked: spell.owned,
+          isChecked: isChecked,
         });
 
         emit("spell-updated", {
-          spellId: spell.id,
-          owned: spell.owned,
+          spellId: spellId,
+          owned: isChecked,
           characterId: props.characterId,
         });
       } catch (error) {
         console.error("Error updating spell ownership:", error);
-        spell.owned = !spell.owned; // Revert the checkbox state
       }
     };
 
@@ -118,22 +117,22 @@ export default defineComponent({
 }
 
 .styled-table thead th {
-  background-color: #2064c4; /* Light blue */
+  background-color: #2064c4;
   color: white;
   padding: 12px;
   text-align: left;
 }
 
 .styled-table tbody tr:nth-of-type(odd) {
-  background-color: #f2f2f2; /* Light grey for odd rows */
+  background-color: #f2f2f2;
 }
 
 .styled-table tbody tr:nth-of-type(even) {
-  background-color: #e6f7ff; /* Very light blue for even rows */
+  background-color: #e6f7ff;
 }
 
 .styled-table tbody tr:hover {
-  background-color: #b3e5fc; /* Slightly darker blue for hover */
+  background-color: #b3e5fc;
 }
 
 .styled-table td {
