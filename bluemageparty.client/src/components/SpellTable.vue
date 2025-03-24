@@ -77,13 +77,18 @@ export default defineComponent({
     },
     missingSpells: {
       type: Array as PropType<{id: string}[]>,
-      required: true,
+      required: false,
+      default: () => []
     },
   },
   emits: ["spell-updated"],
   setup(props, { emit }) {
     const isSpellOwned = (spellId: string) => {
-      return !props.missingSpells?.some((spell) => spell.id === spellId);
+      // If missingSpells is empty array (SpellManager context), assume not owned
+      if (!props.missingSpells || props.missingSpells.length === 0) {
+        return false;
+      }
+      return !props.missingSpells.some((spell) => spell.id === spellId);
     };
 
     const handleCheckboxChange = async (spellId: string, isChecked: boolean) => {
