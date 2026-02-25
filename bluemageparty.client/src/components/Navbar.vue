@@ -53,16 +53,6 @@
         Select Character
       </v-btn>
     </template>
-
-    <v-btn v-if="isAuthenticated" @click="logout">
-      Logout
-    </v-btn>
-    <v-btn v-if="!isAuthenticated && isOnLoginPage" @click="goToRegisterPage">
-      Register
-    </v-btn>
-    <v-btn v-if="!isAuthenticated && !isOnLoginPage" @click="goToLogin">
-      Login
-    </v-btn>
     <LoginWithDiscord v-if="!isAuthenticated" class="login-page" />
   </v-app-bar>
 </template>
