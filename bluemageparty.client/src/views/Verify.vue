@@ -37,7 +37,7 @@
 <script lang="ts">
 import { ref, onMounted, watch } from 'vue';
 import { useAuthStore } from '@/stores/authStore';
-import axios from 'axios';
+import apiClient from '@/apiClient';
 import { useRouter, useRoute } from 'vue-router';
 import { VERIFY_CODE_URL } from '@/constants/api';
 
@@ -75,7 +75,7 @@ export default {
             isVerifying.value = true;
 
             try {
-                const response = await axios.post(VERIFY_CODE_URL, { email, code: code.value });
+                const response = await apiClient.post(VERIFY_CODE_URL, { email, code: code.value });
                 //authStore.clearEmail(); // Clear email after verification
                 router.push('/login?verified=true');
             } catch (err) {

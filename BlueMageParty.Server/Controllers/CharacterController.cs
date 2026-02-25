@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NetStone.Search.Character;
 using NetStone;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BlueMageParty.Server.Controllers
 {

@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import { ref } from 'vue';
-import axios from 'axios';
+import apiClient from '@/apiClient';
 import { useAuthStore } from '@/stores/authStore';
 import {
     SAVE_SPELLS_BULK_URL,
@@ -50,7 +50,7 @@ export default {
         const fetchAndSaveSpells = async (): Promise<void> => {
             try {
                 // Fetch the spell data from the external API
-                const response = await axios.get<Spell[]>(GET_TARO_BOKOKINGWAY_MISSING_SPELLS_URL);
+                const response = await apiClient.get<Spell[]>(GET_TARO_BOKOKINGWAY_MISSING_SPELLS_URL);
 
                 const spellsToSave = response.data.map((spell) => ({
                     number: spell.order,
@@ -73,7 +73,7 @@ export default {
                 }));
 
                 // Send the spells data in bulk to the server
-                const bulkResponse = await axios.post<BulkResponse>(SAVE_SPELLS_BULK_URL, spellsToSave, {
+                const bulkResponse = await apiClient.post<BulkResponse>(SAVE_SPELLS_BULK_URL, spellsToSave, {
                     headers: {
                         'Content-Type': 'application/json',
                     },

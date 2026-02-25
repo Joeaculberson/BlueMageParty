@@ -31,7 +31,7 @@
 <script lang="ts">
 import { ref } from 'vue';
 import { useAuthStore } from '@/stores/authStore';
-import axios from 'axios';
+import apiClient from '@/apiClient';
 import { RESEND_ACTIVATION_EMAIL_URL } from '@/constants/api';
 import { useRouter } from 'vue-router';
 
@@ -63,7 +63,7 @@ export default {
             isVerifying.value = true;
 
             try {
-                const response = await axios.post<ResendActivationEmailResponse>(RESEND_ACTIVATION_EMAIL_URL, { email: email.value });
+                const response = await apiClient.post<ResendActivationEmailResponse>(RESEND_ACTIVATION_EMAIL_URL, { email: email.value });
 
                 // Store email in Pinia (authStore)
                 authStore.setEmail(email.value);

@@ -1,5 +1,5 @@
 <template>
-  <v-table>
+  <v-table class="styled-table">
     <thead>
       <tr>
         <th class="text-left">#</th>
@@ -8,7 +8,6 @@
         <th class="text-left">Enemy</th>
         <th class="text-left">Location</th>
         <th class="text-left">Patch</th>
-        <!-- Only show the "Owned" column if the current user owns the character -->
         <th class="text-left" v-if="showOwnedColumn">Owned</th>
       </tr>
     </thead>
@@ -30,11 +29,10 @@
           </div>
         </td>
         <td>{{ spell.patch }}</td>
-        <!-- Only show the checkbox if the current user owns the character -->
         <td v-if="showOwnedColumn">
           <v-checkbox
-            :input-value="isSpellOwned(spell.id)"
-            @change="(value) => handleCheckboxChange(spell, value)"
+            :model-value="isSpellOwned(spell.id)"
+            @update:model-value="(value) => handleCheckboxChange(spell.id, value)"
             color="primary"
           />
         </td>
@@ -44,27 +42,26 @@
 </template>
 
 <script lang="ts">
-import axios from "axios";
-import { defineComponent } from "vue";
-import type { PropType } from "vue";
+import apiClient from '@/apiClient';
 import { UPDATE_SPELL_OWNED_URL } from "@/constants/api";
+import { defineComponent, PropType } from "vue";
 
-// Define the Spell interface
+interface Source {
+  enemy: string;
+  location: string;
+}
+
 interface Spell {
   id: string;
   number: number;
   icon: string;
   name: string;
-  sources: { enemy: string; location: string }[];
+  sources: Source[];
   patch: string;
 }
 
-// Define the MissingSpell interface (used in missingSpells prop)
-interface MissingSpell {
-  id: string;
-}
-
 export default defineComponent({
+  name: 'SpellTable',
   props: {
     spells: {
       type: Array as PropType<Spell[]>,
@@ -76,32 +73,34 @@ export default defineComponent({
     },
     showOwnedColumn: {
       type: Boolean,
-      default: false,
+      required: true,
     },
     missingSpells: {
-      type: Array as PropType<MissingSpell[]>,
-      default: () => [],
+      type: Array as PropType<{id: string}[]>,
+      required: false,
+      default: () => []
     },
   },
-  emits: ["spell-updated"], // Define the custom event
+  emits: ["spell-updated"],
   setup(props, { emit }) {
-    // Determine if a spell is owned by the character
     const isSpellOwned = (spellId: string) => {
-      return !props.missingSpells?.some((spell) => spell.id === spellId);
+      // If missingSpells is empty array (SpellManager context), assume not owned
+      if (!props.missingSpells || props.missingSpells.length === 0) {
+        return false;
+      }
+      return !props.missingSpells.some((spell) => spell.id === spellId);
     };
 
-    // Handle checkbox state change
-    const handleCheckboxChange = async (spell: Spell, isChecked: boolean) => {
-      console.log("handleCheckBoxChange triggered");
+    const handleCheckboxChange = async (spellId: string, isChecked: boolean) => {
       try {
-        await axios.post(UPDATE_SPELL_OWNED_URL, {
-          spellId: spell.id,
+        await apiClient.post(UPDATE_SPELL_OWNED_URL, {
+          spellId: spellId,
           characterId: props.characterId,
-          owned: isChecked,
+          isChecked: isChecked,
         });
 
         emit("spell-updated", {
-          spellId: spell.id,
+          spellId: spellId,
           owned: isChecked,
           characterId: props.characterId,
         });
@@ -116,12 +115,38 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Arial, sans-serif;
+}
+
+.styled-table thead th {
+  background-color: #2064c4;
+  color: white;
+  padding: 12px;
+  text-align: left;
+}
+
+.styled-table tbody tr:nth-of-type(odd) {
+  background-color: #f2f2f2;
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+  background-color: #e6f7ff;
+}
+
+.styled-table tbody tr:hover {
+  background-color: #b3e5fc;
+}
+
+.styled-table td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
 .spell-sprite {
   border-radius: 0.3rem;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-}
-
-tbody tr:nth-of-type(odd) {
-  background-color: rgba(0, 0, 0, 0.391);
 }
 </style>

@@ -1,6 +1,8 @@
-import axios from "axios";
-import { defineComponent } from "vue";
+/// <reference types="../../node_modules/.vue-global-types/vue_3.5_false.d.ts" />
+import apiClient from '@/apiClient';
 import { UPDATE_SPELL_OWNED_URL } from "@/constants/api";
+import debounce from "lodash.debounce";
+import { defineComponent } from "vue";
 export default defineComponent({
     props: {
         spells: {
@@ -13,39 +15,38 @@ export default defineComponent({
         },
         showOwnedColumn: {
             type: Boolean,
-            default: false,
+            required: true,
         },
         missingSpells: {
             type: Array,
-            default: () => [],
+            required: true,
         },
     },
-    emits: ["spell-updated"], // Define the custom event
+    emits: ["spell-updated"],
     setup(props, { emit }) {
-        // Determine if a spell is owned by the character
         const isSpellOwned = (spellId) => {
             return !props.missingSpells?.some((spell) => spell.id === spellId);
         };
-        // Handle checkbox state change
-        const handleCheckboxChange = async (spell, isChecked) => {
-            console.log("handleCheckBoxChange triggered");
+        const handleCheckboxChange = async (spell) => {
             try {
-                await axios.post(UPDATE_SPELL_OWNED_URL, {
+                await apiClient.post(UPDATE_SPELL_OWNED_URL, {
                     spellId: spell.id,
                     characterId: props.characterId,
-                    owned: isChecked,
+                    isChecked: spell.owned,
                 });
                 emit("spell-updated", {
                     spellId: spell.id,
-                    owned: isChecked,
+                    owned: spell.owned,
                     characterId: props.characterId,
                 });
             }
             catch (error) {
                 console.error("Error updating spell ownership:", error);
+                spell.owned = !spell.owned; // Revert the checkbox state
             }
         };
-        return { isSpellOwned, handleCheckboxChange };
+        const debouncedHandleCheckboxChange = debounce(handleCheckboxChange, 500);
+        return { isSpellOwned, debouncedHandleCheckboxChange };
     },
 });
 ; /* PartiallyEnd: #3632/script.vue */
@@ -112,11 +113,11 @@ function __VLS_template() {
             const __VLS_13 = __VLS_resolvedLocalAndGlobalComponents.VCheckbox;
             /** @type { [typeof __VLS_components.VCheckbox, typeof __VLS_components.vCheckbox, ] } */
             // @ts-ignore
-            const __VLS_14 = __VLS_asFunctionalComponent(__VLS_13, new __VLS_13({ ...{ 'onChange': {} }, inputValue: ((__VLS_ctx.isSpellOwned(spell.id))), color: ("primary"), }));
-            const __VLS_15 = __VLS_14({ ...{ 'onChange': {} }, inputValue: ((__VLS_ctx.isSpellOwned(spell.id))), color: ("primary"), }, ...__VLS_functionalComponentArgsRest(__VLS_14));
+            const __VLS_14 = __VLS_asFunctionalComponent(__VLS_13, new __VLS_13({ ...{ 'onChange': {} }, modelValue: ((spell.owned)), color: ("primary"), }));
+            const __VLS_15 = __VLS_14({ ...{ 'onChange': {} }, modelValue: ((spell.owned)), color: ("primary"), }, ...__VLS_functionalComponentArgsRest(__VLS_14));
             let __VLS_19;
             const __VLS_20 = {
-                onChange: ((value) => __VLS_ctx.handleCheckboxChange(spell, value))
+                onChange: (() => __VLS_ctx.debouncedHandleCheckboxChange(spell))
             };
             let __VLS_16;
             let __VLS_17;

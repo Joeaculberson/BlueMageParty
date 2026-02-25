@@ -1,6 +1,7 @@
+/// <reference types="../../../node_modules/.vue-global-types/vue_3.5_false.d.ts" />
 import { defineComponent, watch, ref, reactive } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import axios from "axios";
+import apiClient from '@/apiClient';
 import { GET_CHARACTER_BY_LOADSTONE_ID_URL, REFRESH_CHARACTER_DATA_FROM_LOADSTONE_URL, GET_MOCK_PARTY_FROM_CHARACTER_IDS_URL } from "@/constants/api";
 import { useCharacterStore } from "@/stores/characterStore";
 import { useAuthStore } from "@/stores/authStore";
@@ -53,7 +54,7 @@ export default defineComponent({
             .some((character) => character.loadstoneCharacterId === route.params.loadstoneCharacterId);
         const getCharacterDetails = async () => {
             try {
-                const response = await axios.get(GET_CHARACTER_BY_LOADSTONE_ID_URL, {
+                const response = await apiClient.get(GET_CHARACTER_BY_LOADSTONE_ID_URL, {
                     params: { loadstoneCharacterId: route.params.loadstoneCharacterId },
                 });
                 if (response.data) {
@@ -80,7 +81,7 @@ export default defineComponent({
                 return null;
             }
             try {
-                const response = await axios.get(GET_MOCK_PARTY_FROM_CHARACTER_IDS_URL, {
+                const response = await apiClient.get(GET_MOCK_PARTY_FROM_CHARACTER_IDS_URL, {
                     params: { characterIds },
                     paramsSerializer: (params) => {
                         return characterIds.map((id) => `characterIds=${id}`).join("&");
@@ -111,7 +112,7 @@ export default defineComponent({
         const refreshCharacterData = async () => {
             loading.value = true;
             try {
-                const response = await axios.post(REFRESH_CHARACTER_DATA_FROM_LOADSTONE_URL, {
+                const response = await apiClient.post(REFRESH_CHARACTER_DATA_FROM_LOADSTONE_URL, {
                     Name: character.firstName + " " + character.lastName,
                     Server: character.server,
                 });

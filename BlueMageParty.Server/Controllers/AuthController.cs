@@ -8,6 +8,7 @@ using BlueMageParty.Server.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using BlueMageParty.Server.Data;
+using Microsoft.AspNetCore.Authorization;
 
 [Route("api/auth")]
 [ApiController]
@@ -16,6 +17,7 @@ public class AuthController : ControllerBase
     private readonly string _discordClientId;
     private readonly string _discordClientSecret;
     private readonly string _jwtSecret;
+    private readonly string _frontendUrl;
 
     public BlueMagePartyContext _context;
     private readonly IConfiguration _configuration;
@@ -28,6 +30,7 @@ public class AuthController : ControllerBase
         _discordClientSecret = this._configuration["Discord:ClientSecret"];
         _discordClientId = this._configuration["DiscordClientKey"];
         _jwtSecret = this._configuration["LoginSettings:JWTSecurityKey"];
+        _frontendUrl = this._configuration["FrontendUrl"];
     }
 
     [HttpPost("discord/callback")]
@@ -40,7 +43,7 @@ public class AuthController : ControllerBase
         tokenRequest.AddParameter("client_secret", _discordClientSecret);
         tokenRequest.AddParameter("grant_type", "authorization_code");
         tokenRequest.AddParameter("code", request.Code);
-        tokenRequest.AddParameter("redirect_uri", "http://localhost:3000/auth/discord/callback");
+        tokenRequest.AddParameter("redirect_uri", _frontendUrl + "/auth/discord/callback");
 
         var tokenResponse = await client.ExecuteAsync(tokenRequest);
         if (!tokenResponse.IsSuccessful)

@@ -1,5 +1,6 @@
+/// <reference types="../../node_modules/.vue-global-types/vue_3.5_false.d.ts" />
 import { ref } from 'vue';
-import axios from 'axios';
+import apiClient from '@/apiClient';
 import { useAuthStore } from '@/stores/authStore';
 import { SAVE_SPELLS_BULK_URL, GET_TARO_BOKOKINGWAY_MISSING_SPELLS_URL, } from '@/constants/api';
 export default (await import('vue')).defineComponent({
@@ -13,7 +14,7 @@ export default (await import('vue')).defineComponent({
         const fetchAndSaveSpells = async () => {
             try {
                 // Fetch the spell data from the external API
-                const response = await axios.get(GET_TARO_BOKOKINGWAY_MISSING_SPELLS_URL);
+                const response = await apiClient.get(GET_TARO_BOKOKINGWAY_MISSING_SPELLS_URL);
                 const spellsToSave = response.data.map((spell) => ({
                     number: spell.order,
                     name: spell.name,
@@ -34,7 +35,7 @@ export default (await import('vue')).defineComponent({
                     }),
                 }));
                 // Send the spells data in bulk to the server
-                const bulkResponse = await axios.post(SAVE_SPELLS_BULK_URL, spellsToSave, {
+                const bulkResponse = await apiClient.post(SAVE_SPELLS_BULK_URL, spellsToSave, {
                     headers: {
                         'Content-Type': 'application/json',
                     },

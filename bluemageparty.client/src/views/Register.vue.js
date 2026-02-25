@@ -1,6 +1,7 @@
+/// <reference types="../../node_modules/.vue-global-types/vue_3.5_false.d.ts" />
 import { defineComponent, ref } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
+import apiClient from '@/apiClient';
 import { REGISTER_URL } from "@/constants/api";
 import { useAuthStore } from '@/stores/authStore';
 import { emailRule, passwordRule, confirmPasswordRule } from '@/utils/validationRules';
@@ -26,7 +27,7 @@ export default defineComponent({
                 if (isVerifying.value)
                     return; // Prevent double clicks
                 isVerifying.value = true;
-                const response = await axios.post(REGISTER_URL, {
+                const response = await apiClient.post(REGISTER_URL, {
                     email: email.value,
                     password: password.value,
                 });

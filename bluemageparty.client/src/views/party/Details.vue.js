@@ -1,5 +1,6 @@
+/// <reference types="../../../node_modules/.vue-global-types/vue_3.5_false.d.ts" />
 import { defineComponent, ref, onMounted, computed, watch } from "vue";
-import axios from "axios";
+import apiClient from '@/apiClient';
 import { useRoute } from "vue-router";
 import { useAuthStore } from "@/stores/authStore";
 import SpellComparison from "@/components/SpellComparison.vue";
@@ -30,7 +31,7 @@ export default defineComponent({
         const getPartyDetails = async () => {
             loading.value = true;
             try {
-                const response = await axios.get(GET_PARTY_DETAILS_URL, {
+                const response = await apiClient.get(GET_PARTY_DETAILS_URL, {
                     params: { partyId: route.params.partyId },
                 });
                 if (response.data) {
@@ -71,7 +72,7 @@ export default defineComponent({
                 return;
             searchLoading.value = true;
             try {
-                const response = await axios.get(SEARCH_DATABASE_CHARACTERS_URL, {
+                const response = await apiClient.get(SEARCH_DATABASE_CHARACTERS_URL, {
                     params: { query: searchQuery.value, partyId: party.value.id },
                 });
                 characters.value = response.data.map((char) => ({
@@ -110,12 +111,12 @@ export default defineComponent({
             }
             try {
                 // Fetch missing spells for the character
-                const response = await axios.get(GET_MISSING_SPELLS_URL, {
+                const response = await apiClient.get(GET_MISSING_SPELLS_URL, {
                     params: { characterId: character.id },
                 });
                 const missingSpells = response.data;
                 // Add the character to the party via API
-                const addResponse = await axios.post(ADD_PARTY_MEMBER_URL, {
+                const addResponse = await apiClient.post(ADD_PARTY_MEMBER_URL, {
                     characterId: character.id,
                     partyId: party.value.id,
                 });

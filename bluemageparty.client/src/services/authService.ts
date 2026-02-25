@@ -1,4 +1,4 @@
-import axios from "axios";
+import apiClient from '@/apiClient';
 
 const VITE_API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const DISCORD_CLIENT_ID = import.meta.env.VITE_DISCORD_CLIENT_ID;
@@ -13,7 +13,7 @@ export const redirectToDiscord = () => {
 
 export const handleDiscordCallback = async (code: string) => {
   try {
-    const response = await axios.post(
+    const response = await apiClient.post(
       VITE_API_BASE_URL + "/auth/discord/callback",
       { code }
     );

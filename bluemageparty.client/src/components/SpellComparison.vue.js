@@ -1,7 +1,8 @@
+/// <reference types="../../node_modules/.vue-global-types/vue_3.5_false.d.ts" />
 import { defineComponent, ref, watch } from 'vue';
 import { useCharacterStore } from '@/stores/characterStore';
 import { useRouter } from "vue-router";
-import axios from "axios";
+import apiClient from '@/apiClient';
 import { REMOVE_PARTY_MEMBER_URL } from '@/constants/api';
 import { useAuthStore } from '@/stores/authStore';
 export default defineComponent({
@@ -82,21 +83,26 @@ export default defineComponent({
         };
         const handleSpellUpdate = async (data) => {
             try {
-                if (!props.party || !props.party.partyMembers) {
-                    console.error('Party or partyMembers is undefined');
+                const { spellId, owned, characterId } = data;
+                // Find the party member whose spell is being updated
+                const member = props.party.partyMembers.find((member) => member.character.id === characterId);
+                if (!member) {
+                    console.error("Member not found");
                     return;
                 }
-                const { spellId, owned, characterId } = data;
-                const member = props.party.partyMembers.find((member) => member.character.id === data.characterId);
+                // Update the missingSpells array for the member
                 if (owned) {
+                    // Remove the spell from missingSpells if it's now owned
                     member.character.missingSpells = member.character.missingSpells.filter((spell) => spell.id !== spellId);
                 }
                 else {
+                    // Add the spell to missingSpells if it's no longer owned
                     const spell = props.party.spells.find((s) => s.id === spellId);
                     if (spell) {
                         member.character.missingSpells.push(spell);
                     }
                 }
+                // Emit the event to update the parent component
                 emit('update-everyone-needs');
             }
             catch (error) {
@@ -107,7 +113,7 @@ export default defineComponent({
             if (!memberId)
                 return;
             try {
-                const response = await axios.delete(REMOVE_PARTY_MEMBER_URL, {
+                const response = await apiClient.delete(REMOVE_PARTY_MEMBER_URL, {
                     params: { Id: memberId }
                 });
                 const updatedPartyMembers = props.party.partyMembers.filter((member) => member.id !== memberId);

@@ -32,8 +32,13 @@
         </v-row>
       </v-card-text>
       <v-container v-else>
-        <SpellTable :spells="filteredSpells" :character-id="characterStore.getVerifiedCharacters()[0]?.id"
-          :show-owned-column="characterStore.getVerifiedCharacters().length > 0" @spell-updated="handleSpellUpdate" />
+        <SpellTable 
+          :spells="filteredSpells" 
+          :character-id="characterStore.getVerifiedCharacters()[0]?.id"
+          :show-owned-column="characterStore.getVerifiedCharacters().length > 0" 
+          :missing-spells="missingSpells"
+          @spell-updated="handleSpellUpdate" 
+        />
       </v-container>
     </div>
   </v-container>
@@ -41,11 +46,33 @@
 
 <script lang="ts">
 import SpellTable from "@/components/SpellTable.vue";
-import { ref, computed, onMounted, watch } from 'vue';
-import axios from 'axios';
+import { ref, computed, onMounted } from 'vue';
+import apiClient from '@/apiClient';
 import { useAuthStore } from '@/stores/authStore';
+import { watch } from 'vue';
 import { useCharacterStore } from '@/stores/characterStore';
-import { GET_SPELLS_URL } from '@/constants/api';
+import {
+  GET_SPELLS_URL,
+  GET_MISSING_SPELLS_URL
+} from '@/constants/api';
+
+interface MissingSpell {
+  id: string;
+  number: number;
+  name: string | null;
+  description: string | null;
+  tooltip: string | null;
+  order: number;
+  rank: number;
+  patch: string | null;
+  icon: string | null;
+  typeName: string | null;
+  aspectName: string | null;
+  isSolo: boolean;
+  isLightParty: boolean;
+  isFullParty: boolean;
+  sources: any[] | null;
+}
 
 interface Spell {
   id: string;
@@ -60,83 +87,81 @@ interface Spell {
   type: { id: number; name: string };
   aspect: { id: number; name: string };
   sources: { enemy: string; location: string }[];
-  owned: boolean; // Track checkbox state
+  owned: boolean;
   isSolo: boolean;
   isLightParty: boolean;
   isFullParty: boolean;
-}
-
-interface Filters {
-  isSolo: boolean;
-  isLightParty: boolean;
-  isFullParty: boolean;
-  hideOwned: boolean;
 }
 
 export default {
   name: 'SpellManager',
   components: {
-    SpellTable,
+    SpellTable
   },
   setup() {
     const characterStore = useCharacterStore();
-    const authStore = useAuthStore();
     const alertType = ref<'success' | 'error' | 'info'>('info');
     const adminMessage = ref('');
     const isAdmin = ref(false);
-    const spells = ref<Spell[]>([]); // Store spells here
+    const spells = ref<Spell[]>([]);
     const isLoading = ref(false);
+    const authStore = useAuthStore();
     const currentUserId = authStore.getUserId();
-    const filters = ref<Filters>({
-      isSolo: true, // Start checked
-      isLightParty: true, // Start checked
-      isFullParty: true, // Start checked
-      hideOwned: true, // Start checked
+    const missingSpells = ref<MissingSpell[]>([]);
+    const filters = ref({
+      isSolo: true,
+      isLightParty: true,
+      isFullParty: true,
+      hideOwned: true
     });
 
     const filteredSpells = computed(() => {
       return spells.value.filter((spell) => {
-        // Check if the spell matches any of the selected party types
         const matchesPartyType =
           (filters.value.isSolo && spell.isSolo) ||
           (filters.value.isLightParty && spell.isLightParty) ||
           (filters.value.isFullParty && spell.isFullParty);
 
-        // Check if the spell should be hidden based on ownership
         const matchesOwnership = !filters.value.hideOwned || !spell.owned;
 
-        // Only include the spell if it matches at least one party type and the ownership filter
         return matchesPartyType && matchesOwnership;
       });
     });
 
-    // Handle spell ownership updates
     const handleSpellUpdate = (data: { spellId: string; owned: boolean }) => {
-      const spell = spells.value.find((s) => s.id === data.spellId);
-      if (spell) {
-        spell.owned = data.owned;
+      // Update the spells array to reflect the new owned status
+      const spellIndex = spells.value.findIndex(spell => spell.id === data.spellId);
+      if (spellIndex !== -1) {
+        spells.value[spellIndex].owned = data.owned;
       }
     };
 
-    // Fetch the list of spells
     const getSpells = async () => {
       if (!isLoading.value) {
         isLoading.value = true;
         try {
-          const characterId =
-            characterStore.getVerifiedCharacters().length > 0
-              ? characterStore.getVerifiedCharacters()[0].id
-              : undefined;
+          const characterId = characterStore.getVerifiedCharacters()[0]?.id;
+          if (!characterId) return;
 
-          // Fetch spells based on the active character
-          const response = await axios.get<Spell[]>(GET_SPELLS_URL, {
+          // Fetch spells
+          const response = await apiClient.get<Spell[]>(GET_SPELLS_URL, {
             params: { characterId },
           });
 
+          // Fetch missing spells with proper typing
+          const missingSpellsResponse = await apiClient.get<MissingSpell[]>(GET_MISSING_SPELLS_URL, {
+            params: { characterId },
+          });
+
+          // Update missing spells
+          missingSpells.value = missingSpellsResponse.data;
+
+          // Initialize spells with owned status
           spells.value = response.data.map((spell) => ({
             ...spell,
-            checked: false, // Initialize checkbox state as false
+            owned: !missingSpells.value.some(missing => missing.id === spell.id)
           }));
+
           alertType.value = 'success';
         } catch (error) {
           alertType.value = 'error';
@@ -150,24 +175,23 @@ export default {
       applyFilters();
     }, { deep: true });
 
-    // Watch for changes to the verified characters and fetch spells when the list changes
     watch(
       () => characterStore.getVerifiedCharacters(),
       (newCharacters) => {
         if (newCharacters.length > 0) {
-          getSpells(); // Only fetch spells when characters are available
+          getSpells();
         }
       },
       { deep: true, immediate: true }
     );
 
-    // Apply filters to the spells
     const applyFilters = () => {
-      spells.value = [...spells.value]; // Forces reactivity update
+      // Force reactivity update
+      spells.value = [...spells.value];
     };
 
     onMounted(() => {
-      //getSpells();
+      // Initialization if needed
     });
 
     return {
@@ -183,6 +207,7 @@ export default {
       filteredSpells,
       applyFilters,
       currentUserId,
+      missingSpells
     };
   },
 };

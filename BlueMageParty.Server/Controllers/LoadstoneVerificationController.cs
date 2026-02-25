@@ -4,6 +4,7 @@ using NetStone;
 using BlueMageParty.Server.Models;
 using BlueMageParty.Server.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
 [Route("api/[controller]")]

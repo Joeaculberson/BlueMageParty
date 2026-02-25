@@ -1,6 +1,7 @@
+/// <reference types="../../node_modules/.vue-global-types/vue_3.5_false.d.ts" />
 import { ref, onMounted, watch } from 'vue';
 import { useAuthStore } from '@/stores/authStore';
-import axios from 'axios';
+import apiClient from '@/apiClient';
 import { useRouter, useRoute } from 'vue-router';
 import { VERIFY_CODE_URL } from '@/constants/api';
 export default (await import('vue')).defineComponent({
@@ -33,7 +34,7 @@ export default (await import('vue')).defineComponent({
                 return; // Prevent double clicks
             isVerifying.value = true;
             try {
-                const response = await axios.post(VERIFY_CODE_URL, { email, code: code.value });
+                const response = await apiClient.post(VERIFY_CODE_URL, { email, code: code.value });
                 //authStore.clearEmail(); // Clear email after verification
                 router.push('/login?verified=true');
             }
