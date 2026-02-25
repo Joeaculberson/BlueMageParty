@@ -1,8 +1,9 @@
+/// <reference types="../../node_modules/.vue-global-types/vue_3.5_false.d.ts" />
 import { defineComponent, onMounted } from 'vue';
 import { handleDiscordCallback } from '@/services/authService';
 import { useAuthStore } from '@/stores/authStore';
 import { useRouter } from 'vue-router';
-import axios from 'axios';
+import apiClient from '@/apiClient';
 import { GET_LOGIN_RESPONSE } from '@/constants/api';
 export default defineComponent({
     name: 'DiscordCallback',
@@ -11,7 +12,7 @@ export default defineComponent({
         const authStore = useAuthStore();
         const getUser = async (token) => {
             try {
-                const response = await axios.get(GET_LOGIN_RESPONSE, {
+                const response = await apiClient.get(GET_LOGIN_RESPONSE, {
                     params: { jwt: token },
                 });
                 if (response.data) {

@@ -7,18 +7,18 @@
         <v-row justify="center" align="center" class="main-content">
             <v-col cols="12" md="8" class="text-center">
                 <!-- Title with Animation -->
-                <h1 class="display-3 font-weight-bold mb-4 animated-title">
+                <h1 class="display-2 display-md-3 font-weight-bold mb-4 animated-title">
                     Blue Mage Party
                 </h1>
 
                 <!-- Subtitle with Animation -->
-                <p class="headline mb-4 animated-subtitle">
+                <p class="subtitle-1 headline-md mb-4 animated-subtitle">
                     The Ultimate Tool for Final Fantasy XIV Blue Mages
                 </p>
 
                 <!-- Centered Image -->
                 <div class="image-container">
-                    <img width="450px" src="@/assets/seifer-blue-mage.png" alt="Blue Mage" />
+                    <img :src="blueMageImage" alt="Blue Mage" width="450px" class="responsive-image" />
                 </div>
             </v-col>
         </v-row>
@@ -26,23 +26,23 @@
         <!-- Features Section -->
         <v-row class="features-section">
             <v-col cols="12" md="4" class="text-center">
-                <v-icon color="#2064c4" size="64" class="mb-4">mdi-account-plus</v-icon>
+                <v-icon color="#2064c4" size="48" class="mb-2">mdi-account-plus</v-icon>
                 <h2 class="title mb-2">Claim Your Character</h2>
-                <p class="body-1">
+                <p class="body-2">
                     Start by claiming a character from the Lodestone. You can claim multiple characters if needed.
                 </p>
             </v-col>
             <v-col cols="12" md="4" class="text-center">
-                <v-icon color="#2064c4" size="64" class="mb-4">mdi-book-open</v-icon>
+                <v-icon color="#2064c4" size="48" class="mb-2">mdi-book-open</v-icon>
                 <h2 class="title mb-2">Mark Your Spells</h2>
-                <p class="body-1">
+                <p class="body-2">
                     Use the Spell Manager to mark which spells your character has learned.
                 </p>
             </v-col>
             <v-col cols="12" md="4" class="text-center">
-                <v-icon color="#2064c4" size="64" class="mb-4">mdi-account-group</v-icon>
+                <v-icon color="#2064c4" size="48" class="mb-2">mdi-account-group</v-icon>
                 <h2 class="title mb-2">Create a Party</h2>
-                <p class="body-1">
+                <p class="body-2">
                     Add characters to your party to see which spells are missing across the group.
                 </p>
             </v-col>
@@ -55,6 +55,7 @@ import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/authStore';
 import gsap from 'gsap';
+import blueMageImage from '@/assets/seifer-blue-mage.png'; // Import the image
 
 export default {
     name: 'Home',
@@ -68,29 +69,31 @@ export default {
                 router.push('/character/search');
             }
 
-            // GSAP Animations
-            gsap.from('.animated-title', {
-                duration: 1.5,
-                y: -50,
-                opacity: 0,
-                ease: 'power3.out',
-            });
+            // Only run animations on non-mobile devices
+            if (window.innerWidth > 768) {
+                gsap.from('.animated-title', {
+                    duration: 1.5,
+                    y: -50,
+                    opacity: 0,
+                    ease: 'power3.out',
+                });
 
-            gsap.from('.animated-subtitle', {
-                duration: 1.5,
-                y: 50,
-                opacity: 0,
-                ease: 'power3.out',
-                delay: 0.5,
-            });
+                gsap.from('.animated-subtitle', {
+                    duration: 1.5,
+                    y: 50,
+                    opacity: 0,
+                    ease: 'power3.out',
+                    delay: 0.5,
+                });
 
-            gsap.from('.features-section', {
-                duration: 1.5,
-                y: 50,
-                opacity: 0,
-                ease: 'power3.out',
-                delay: 1.5,
-            });
+                gsap.from('.features-section', {
+                    duration: 1.5,
+                    y: 50,
+                    opacity: 0,
+                    ease: 'power3.out',
+                    delay: 1.5,
+                });
+            }
         });
 
         const navigateToDashboard = () => {
@@ -99,15 +102,15 @@ export default {
 
         return {
             navigateToDashboard,
+            blueMageImage, // Return the imported image
         };
     },
 };
 </script>
-
 <style scoped>
 .home-page {
     position: relative;
-    height: 100vh;
+    min-height: 100vh;
     overflow: hidden;
 }
 
@@ -132,45 +135,66 @@ export default {
 }
 
 .main-content {
-    height: 40vh; /* Adjusted height to accommodate the image */
+    height: 50vh; /* Adjusted height for mobile */
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #2064c4; /* Set text color to #2064c4 */
-    background: rgba(255, 255, 255, 0.9); /* Light background for contrast */
-    backdrop-filter: blur(5px); /* Optional: Add a blur effect */
-    padding: 20px; /* Add some padding */
+    color: #2064c4;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(5px);
+    padding: 20px;
 }
 
 .image-container {
     display: flex;
-    justify-content: center; /* Center the image horizontally */
-    align-items: center; /* Center the image vertically */
+    justify-content: center;
+    align-items: center;
+}
+
+.responsive-image {
+    max-width: 100%;
+    height: auto;
 }
 
 .features-section {
-    padding: 50px 0;
-    background: rgba(255, 255, 255, 0.9); /* Light background for contrast */
+    padding: 20px 0; /* Reduced padding for mobile */
+    background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(10px);
     border-radius: 15px;
-    margin: 20px auto; /* Centered horizontally */
-    width: 90%; /* Adjusted width */
-    max-width: 1200px; /* Maximum width for larger screens */
-    color: #2064c4; /* Set text color to #2064c4 */
+    margin: 20px auto;
+    width: 90%;
+    max-width: 1200px;
+    color: #2064c4;
 }
 
 .animated-title {
-    color: #2064c4; /* Set title color to #2064c4 */
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add subtle shadow */
+    color: #2064c4;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 2.5rem; /* Smaller font size for mobile */
 }
 
 .animated-subtitle {
-    color: #2064c4; /* Set subtitle color to #2064c4 */
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Optional: Add subtle shadow */
+    color: #2064c4;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    font-size: 1.2rem; /* Smaller font size for mobile */
 }
 
-.animated-button {
-    margin-top: 20px;
-    color: white; /* Set button text color to white for contrast */
+/* Media Queries for Mobile */
+@media (max-width: 768px) {
+    .main-content {
+        height: 60vh; /* Adjusted height for smaller screens */
+    }
+
+    .animated-title {
+        font-size: 2rem; /* Even smaller font size for very small screens */
+    }
+
+    .animated-subtitle {
+        font-size: 1rem;
+    }
+
+    .features-section {
+        padding: 10px 0; /* Further reduced padding for very small screens */
+    }
 }
 </style>

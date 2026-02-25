@@ -1,28 +1,26 @@
-import SpellTable from "@/components/SpellTable.vue";
-import { ref, computed, onMounted, watch } from 'vue';
-import axios from 'axios';
+/// <reference types="../../node_modules/.vue-global-types/vue_3.5_false.d.ts" />
+import { ref, computed, onMounted } from 'vue';
+import apiClient from '@/apiClient';
 import { useAuthStore } from '@/stores/authStore';
+import { watch } from 'vue';
 import { useCharacterStore } from '@/stores/characterStore';
 import { GET_SPELLS_URL } from '@/constants/api';
 export default (await import('vue')).defineComponent({
     name: 'SpellManager',
-    components: {
-        SpellTable,
-    },
     setup() {
         const characterStore = useCharacterStore();
-        const authStore = useAuthStore();
         const alertType = ref('info');
         const adminMessage = ref('');
         const isAdmin = ref(false);
         const spells = ref([]); // Store spells here
         const isLoading = ref(false);
+        const authStore = useAuthStore();
         const currentUserId = authStore.getUserId();
         const filters = ref({
             isSolo: true, // Start checked
             isLightParty: true, // Start checked
             isFullParty: true, // Start checked
-            hideOwned: true, // Start checked
+            hideOwned: true // Start checked
         });
         const filteredSpells = computed(() => {
             return spells.value.filter((spell) => {
@@ -38,10 +36,8 @@ export default (await import('vue')).defineComponent({
         });
         // Handle spell ownership updates
         const handleSpellUpdate = (data) => {
-            const spell = spells.value.find((s) => s.id === data.spellId);
-            if (spell) {
-                spell.owned = data.owned;
-            }
+            // console.log("Spell ownership updated:", data);
+            // Update the spells array if needed
         };
         // Fetch the list of spells
         const getSpells = async () => {
@@ -52,9 +48,10 @@ export default (await import('vue')).defineComponent({
                         ? characterStore.getVerifiedCharacters()[0].id
                         : undefined;
                     // Fetch spells based on the active character
-                    const response = await axios.get(GET_SPELLS_URL, {
+                    const response = await apiClient.get(GET_SPELLS_URL, {
                         params: { characterId },
                     });
+                    console.log(response);
                     spells.value = response.data.map((spell) => ({
                         ...spell,
                         checked: false, // Initialize checkbox state as false
@@ -79,7 +76,7 @@ export default (await import('vue')).defineComponent({
         }, { deep: true, immediate: true });
         // Apply filters to the spells
         const applyFilters = () => {
-            spells.value = [...spells.value]; // Forces reactivity update
+            spells.value = spells.value.map(spell => ({ ...spell })); // Forces reactivity update
         };
         onMounted(() => {
             //getSpells();
@@ -104,9 +101,6 @@ export default (await import('vue')).defineComponent({
 function __VLS_template() {
     const __VLS_ctx = {};
     const __VLS_localComponents = {
-        ...{
-            SpellTable,
-        },
         ...{},
         ...{},
         ...__VLS_ctx,
@@ -240,8 +234,8 @@ function __VLS_template() {
             const __VLS_99 = __VLS_resolvedLocalAndGlobalComponents.SpellTable;
             /** @type { [typeof __VLS_components.SpellTable, ] } */
             // @ts-ignore
-            const __VLS_100 = __VLS_asFunctionalComponent(__VLS_99, new __VLS_99({ ...{ 'onSpellUpdated': {} }, spells: ((__VLS_ctx.filteredSpells)), characterId: ((__VLS_ctx.characterStore.getVerifiedCharacters()[0]?.id)), showOwnedColumn: ((__VLS_ctx.characterStore.getVerifiedCharacters().length > 0)), }));
-            const __VLS_101 = __VLS_100({ ...{ 'onSpellUpdated': {} }, spells: ((__VLS_ctx.filteredSpells)), characterId: ((__VLS_ctx.characterStore.getVerifiedCharacters()[0]?.id)), showOwnedColumn: ((__VLS_ctx.characterStore.getVerifiedCharacters().length > 0)), }, ...__VLS_functionalComponentArgsRest(__VLS_100));
+            const __VLS_100 = __VLS_asFunctionalComponent(__VLS_99, new __VLS_99({ ...{ 'onSpellUpdated': {} }, spells: ((__VLS_ctx.filteredSpells)), characterId: ((__VLS_ctx.characterStore.getVerifiedCharacters()[0]?.id)), showOwnedColumn: ((__VLS_ctx.characterStore.getVerifiedCharacters().length > 0)), missingSpells: (([])), }));
+            const __VLS_101 = __VLS_100({ ...{ 'onSpellUpdated': {} }, spells: ((__VLS_ctx.filteredSpells)), characterId: ((__VLS_ctx.characterStore.getVerifiedCharacters()[0]?.id)), showOwnedColumn: ((__VLS_ctx.characterStore.getVerifiedCharacters().length > 0)), missingSpells: (([])), }, ...__VLS_functionalComponentArgsRest(__VLS_100));
             let __VLS_105;
             const __VLS_106 = {
                 onSpellUpdated: (__VLS_ctx.handleSpellUpdate)

@@ -1,5 +1,6 @@
 ﻿using BlueMageParty.Server.Data;
 using BlueMageParty.Server.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NetStone;
 using NetStone.Model.Parseables.Character;

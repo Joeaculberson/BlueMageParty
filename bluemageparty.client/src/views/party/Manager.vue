@@ -9,9 +9,16 @@
         <v-card>
           <v-card-title class="text-h5">Create a Party</v-card-title>
           <v-card-text>
-            <v-text-field v-model="partyName" label="Enter party name"
-              :disabled="characterStore.getVerifiedCharacters().length == 0" maxlength="255" counter outlined
-              dense></v-text-field>
+            <v-text-field
+              v-model="partyName"
+              label="Enter party name"
+              :disabled="characterStore.getVerifiedCharacters().length == 0"
+              maxlength="255"
+              counter
+              outlined
+              dense
+              @keyup.enter="createParty"
+            ></v-text-field>
           </v-card-text>
           <v-card-actions>
             <v-btn @click="createParty" :disabled="!partyName" color="blue" class="w-full">
@@ -36,8 +43,7 @@
       </v-col>
 
       <!-- No Parties Found Message -->
-      <v-col cols="12" v-else-if="hostedParties.length === 0 && guestOfParties.length === 0"
-        class="text-center grey--text">
+      <v-col cols="12" v-else-if="hostedParties.length === 0 && guestOfParties.length === 0" class="text-center grey--text">
         No parties found.
       </v-col>
 
@@ -83,7 +89,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
-import axios from "axios";
+import apiClient from '@/apiClient';
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/authStore";
 import { useCharacterStore } from "@/stores/characterStore";
@@ -127,7 +133,7 @@ export default defineComponent({
     const getUsersParties = async () => {
       loading.value = true;
       try {
-        const response = await axios.get<GetPartiesResponse>(GET_PARTIES_BY_USER_ID_URL, {
+        const response = await apiClient.get<GetPartiesResponse>(GET_PARTIES_BY_USER_ID_URL, {
           params: { authToken: authStore.getAuthToken() }
         });
 
@@ -144,7 +150,7 @@ export default defineComponent({
       if (!partyName.value) return;
 
       try {
-        const response = await axios.post<CreatePartyResponse>(CREATE_PARTY_URL, {
+        const response = await apiClient.post<CreatePartyResponse>(CREATE_PARTY_URL, {
           authToken: authStore.getAuthToken(),
           characterId: characterStore.getVerifiedCharacters()[0].id,
           partyName: partyName.value
@@ -170,7 +176,7 @@ export default defineComponent({
 
     const deleteParty = async (partyId: string) => {
       try {
-        await axios.delete(DELETE_PARTY_URL, { params: { partyId } });
+        await apiClient.delete(DELETE_PARTY_URL, { params: { partyId } });
         hostedParties.value = hostedParties.value.filter((p) => p.id !== partyId);
       } catch (error) {
         console.error("Error deleting party:", error);

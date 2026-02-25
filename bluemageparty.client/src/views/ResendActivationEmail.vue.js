@@ -1,6 +1,7 @@
+/// <reference types="../../node_modules/.vue-global-types/vue_3.5_false.d.ts" />
 import { ref } from 'vue';
 import { useAuthStore } from '@/stores/authStore';
-import axios from 'axios';
+import apiClient from '@/apiClient';
 import { RESEND_ACTIVATION_EMAIL_URL } from '@/constants/api';
 import { useRouter } from 'vue-router';
 export default (await import('vue')).defineComponent({
@@ -26,7 +27,7 @@ export default (await import('vue')).defineComponent({
                 return; // Prevent double clicks
             isVerifying.value = true;
             try {
-                const response = await axios.post(RESEND_ACTIVATION_EMAIL_URL, { email: email.value });
+                const response = await apiClient.post(RESEND_ACTIVATION_EMAIL_URL, { email: email.value });
                 // Store email in Pinia (authStore)
                 authStore.setEmail(email.value);
                 alertType.value = 'success';

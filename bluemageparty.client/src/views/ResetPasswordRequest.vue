@@ -29,7 +29,7 @@
   
   <script lang="ts">
   import { ref } from 'vue';
-  import axios from 'axios';
+  import apiClient from '@/apiClient';
   import { RESET_PASSWORD_REQUEST_URL } from '@/constants/api';
   import { useAuthStore } from '@/stores/authStore';
   import { emailRule } from '@/utils/validationRules';
@@ -55,7 +55,7 @@
         isVerifying.value = true;
   
         try {
-          const response = await axios.post<ResetPasswordResponse>(RESET_PASSWORD_REQUEST_URL, { email: email.value });
+          const response = await apiClient.post<ResetPasswordResponse>(RESET_PASSWORD_REQUEST_URL, { email: email.value });
   
           // Store email in Pinia
           authStore.setEmail(email.value);

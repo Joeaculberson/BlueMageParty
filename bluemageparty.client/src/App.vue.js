@@ -1,3 +1,4 @@
+/// <reference types="../node_modules/.vue-global-types/vue_3.5_false.d.ts" />
 import { ref, computed, defineComponent } from 'vue'; // Added defineComponent and computed
 import { useRouter } from 'vue-router'; // Added useRouter
 import Navbar from './components/Navbar.vue';

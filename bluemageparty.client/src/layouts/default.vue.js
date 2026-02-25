@@ -1,3 +1,5 @@
+/// <reference types="../../node_modules/.vue-global-types/vue_3.5_false.d.ts" />
+//
 const { defineProps, defineSlots, defineEmits, defineExpose, defineModel, defineOptions, withDefaults, } = await import('vue');
 //
 ; /* PartiallyEnd: #3632/scriptSetup.vue */
